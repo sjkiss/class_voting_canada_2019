@@ -76,3 +76,5 @@ ces88<-set_value_labels(ces88,
 #check
 ces88$degree
 ces88$male
+
+#february 4
