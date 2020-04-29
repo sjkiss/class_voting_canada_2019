@@ -74,25 +74,28 @@ names(ces.list)<-c('1993', '1997')
 
 #Start with the list
 ces.list %>% 
+  #Bind the rows, making a new variable called survey that will be populated with the names of the list items
   bind_rows(., .id="survey") ->ces
+#Do a summary
 summary(ces)
 #Check the names
 names(ces)
 
 #You see how this has *all* the variables from both 1993 and 1997. 
 #So here we just select out names variables that we want. 
-#Nicely because bind_rows creates missing values in list items that *do not* have shared values, we will end up with a complete set of variables for all data frames. 
 ces %>% 
   select(c("union", "degree", "survey"))-> ces
-ces
-ces.list %>% 
-  map(function(x) glm(union~degree, data=x)) %>% 
-  map(broom::tidy) %>% 
-  bind_rows()
-  
+
+  ###This fits a couple of logistic regression models
+#Start with the dataframe we made from the lists
 ces %>% 
+  #The data variables are union and degree, the variable survey will be the nesting variable
   nest(data=c('union', 'degree')) %>% 
+  #mutate the data frame making a new variable called mod
+  # This new variable will contain teh results of the glm model union on degree
   mutate(mod=map(data, ~glm(.$union~.$degree, family="binomial"))) %>% 
+  #mutate the data frame again adding the results from this  model fit 
 mutate(results=map(mod, broom::tidy)) %>% 
+  #Unnest the new variable results 
   unnest(results)
 
