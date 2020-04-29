@@ -96,19 +96,20 @@ look_for(ces84, "occupation")
 ces84 %>% 
   mutate(sector=case_when(
     VAR530==13 ~1,
-    VAR526> 2710 & VAR526 < 2800 ~ 1,
+      VAR526> 2710 & VAR526 < 2800 ~ 1,
     VAR526> 3129 & VAR526 < 3136 ~ 1,
     VAR530==99 ~NA_real_ ,
     TRUE ~ 0
   ))->ces84
 
 val_labels(ces84$sector)<-c(Private=0, Public=1)
+ces84$sector
 #checks
-table(ces84$VAR530, ces84$sector)
-ces84 %>% 
-  filter(VAR526>2710 & VAR526< 3000) %>% 
-  filter(VAR526>3129 & VAR526< 3136) %>%
-  select(VAR526, sector) %>% 
+table(as_factor(ces84$VAR530), as_factor(ces84$sector))
+# ces84 %>% 
+#   filter(VAR526>2710 & VAR526< 3000) %>% 
+#   filter(VAR526>3129 & VAR526< 3136) %>%
+#   select(VAR526, sector) 
 
 val_labels(ces84$sector)
 table(ces84$sector)

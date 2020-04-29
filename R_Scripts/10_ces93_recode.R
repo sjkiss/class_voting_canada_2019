@@ -49,7 +49,7 @@ table(ces93$degree)
 #recode Region (CPSPROV)
 look_for(ces93, "province")
 ces93$region<-Recode(ces93$CPSPROV, "0:3=1; 5=2; 6:9=3; 4=NA")
-val_labelsces93$(region)<-c(Atlantic=1, Ontario=2, West=3)
+val_labels(ces93$region)<-c(Atlantic=1, Ontario=2, West=3)
 #checks
 val_labels(ces93$region)
 table(ces93$region)
