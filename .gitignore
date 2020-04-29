@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 /Data/*.sav
+/income_quintiles/*
