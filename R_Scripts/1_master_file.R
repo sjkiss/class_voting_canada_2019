@@ -38,18 +38,156 @@ ces0411 %>%
 
 ces0411 %>% 
   select(contains("union"))
-### Can you go through and get ces04, ces06, ces08, and ces11. 
+
+### Can you go through and get ces04, ces06, ces08, and ces11.
 #To maximize the sample size, I think we want to get respondents who filled out the CPS, MBS, PES and WBS, right
 #I am not sure to do with the respondents who filled out both the 04 and 06 surveys. On the one hand there are 400 of them, which is a lot. On the other hand, they are kind of an inadvertent panel 
 #Fuck it let's keep them in.
 #Here's what will happen:
 ### Filter them in to each of the ces04 and the ces06. 
 ###Then, in the ces04 dataframe, there will be a  union04 and a union06 variable, right?
+
 #### STEP 3 RENAMING VARIABLES
 
 ### This is how we will rename the variables in each data frame.. removing the years. 
+
+###CES04
+
+ces0411 %>% 
+  filter(survey=="CPS04 PES04 MBS04")->ces04
+
+ces04 %>% 
+  rename(union_both=union_both06)->ces04
+ces04 %>% 
+  rename(union=union06)->ces04
+ces04 %>% 
+  rename(degree=degree04)->ces04
+ces04 %>% 
+  rename(region=region04)->ces04
+ces04 %>% 
+  rename(quebec=quebec04)->ces04
+ces04 %>% 
+  rename(age=age04)->ces04
+ces04 %>% 
+  rename(religion=religion04)->ces04
+ces04 %>% 
+  rename(language=language04)->ces04
+ces04 %>% 
+  rename(employment=employment04)->ces04
+ces04 %>% 
+  rename(sector=sector04)->ces04
+ces04 %>% 
+  rename(party_id=party_id04)->ces04
+ces04 %>% 
+  rename(vote=vote04)->ces04
+ces04 %>% 
+  rename(occupation=occupation04)->ces04
+ces04 %>% 
+  rename(income=income04)->ces04
+
+#CES06
+
+ces0411 %>% 
+  filter(survey=="CPS06 PES06")->ces06
+
 ces06 %>% 
-  rename(union=union_both06)->ces06
+  rename(union_both=union_both06)->ces06
+ces06 %>% 
+  rename(union=union06)->ces06
+ces06 %>% 
+  rename(degree=degree06)->ces06
+ces06 %>% 
+  rename(region=region06)->ces06
+ces06 %>% 
+  rename(quebec=quebec06)->ces06
+ces06 %>% 
+  rename(age=age06)->ces06
+ces06 %>% 
+  rename(religion=religion06)->ces06
+ces06 %>% 
+  rename(language=language06)->ces06
+ces06 %>% 
+  rename(employment=employment06)->ces06
+ces06 %>% 
+  rename(sector=sector06)->ces06
+ces06 %>% 
+  rename(vote=vote06)->ces06
+ces06 %>% 
+  rename(party_id=party_id06)->ces06
+ces06 %>% 
+  rename(occupation=occupation06)->ces06
+ces06 %>% 
+  rename(income=income06)->ces06
+
+###CES08
+
+ces0411 %>% 
+  filter(survey=="CPS08 PES08 MBS08")->ces08
+
+ces08 %>% 
+  rename(union_both=union_both06)->ces08
+ces08 %>% 
+  rename(union=union06)->ces08
+ces08 %>% 
+  rename(degree=degree08)->ces08
+ces08 %>% 
+  rename(region=region08)->ces08
+ces08 %>% 
+  rename(quebec=quebec08)->ces08
+ces08 %>% 
+  rename(age=age08)->ces08
+ces08 %>% 
+  rename(religion=religion08)->ces08
+ces08 %>% 
+  rename(language=language08)->ces08
+ces08 %>% 
+  rename(employment=employment08)->ces08
+ces08 %>% 
+  rename(sector=sector08)->ces08
+ces08 %>% 
+  rename(party_id=party_id08)->ces08
+ces08 %>% 
+  rename(vote=vote08)->ces08
+ces08 %>% 
+  rename(occupation=occupation08)->ces08
+ces08 %>% 
+  rename(income=income08)->ces08
+
+###CES11
+
+ces0411 %>% 
+  filter(survey=="CPS11 PES11 MBS11 WBS11")->ces11
+
+ces11 %>% 
+  rename(union_both=union_both06)->ces11
+ces11 %>% 
+  rename(union=union06)->ces11
+ces11 %>% 
+  rename(degree=degree11)->ces11
+ces11 %>% 
+  rename(region=region11)->ces11
+ces11 %>% 
+  rename(quebec=quebec11)->ces11
+ces11 %>% 
+  rename(age=age11)->ces11
+ces11 %>% 
+  rename(religion=religion11)->ces11
+ces11 %>% 
+  rename(language=language11)->ces11
+ces11 %>% 
+  rename(employment=employment11)->ces11
+ces11 %>% 
+  rename(sector=sector11)->ces11
+ces11 %>% 
+  rename(party_id=party_id11)->ces11
+ces11 %>% 
+  rename(vote=vote11)->ces11
+ces11 %>% 
+  rename(occupation=occupation11)->ces11
+ces11 %>% 
+  rename(income=income11)->ces11
+
+
 
 ######REJOINING THE FILES
 ### Ultimately we're going to join the data frames like this. 
