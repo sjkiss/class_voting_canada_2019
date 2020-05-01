@@ -12,8 +12,11 @@ source(here("R_Scripts/11_ces97_recode.R"))
 source(here("R_Scripts/12_ces00_recode.R"))
 source(here("R_Scripts/13_ces0411_recode.R"))
 source(here("R_Scripts/14_ces15_recode.R"))
+
 #####SPLITTING THE 04-11 FILE
+
 ### STEP 1
+
 ### The next thing to do would be to split the 2004-2011 file into separate files
 ### I don't think we want to mess around with the panel data
 ### I made a survey variable when we started
@@ -28,22 +31,26 @@ ces0411 %>%
   arrange(desc(n)) %>% 
   #print all the rows
   print(n=69)
+
 #### STEP 2 FILTERING
+
 #This is how we filter out the the specific survey years into separate surveys. 
 ###CES04
 
 ces0411 %>% 
-  filter(survey=="CPS04 PES04 MBS04" | survey=="CPS04 PES04")->ces04
+  filter(survey=="CPS04 PES04 MBS04" | survey=="CPS04 PES04"| survey=="CPS04"| survey=="CPS04 PES04 MBS04 CPS06 PES06" | survey=="CPS04 PES04 CPS06 PES06")->ces04
 
 ### CES06
-ces0411 %>% 
-  filter(survey=="CPS06 PES06"| survey=="CPS06 PES06" | survey=="CPS04 PES04 MBS04 CPS06 PES06" | survey=="CPS04 PES04 CPS06 PES06")->ces06
+ces0411 %>%  
+  filter(survey=="CPS06"| survey=="CPS06 PES06" | survey=="CPS04 PES04 MBS04 CPS06 PES06" | survey=="CPS04 PES04 CPS06 PES06")->ces06
 
 ### CES08
+ces0411 %>% 
+  filter(survey=="CPS08 PES08 MBS08"| survey=="CPS08 PES08" | survey=="CPS08")->ces08
 
 ### CES11
-
-
+ces0411 %>% 
+  filter(survey=="New RDD_2011 CPS11 PES11"| survey=="New RDD_2011 CPS11" | survey=="New RDD_2011 CPS11 PES11 MBS11" | survey=="New RDD_2011 CPS11 PES11 MBS11 WBS11")->ces11
 
 ### Can you go through and get ces04, ces06, ces08, and ces11.
 #To maximize the sample size, I think we want to get respondents who filled out the CPS, MBS, PES and WBS, right
@@ -57,6 +64,7 @@ ces0411 %>%
 
 ### This is how we will rename the variables in each data frame.. removing the years. 
 
+### CES04
 
 ces04 %>% 
   rename(union_both=union_both06)->ces04
@@ -87,10 +95,7 @@ ces04 %>%
 ces04 %>% 
   rename(income=income04)->ces04
 
-#CES06
-
-ces0411 %>% 
-  filter(survey=="CPS06 PES06")->ces06
+### CES06
 
 ces06 %>% 
   rename(union_both=union_both06)->ces06
@@ -123,9 +128,6 @@ ces06 %>%
 
 ###CES08
 
-ces0411 %>% 
-  filter(survey=="CPS08 PES08 MBS08")->ces08
-
 ces08 %>% 
   rename(union_both=union_both06)->ces08
 ces08 %>% 
@@ -157,9 +159,6 @@ ces08 %>%
 
 ###CES11
 
-ces0411 %>% 
-  filter(survey=="CPS11 PES11 MBS11 WBS11")->ces11
-
 ces11 %>% 
   rename(union_both=union_both06)->ces11
 ces11 %>% 
@@ -189,8 +188,7 @@ ces11 %>%
 ces11 %>% 
   rename(income=income11)->ces11
 
-
-
+-------------------------------------------------------------------------------------------
 ######REJOINING THE FILES
 ### Ultimately we're going to join the data frames like this. 
 
