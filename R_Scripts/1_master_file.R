@@ -30,14 +30,20 @@ ces0411 %>%
   print(n=69)
 #### STEP 2 FILTERING
 #This is how we filter out the the specific survey years into separate surveys. 
+###CES04
 
 ces0411 %>% 
-  filter(survey=="CPS06 PES06")->ces06
-#You can combine with the | operator | survey=="CPS06 PES06 MBS)6
-#You can also do it by testing for the occurrence of a string
+  filter(survey=="CPS04 PES04 MBS04" | survey=="CPS04 PES04")->ces04
 
+### CES06
 ces0411 %>% 
-  select(contains("union"))
+  filter(survey=="CPS06 PES06"| survey=="CPS06 PES06" | survey=="CPS04 PES04 MBS04 CPS06 PES06" | survey=="CPS04 PES04 CPS06 PES06")->ces06
+
+### CES08
+
+### CES11
+
+
 
 ### Can you go through and get ces04, ces06, ces08, and ces11.
 #To maximize the sample size, I think we want to get respondents who filled out the CPS, MBS, PES and WBS, right
@@ -51,10 +57,6 @@ ces0411 %>%
 
 ### This is how we will rename the variables in each data frame.. removing the years. 
 
-###CES04
-
-ces0411 %>% 
-  filter(survey=="CPS04 PES04 MBS04")->ces04
 
 ces04 %>% 
   rename(union_both=union_both06)->ces04
