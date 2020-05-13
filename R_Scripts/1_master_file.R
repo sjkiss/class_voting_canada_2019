@@ -309,7 +309,7 @@ mutate(results=map(mod, broom::tidy)) %>%
   ces %>% 
     # form groups by election year
     group_by(election) %>% 
-    # summarize each variable by summing, removing any missing values
+    # summarize each variable by summing the number of values athat are missing (is.na(.))
     summarize_all(funs(sum(is.na(.))))
 
   #Check the union_both variable
