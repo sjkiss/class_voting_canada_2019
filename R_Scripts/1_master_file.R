@@ -21,6 +21,7 @@ source(here("R_Scripts/14_ces15_recode.R"))
 ### I don't think we want to mess around with the panel data
 ### I made a survey variable when we started
 table(ces0411$survey)
+names(ces0411)
 ##This code groups by the survey variable
 ces0411 %>% 
   #make gtroups
@@ -36,7 +37,6 @@ ces0411 %>%
 
 #This is how we filter out the the specific survey years into separate surveys. 
 ###CES04
-
 ces0411 %>% 
   filter(survey=="CPS04 PES04 MBS04" | survey=="CPS04 PES04"| survey=="CPS04"| survey=="CPS04 PES04 MBS04 CPS06 PES06" | survey=="CPS04 PES04 CPS06 PES06")->ces04
 
@@ -206,7 +206,11 @@ names(ces93)
 ces.list<-list(ces65, ces68, ces72_nov, ces74, ces74b, ces79, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone, ces19phone)
 #WE are going to name each item in the list
 names(ces.list)<-c('1965', '1968', '1972', '1980', '1974', '1979', '1984', '1988', '1993', '1997', '2000', '2004', '2006', '2008', '2011', '2015', '2019')
-
+# 
+# str(ces.list)
+# str(ces.list$`2019`)
+# ces.list%>%
+#   map(., ncol)
 #bind_rows binds the rows of each element in the list together
 #.id="survey"creates a new variable called "survey" and its values are the names of the list items. 
 
@@ -214,7 +218,7 @@ names(ces.list)<-c('1965', '1968', '1972', '1980', '1974', '1979', '1984', '1988
 #Start with the list
 ces.list %>% 
   #Bind the rows, making a new variable called survey that will be populated with the names of the list items
-  bind_rows(., .id="survey") ->ces
+  bind_rows(., .id="election") ->ces
 #Do a summary
 summary(ces)
 #Check the names
@@ -222,11 +226,32 @@ names(ces)
 
 #You see how this has *all* the variables from both 1993 and 1997. 
 #So here we just select out names variables that we want. 
-ces %>% 
-  select(c("union", "degree", "survey"))-> ces
+# ces %>% 
+  # select(c("union", "degree", "survey"))-> ces
 
 ces %>% 
-  select(c("male", "union_both", "union", "degree", "region", "quebec", "age", "religion", "language", "employment", "sector", "party_id", "vote", "occupation", "income"))-> ces
+  select(c("male", 
+           "union_both",
+           "union", 
+           "degree", 
+           "region", 
+           "quebec", 
+      #     "age", 
+           "religion",
+           "language", 
+           "employment", 
+           "sector",
+           "party_id", 
+           "vote", 
+           "occupation" 
+       #    "income")
+      ))-> ces
+##
+
+
+library(stringr)
+table(str_detect(names(ces0411), "survey"))
+table(str_detect(names(ces00), "survey"))
 
 
   ###This fits a couple of logistic regression models
