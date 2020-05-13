@@ -1,4 +1,6 @@
 library(here)
+here()
+here("R_Scripts/2_ces65_recode.R")
 source(here("R_Scripts/2_ces65_recode.R"))
 source(here("R_Scripts/3_ces68_recode.R"))
 source(here("R_Scripts/4_ces72_nov_recode.R"))
@@ -12,6 +14,7 @@ source(here("R_Scripts/11_ces97_recode.R"))
 source(here("R_Scripts/12_ces00_recode.R"))
 source(here("R_Scripts/13_ces0411_recode.R"))
 source(here("R_Scripts/14_ces15_recode.R"))
+source(here("R_Scripts/14_ces19_recode.R"))
 
 #####SPLITTING THE 04-11 FILE
 
@@ -35,22 +38,22 @@ ces0411 %>%
 
 #### STEP 2 FILTERING
 
-#This is how we filter out the the specific survey years into separate surveys. 
+#Panels not added but the rest have been
 ###CES04
 ces0411 %>% 
-  filter(survey=="CPS04 PES04 MBS04" | survey=="CPS04 PES04"| survey=="CPS04"| survey=="CPS04 PES04 MBS04 CPS06 PES06" | survey=="CPS04 PES04 CPS06 PES06")->ces04
+  filter(survey=="CPS04 PES04 MBS04" | survey=="CPS04 PES04" | survey=="CPS04 PES04 MBS04 CPS06 PES06" | survey=="CPS04 PES04 CPS06 PES06" | survey=="CPS04 PES04 CPS06" | survey=="CPS04 PES04 MBS04 CPS06" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 CPS06 PES06 CPS11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 CPS11" | survey=="CPS04 PES04 MBS04 CPS06 CPS11" | survey=="CPS04 PES04 CPS06 CPS11 PES11" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 MBS04 CPS06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 CPS06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11 WBS11")->ces04
 
 ### CES06
 ces0411 %>%  
-  filter(survey=="CPS06"| survey=="CPS06 PES06" | survey=="CPS04 PES04 MBS04 CPS06 PES06" | survey=="CPS04 PES04 CPS06 PES06")->ces06
+  filter(survey=="CPS06 PES06" | survey=="CPS04 PES04 MBS04 CPS06 PES06" | survey=="CPS04 PES04 CPS06 PES06" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 CPS06 PES06 CPS11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11 WBS11")->ces06
 
 ### CES08
 ces0411 %>% 
-  filter(survey=="CPS08 PES08 MBS08"| survey=="CPS08 PES08" | survey=="CPS08")->ces08
+  filter(survey=="CPS08 PES08 MBS08" | survey=="CPS08 PES08")->ces08
 
 ### CES11
 ces0411 %>% 
-  filter(survey=="New RDD_2011 CPS11 PES11"| survey=="New RDD_2011 CPS11" | survey=="New RDD_2011 CPS11 PES11 MBS11" | survey=="New RDD_2011 CPS11 PES11 MBS11 WBS11")->ces11
+  filter(survey=="New RDD_2011 CPS11 PES11" | survey=="New RDD_2011 CPS11" | survey=="New RDD_2011 CPS11 PES11 MBS11" | survey=="New RDD_2011 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 CPS11 PES11" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 MBS04 CPS06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 CPS06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11 WBS11")->ces11
 
 ### Can you go through and get ces04, ces06, ces08, and ces11.
 #To maximize the sample size, I think we want to get respondents who filled out the CPS, MBS, PES and WBS, right
@@ -206,6 +209,26 @@ names(ces93)
 ces.list<-list(ces65, ces68, ces72_nov, ces74, ces74b, ces79, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone, ces19phone)
 #WE are going to name each item in the list
 names(ces.list)<-c('1965', '1968', '1972', '1980', '1974', '1979', '1984', '1988', '1993', '1997', '2000', '2004', '2006', '2008', '2011', '2015', '2019')
+#removing election files
+rm(ces00)
+rm(ces04)
+rm(ces0411)
+rm(ces06)
+rm(ces08)
+rm(ces11)
+rm(ces15phone)
+rm(ces65)
+rm(ces68)
+rm(ces72_nov)
+rm(ces74)
+rm(ces74b)
+rm(ces79)
+rm(ces84)
+rm(ces88)
+rm(ces93)
+rm(ces97)
+rm(ces19phone)
+
 # 
 # str(ces.list)
 # str(ces.list$`2019`)
@@ -236,18 +259,16 @@ ces %>%
            "degree", 
            "region", 
            "quebec", 
-      #     "age", 
+           "age", 
            "religion",
            "language", 
            "employment", 
            "sector",
            "party_id", 
            "vote", 
-           "occupation" 
-       #    "income")
-      ))-> ces
+           "occupation",
+          "income") )-> ces
 ##
-
 
 library(stringr)
 table(str_detect(names(ces0411), "survey"))
