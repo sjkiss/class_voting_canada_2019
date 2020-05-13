@@ -251,6 +251,7 @@ names(ces)
 #So here we just select out names variables that we want. 
 # ces %>% 
   # select(c("union", "degree", "survey"))-> ces
+###We forgot to include the new variable "election" in what is selected.
 
 ces %>% 
   select(c("male", 
@@ -267,19 +268,25 @@ ces %>%
            "party_id", 
            "vote", 
            "occupation",
-          "income") )-> ces
+          "income", "election") )-> ces
 ##
 
 library(stringr)
 table(str_detect(names(ces0411), "survey"))
 table(str_detect(names(ces00), "survey"))
 
+names(ces)
+table(ces$union)
 
-  ###This fits a couple of logistic regression models
+####
+
+
+
+###This fits a couple of logistic regression models
 #Start with the dataframe we made from the lists
 ces %>% 
-  #The data variables are union and degree, the variable survey will be the nesting variable
-  nest(data=c('union', 'degree')) %>% 
+  group_by(election) %>% 
+nest(data=c("union", "degree")) %>% 
   #mutate the data frame making a new variable called mod
   # This new variable will contain teh results of the glm model union on degree
   mutate(mod=map(data, ~glm(.$union~.$degree, family="binomial"))) %>% 
@@ -288,3 +295,23 @@ mutate(results=map(mod, broom::tidy)) %>%
   #Unnest the new variable results 
   unnest(results)
 
+  
+  ### Trouble-shoot the errors
+#Start with CES  
+  ces %>% 
+    # form groups by election year
+    group_by(election) %>% 
+    # summarize each variable by summing, removing any missing values
+    summarize_all(sum, na.rm=T)
+
+  ####So somehow, there are a lot of values scattered throughout where the recodes resulted only in cases of zero; i.e. no one is a union member in 1965. And none of the     ### Trouble-shoot the errors
+  #Start with CES  
+  ces %>% 
+    # form groups by election year
+    group_by(election) %>% 
+    # summarize each variable by summing, removing any missing values
+    summarize_all(funs(sum(is.na(.))))
+
+  #Check the union_both variable
+  table(ces$union_both)
+table(ces$union_both, ces$election)  
