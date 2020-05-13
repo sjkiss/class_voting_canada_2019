@@ -22,6 +22,20 @@ val_labels(ces15phone$union)<-c(None=0, Union=1)
 val_labels(ces15phone$union)
 table(ces15phone$union)
 
+#recode Union Combined (PES15_93 and PES15_94)
+ces15phone %>% 
+  mutate(union_both11=case_when(
+    PES15_93==1 | PES15_94==1 ~ 1,
+    PES15_93==5 | PES15_94==5 ~ 0,
+    PES15_93==8 | PES15_94==9 ~ NA_real_,
+    PES15_93==8 | PES15_94==9 ~ NA_real_,
+  ))->ces15phone
+
+val_labels(ces15phone$union_both)<-c(None=0, Union=1)
+#checks
+val_labels(ces15phone$union_both)
+table(ces15phone$union_both)
+
 #recode Education (CPS15_79)
 look_for(ces15phone, "education")
 ces15phone$degree<-Recode(ces15phone$CPS15_79, "9:11=1; 1:8=0; else=NA")

@@ -49,10 +49,13 @@ val_labels(ces19phone$quebec)
 table(ces19phone$quebec)
 
 #recode Age (age)
+##Just use underlying age variable
+#no missing values apparent
 look_for(ces19phone, "age")
-ces19phone$age<-ces19phone$age
-#check
-table(ces19phone$age)
+# ces19phone$age<-ces19phone$age
+# summary(ces19phone$age)
+# #check
+# table(ces19phone$age)
 
 #recode Religion (q62)
 look_for(ces19phone, "relig")

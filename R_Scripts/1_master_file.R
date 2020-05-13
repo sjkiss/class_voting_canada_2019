@@ -203,9 +203,10 @@ names(ces93)
 #I *think* that this is the quickest way forward. 
 
 ##We are going to make a list of each survey
-ces.list<-list(ces93, ces97)
+ces.list<-list(ces65, ces68, ces72_nov, ces74, ces74b, ces79, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone, ces19phone)
 #WE are going to name each item in the list
-names(ces.list)<-c('1993', '1997')
+names(ces.list)<-c('1965', '1968', '1972', '1980', '1974', '1979', '1984', '1988', '1993', '1997', '2000', '2004', '2006', '2008', '2011', '2015', '2019')
+
 #bind_rows binds the rows of each element in the list together
 #.id="survey"creates a new variable called "survey" and its values are the names of the list items. 
 
@@ -223,6 +224,10 @@ names(ces)
 #So here we just select out names variables that we want. 
 ces %>% 
   select(c("union", "degree", "survey"))-> ces
+
+ces %>% 
+  select(c("male", "union_both", "union", "degree", "region", "quebec", "age", "religion", "language", "employment", "sector", "party_id", "vote", "occupation", "income"))-> ces
+
 
   ###This fits a couple of logistic regression models
 #Start with the dataframe we made from the lists
