@@ -14,7 +14,7 @@ source(here("R_Scripts/11_ces97_recode.R"))
 source(here("R_Scripts/12_ces00_recode.R"))
 source(here("R_Scripts/13_ces0411_recode.R"))
 source(here("R_Scripts/14_ces15_recode.R"))
-source(here("R_Scripts/14_ces19_recode.R"))
+source(here("R_Scripts/15_ces19_recode.R"))
 
 #####SPLITTING THE 04-11 FILE
 
@@ -70,9 +70,9 @@ ces0411 %>%
 ### CES04
 
 ces04 %>% 
-  rename(union_both=union_both06)->ces04
+  rename(union_both=union_both04)->ces04
 ces04 %>% 
-  rename(union=union06)->ces04
+  rename(union=union04)->ces04
 ces04 %>% 
   rename(degree=degree04)->ces04
 ces04 %>% 
@@ -132,9 +132,9 @@ ces06 %>%
 ###CES08
 
 ces08 %>% 
-  rename(union_both=union_both06)->ces08
+  rename(union_both=union_both08)->ces08
 ces08 %>% 
-  rename(union=union06)->ces08
+  rename(union=union08)->ces08
 ces08 %>% 
   rename(degree=degree08)->ces08
 ces08 %>% 
@@ -163,9 +163,9 @@ ces08 %>%
 ###CES11
 
 ces11 %>% 
-  rename(union_both=union_both06)->ces11
+  rename(union_both=union_both11)->ces11
 ces11 %>% 
-  rename(union=union06)->ces11
+  rename(union=union11)->ces11
 ces11 %>% 
   rename(degree=degree11)->ces11
 ces11 %>% 
