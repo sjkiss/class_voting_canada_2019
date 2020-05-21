@@ -3,14 +3,17 @@ load("Data/recoded_cesdata.Rdata")
 library(tidyverse)
 ##### SPLITTING THE 1979-1980 FILE
 look_for(ces79, "filter")
-
+table(ces7980$male80)
+names(ces7980)
+names(ces93)
+tail(names(ces0411))
 ces7980 %>% 
   filter(V4002==1)->ces79
 ces7980 %>% 
   filter(V4008==1)->ces80
 options(max.print=1500)
 names(ces80)
-
+names(ces7980)
 ### We have all of the demographic variables from the ces79 questions stored in the ces80 data set. 
 ##Show this
 table(ces80$male)

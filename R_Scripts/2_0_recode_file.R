@@ -1,18 +1,29 @@
 #This loads the raw data installed in Simon's cesdata package
 #These are direct files with no recodes; they've only been renamed to be things like ces65, ces79, etc.
 #Uncomment if updates must be installed
-#remotes::install_github("sjkiss/cesdata")
+#remotes::install_github("sjkiss/cesdata", force=T)
+data()
+
 library(cesdata)
+
 library(tidyverse)
 library(car)
 library(labelled)
 #Some checks
+
 nrow(ces65)==2118
 nrow(ces74)==2562
 nrow(ces7980)==2761
 nrow(ces84)==3377
 nrow(ces88)==3609
+####Check that the datasets do not contain the recoded variable names
+tail(names(ces84))
+tail(names(ces0411))
+tail(names(ces15phone))
 
+## Note: If it appears that the loaded datasets include recoded variable names at this point you may  neee do uncomment the next line, and run it once
+#rm(list = ls(all.names = TRUE)) #will clear all objects includes hidden objects.
+#### and then go back up and re-run the code, not re-running the rm() line above again. 
 #load the here() library
 library(here)
 ###How to use the here()package
@@ -38,6 +49,10 @@ source(here("R_Scripts/2_13_ces15_recode.R"))
 source(here("R_Scripts/2_14_ces19_recode.R"))
 
 #This saves the ojbects that we 
-save(ces65, ces68, ces72_nov, ces74, ces79, ces84, ces88, ces93, ces97, ces00, ces0411, ces15phone, ces19web, ces19phone, file="Data/recoded_cesdata.Rdata")
+save(ces65, ces68, ces72_nov, ces74, ces7980, ces84, ces88, ces93, ces97, ces00, ces0411, ces15phone, ces19web, ces19phone, file="Data/recoded_cesdata.Rdata")
+
 #now clear everything out
 rm(list=ls())
+
+## Detach package "cesdata"
+detach("package:cesdata")
