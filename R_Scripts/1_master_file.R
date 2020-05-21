@@ -1,8 +1,8 @@
 ##load recoded ces files
 load("Data/recoded_cesdata.Rdata")
 library(tidyverse)
+library(labelled)
 ##### SPLITTING THE 1979-1980 FILE
-look_for(ces79, "filter")
 table(ces7980$male80)
 names(ces7980)
 names(ces93)
