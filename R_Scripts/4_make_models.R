@@ -85,43 +85,47 @@ ces %>%
   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Percent of Low Income Voting NDP")
 
 
-
-## Let's just fit a binomial logistic regression of being a union member by degree
-
-model1<-glm(ndp~union, data=ces, family="binomial")
-summary(model1)
-str(model1)
+##Let's make some models
+## Let's just fit a binomial logistic regression of voting NDP by union membership
 #To model the NDPO we need to create a dichotomous NDP variable 
 # I would do it this way, but I am curious where you found the way that you did it. 
-
 ces$ndp<-car::Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
 ndp_model<-glm(ndp~union, data=ces, family="binomial")
 
+summary(ndp_model)
+str(ndp_model)
 
-##Let's make some models
-
-## There are two ways to check the impact of time.
-##I prefer this way
 ##broom is a package that aids in the reporting of models
-
-
+## https://cran.r-project.org/web/packages/broom/vignettes/broom.html
 
 library(broom)
+#AS always start witht hte data frame
 ces %>% 
+  #form the groups of interest
   group_by(election) %>% 
+  #we need to filter out years where there are missing variables
   filter(election!=1965 & election!=1968) %>%  
+  #nest all the other data columns into "list columns", one for each election (group)
   nest() %>% 
   #mutate adds a new column called models
-  #To create that we are mapping onto each instance of data the function that follows 
+  #To create that we are mapping onto each instance of the column data the function that follows 
   mutate(mods=map(data, function(x) glm(ndp~union, data=x, family="binomial")), 
+         #Then we are using the tidy function applied to the new column mods to tidy up those models
+         #and storing everything into an object called models
          tidied=map(mods, tidy)) -> models
 #take a look at models
 head(models)
+#as always start with the data frame and pipe
 models %>% 
+  #unnest takes the tidied column and spreads it out for viewing
   unnest(tidied) %>% 
+  #filter only the union coefficients
   filter(term=="union") %>% 
+  #plot
   ggplot(., aes(x=election,y=estimate ))+geom_point()+labs(title="Logit Coefficients of voting NDP vote by union")
 
+#we can save that plot 
+ggsave(here("Plots", "union_ndp_coefficients.png"))
 ##Lots of functions to print regression tables
 library(stargazer)
 ##stargazer works best with the untidied models
@@ -129,6 +133,18 @@ stargazer(models$mods, type="text")
 #Can also output models as an html file
 stargazer(models$mods, type="html", out=here("Tables", "union_models.html"))
 
+#How to print the exponentiated
+#The tidy function has a lot of useful functions
+#Because we have the object models that has the models already stored, we can just run tidy on them
+#As always start with the data frame
+models %>% 
+  #mutate adds a new column
+  mutate(odds=map(mods, function(x) tidy(x, exponentiate=T)))->models
+head(models)
+
+#compare
+models$tidied[1]
+models$odds[1]
 ### How to add an interaction
 ces %>% 
   group_by(election) %>% 
@@ -137,6 +153,7 @@ ces %>%
   nest() %>% 
   mutate(mods=map(data, function(x) glm(ndp~union+sector+union:sector, data=x, family="binomial")), 
          tidied=map(mods, tidy)) -> interaction_models
+interaction_models
 table(ces$election, ces$sector)
 #take a look at models
 head(interaction_models)
@@ -153,6 +170,21 @@ interaction_models %>%
   filter(term=="union:sector") %>% 
   ggplot(., aes(x=election,y=estimate ))+geom_point()+labs(title="Interaction Coefficients for sector and union")
 
+
+### How to subset groups (i.e. income)
+ces %>% 
+  filter(income==1 & election!=1965&election!=1968) %>% 
+  group_by(election) %>% 
+  nest() %>% 
+  mutate(mods=map(data, function(x) glm(ndp~union+income, data=x, family="binomial")))->poor_models
+
+ces %>% 
+  filter(election!=1965& election!=1968) %>% 
+  group_by(election) %>% 
+  nest() %>% 
+  #Remember income is stored as a number, need to turn it into a factor on the fly
+  mutate(mods=map(data, function(x) glm(ndp~union+as.factor(income), data=x, family="binomial")))->poor_models
+
 ##Lots of functions to print regression tables
 library(stargazer)
 ##stargazer works best with the untidied models
@@ -160,12 +192,3 @@ stargazer(models$mods, type="text")
 #Can also output models as an html file
 stargazer(models$mods, type="html", out=here("Tables", "union_models.html"))
 ##The other way would be to turn the election variable into a series of dichotommous variables. 
-
-## we can do this with pivot_wider
-## I found this crazy code here https://stackoverflow.com/questions/35663580/using-tidyr-spread-function-to-create-columns-with-binary-value
-# 
-# ces %>% 
-# pivot_wider(names_from="election", 
-#             values_from="election", 
-#             values_fill=list(election=0),
-#             values_fn = list(election = ~+(as.logical(length(.))))) ->ces.wide
