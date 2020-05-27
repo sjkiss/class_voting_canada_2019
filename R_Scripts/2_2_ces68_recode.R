@@ -11,9 +11,28 @@ val_labels(ces68$male)<-c(Female=0, Male=1)
 val_labels(ces68$male)
 table(ces68$male)
 
-#No Union Household variable
+#recode Union Household (var363)
+look_for(ces68, "union")
+ces68$union<-Recode(ces68$var363, "1=0; 2:4=1; 5=NA")
+val_labels(ces68$union)<-c(None=0, Union=1)
+#checks
+val_labels(ces68$union)
+table(ces68$union)
 
-#No Union Combined variable
+#recode Union Combined (var363 and var379)
+ces68 %>% 
+  mutate(union_both=case_when(
+    var363==2 | var379==2 ~ 1,
+    var363==3 | var379==3 ~ 1,
+    var363==4 | var379==4 ~ 1,
+    var363==1 | var379==1 ~ 0,
+    var363==5 | var379==5 ~ NA_real_,
+  ))->ces68
+
+val_labels(ces68$union_both)<-c(None=0, Union=1)
+#checks
+val_labels(ces68$union_both)
+table(ces68$union_both)
 
 #recode Education (var334)
 ces68$degree<-Recode(ces68$var334, "17:20=1; 25:26=1; 1:16=0; 21:24=0; 27=0; 30=NA")

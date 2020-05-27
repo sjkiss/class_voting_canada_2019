@@ -10,7 +10,13 @@ val_labels(ces65$male)<-c(Female=0, Male=1)
 val_labels(ces65$male)
 table(ces65$male)
 
-#No Union Household variable
+#recode Union Household (V327)
+look_for(ces65, "union")
+ces65$union<-Recode(ces65$v327, "1=1; 5=0")
+val_labels(ces65$union)<-c(None=0, Union=1)
+#checks
+val_labels(ces65$union)
+table(ces65$union)
 
 #No Union Combined variable
 
