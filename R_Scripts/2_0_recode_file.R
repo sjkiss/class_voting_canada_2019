@@ -17,6 +17,8 @@ nrow(ces7980)==2761
 nrow(ces84)==3377
 nrow(ces88)==3609
 ####Check that the datasets do not contain the recoded variable names
+tail(names(ces65))
+tail(names(ces68))
 tail(names(ces84))
 tail(names(ces0411))
 tail(names(ces15phone))
