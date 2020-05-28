@@ -18,8 +18,12 @@ val_labels(ces65$union)<-c(None=0, Union=1)
 #checks
 val_labels(ces65$union)
 table(ces65$union)
-table(ces65$union, ces65$v327)
-#No Union Combined variable
+
+#Union Combined variable (identical copy of union)
+ces65$union_both<-ces65$union
+#checks
+val_labels(ces65$union_both)
+table(ces65$union_both)
 
 #recode Education (v307)
 look_for(ces65, "school")
