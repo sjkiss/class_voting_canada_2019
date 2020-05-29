@@ -3,6 +3,20 @@ load("Data/recoded_cesdata.Rdata")
 library(tidyverse)
 library(labelled)
 library(here)
+
+
+##### 
+#Checks
+ces %>% 
+  filter(election==1997) %>% 
+  group_by(union, union_both) %>% 
+  summarize(n=n())
+
+ces %>% 
+  filter(election==1968) %>% 
+  group_by(union, union_both) %>% 
+  summarize(n=n())
+  
 ##### SPLITTING THE 1979-1980 FILE
 table(ces7980$male80)
 names(ces7980)

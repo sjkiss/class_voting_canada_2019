@@ -1,4 +1,4 @@
-#File to Recode 1974b CES Data for 1974 election 
+#File to Recode 1974 CES Data for 1974 election 
 
 #load data
 data("ces74")
@@ -20,10 +20,10 @@ val_labels(ces74$union)
 table(ces74$union)
 
 #Union Combined variable (identical copy of union)
-ces74b$union_both<-ces74b$union
+ces74$union_both<-ces74$union
 #checks
-val_labels(ces74b$union_both)
-table(ces74b$union_both)
+val_labels(ces74$union_both)
+table(ces74$union_both)
 
 #recode Education (V414)
 look_for(ces74, "school")
