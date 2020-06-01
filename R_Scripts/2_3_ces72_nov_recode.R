@@ -57,11 +57,12 @@ table(ces72_nov$age)
 
 #recode Religion (qvii)
 look_for(ces72_nov, "relig")
-ces72_nov$religion<-Recode(ces72_nov$qvii, "0=NA; 1=1; 2=2; 3:5=3")
+ces72_nov$religion<-Recode(ces72_nov$qvii, "0=NA; 1=1; 2=2; 3:4=3; 5=0")
 val_labels(ces72_nov$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 #checks
 val_labels(ces72_nov$religion)
 table(ces72_nov$religion)
+table(ces72_nov$qvii)
 
 #recode Language (qixb)
 look_for(ces72_nov, "language")
