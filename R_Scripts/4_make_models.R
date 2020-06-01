@@ -53,6 +53,8 @@ ces %>%
   mutate(pct=n/sum(n)) %>%
   filter(degree==1& vote==3) %>% 
   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Percent of Degree Holders Voting NDP")
+#we can save that plot 
+ggsave(here("Plots", "percent_ndp_degree.png"))
 
 #Voting NDP by Party ID
 ces %>% 
