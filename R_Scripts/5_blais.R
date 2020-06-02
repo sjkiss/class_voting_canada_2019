@@ -40,15 +40,14 @@ table(ces$election, ces$occupation_345)
 library(tidyverse)
 names(ces)
 #start with data frame and pipe
+
 ces %>% 
   #transforming a new variable so mutate  based on conditions in case_when
   mutate(atlantic=case_when(
     #quebec is the reference case for all and atlantic was 1
-    quebec==0 &region== 1 ~1,
+    region== 1 ~1,
     #if quebec==1 then it doesn't matter what the region variable is, atlantic gets the value 0
-    quebec==1 ~ 0,
-    #all other cases are defined as missing
-    TRUE ~ NA_real_
+    quebec==1 ~ 0
   ))->ces
 #Check
 table(ces$atlantic)#
@@ -62,14 +61,14 @@ table(ces$quebec, ces$atlantic)
 table(ces$quebec, ces$region)
 #all respondents who have 0 on the quebec variable have various values on the other regions
 table(ces$region)
+table(ces$atlantic, ces$ndp, ces$election)
 
 # Ontario
 ces %>% 
   #transforming a new variable so mutate  based on conditions in case_when
   mutate(ontario=case_when(
-    quebec==0 &region== 2 ~1,
+    region== 2 ~1,
     quebec==1 ~ 0,
-    TRUE ~ NA_real_
   ))->ces
 #Check
 table(ces$ontario)
@@ -78,13 +77,37 @@ table(ces$ontario)
 ces %>% 
   #transforming a new variable so mutate  based on conditions in case_when
   mutate(west=case_when(
-    quebec==0 &region== 3 ~1,
-    quebec==1 ~ 0,
-    TRUE ~ NA_real_
+    region== 3 ~1,
+    quebec==1 ~ 0
   ))->ces
+table(ces$region,ces$quebec)
+table(ces$quebec)
 #Check
-table(ces$west)
+table(ces$west, ces$election)
+table(ces$ontario, ces$election)
+table(ces$atlantic, ces$election)
+table(ces$west, ces$ndp)
+table(ces$atlantic, ces$ndp)
+table(ces$ontario, ces$ndp)
+table(ces$quebec, ces$west)
+table(ces$quebec, ces$ontario)
 
+# Create region2
+ces %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces
+ces$region2<-factor(ces$region2, levels=c("Quebec", "Atlantic", "West", "Ontario"))
+levels(ces$region2)
+##Create female variable
+ces %>% 
+  mutate(female=case_when(
+    male==1~0,
+    male==0~1
+  ))->ces
 
 #Info: Missing variable in the following elections:
 #Sector 1965, 68 and 72
@@ -95,30 +118,29 @@ head(ces)
 tail(ces)
 library(broom)
 
-
-
 #------------------------------------------------------------------------------------------------------------
 
 ###Model 1 - Blais replication (all elections with region)
-
+table(ces$election, ces$sector)
 #AS always start witht the data frame
 ces %>% 
   #form the groups of interest
   group_by(election) %>% 
   #we need to filter out years where there are missing variables
-  #filter(election!=1965 & election!=1968) %>%  
+  filter(election!=1965 & election!=1968& election!=1972) %>%  
   #nest all the other data columns into "list columns", one for each election (group)
   nest(variables=-election) %>% 
   #mutate adds a new column called models
   #To create that we are mapping onto each instance of the column data the function that follows 
-  mutate(linear.models1=map(variables, function(x) lm(ndp~region+union_both+age+male+no_religion+catholic, data=x)),
+  mutate(linear.models1=map(variables, function(x) lm(ndp~region2+catholic+no_religion+union_both+age+female+sector, data=x)),
          
          #Then we are using the tidy function applied to the new column mods to tidy up those models
          #and storing everything into an object called models
          
          tidied=map(linear.models1, tidy)
          )->models1
-
+ces$region2
+table(ces$sector)
 #take a look at models
 head(models1)
 models1$linear.models1
@@ -129,22 +151,21 @@ models1 %>%
   #unnest takes the tidied column and spreads it out for viewing
   unnest(tidied) %>% 
   #filter only the union_both coefficients
-  filter(term=="union_both") %>% 
+  filter(term=="sector") %>% 
   #plot
-  ggplot(., aes(x=election,y=estimate ))+geom_point()+labs(title="M1: Linear Coefficients of voting NDP vote by union_both")
+  ggplot(., aes(x=election,y=estimate ))+geom_point()+labs(title="M1: Linear Coefficients of voting NDP by sector")
 
 #we can save that plot 
-ggsave(here("Plots", "M1_union_both&ndp_coefficients.png"))
+ggsave(here("Plots", "M1_ndp_by_sector.png"))
 ##Lots of functions to print regression tables
 
 library(stargazer)
-elections<-c('1965', '1968', '1972', '1974', '1979', '1980', '1984', '1988', '1993', '1997', '2000', '2004', '2006', '2008', '2011', '2015', '2019')
-
+elections<-c( '1974', '1979', '1980', '1984', '1988', '1993', '1997', '2000', '2004', '2006', '2008', '2011', '2015', '2019')
+elections
 ##stargazer works best with the untidied models
-
 stargazer(models1$linear.models1, column.labels=elections, type="text")
 #Can also output models as an html file
-stargazer(models1$linear.models1, column.labels="elections", type="html", out=here("Tables", "M1_Blais_replication.html"))
+stargazer(models1$linear.models1, column.labels=elections, type="html", out=here("Tables", "M1_Blais_replication.html"), digits=2)
 
 #------------------------------------------------------------------------------------------------------------
 ###Model 2 - Blais replication (all elections with Quebec)
