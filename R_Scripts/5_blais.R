@@ -1,23 +1,25 @@
 #Replicating 'The public-private sector cleavage in North America (Blais et al 1990)'
 
 #Run master file to load up data
+#Instead of typing Recode everytime, we can just load the car library here
+library(car)
 
 #To model party voting we need to create party vote dummy variables
-ces$ndp<-car::Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
-ces$liberal<-car::Recode(ces$vote, "1=1; 2:5=0; NA=NA")
-ces$conservative<-car::Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
+ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
+ces$liberal<-Recode(ces$vote, "1=1; 2:5=0; NA=NA")
+ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
 
 #Create other relevant dummy variables (Catholic, no_religion, ndp_id, low income x2, lower occupations)
-ces$catholic<-car::Recode(ces$religion, "1=1; 2:3=0; 0=0; NA=NA")
-ces$no_religion<-car::Recode(ces$religion, "0=1; 1:3=0; NA=NA")
-ces$ndp_id<-car::Recode(ces$party_id, "3=1; 0:2=0; 4:5=0; NA=NA")
-ces$low_income<-car::Recode(ces$income, "1=1; 2:5=0; NA=NA")
-ces$high_income<-car::Recode(ces$income, "1:4=0; 5=1; NA=NA")
-ces$income_12<-car::Recode(ces$income, "1:2=1; 3:5=0; NA=NA")
-ces$income_345<-car::Recode(ces$income, "3:5=1; 1:2=0; NA=NA")
-ces$occupation_12<-car::Recode(ces$occupation, "1:2=1; 3:5=0; NA=NA")
-ces$occupation_345<-car::Recode(ces$occupation, "3:5=1; 1:2=0; NA=NA")
-ces$working_class<-car::Recode(ces$occupation, "5=1; 1:4=0; NA=NA")
+ces$catholic<-Recode(ces$religion, "1=1; 2:3=0; 0=0; NA=NA")
+ces$no_religion<-Recode(ces$religion, "0=1; 1:3=0; NA=NA")
+ces$ndp_id<-Recode(ces$party_id, "3=1; 0:2=0; 4:5=0; NA=NA")
+ces$low_income<-Recode(ces$income, "1=1; 2:5=0; NA=NA")
+ces$high_income<-Recode(ces$income, "1:4=0; 5=1; NA=NA")
+ces$income_12<-Recode(ces$income, "1:2=1; 3:5=0; NA=NA")
+ces$income_345<-Recode(ces$income, "3:5=1; 1:2=0; NA=NA")
+ces$occupation_12<-Recode(ces$occupation, "1:2=1; 3:5=0; NA=NA")
+ces$occupation_345<-Recode(ces$occupation, "3:5=1; 1:2=0; NA=NA")
+ces$working_class<-Recode(ces$occupation, "5=1; 1:4=0; NA=NA")
 
 #new variable checks
 table(ces$election, ces$ndp)
@@ -93,9 +95,7 @@ head(ces)
 tail(ces)
 library(broom)
 
-library(stargazer)
-elections<-c(1965, 1968, 1972, 1974, 1979, 1980, 1984, 1988, 1993, 1997, 2000, 2004, 2006, 2008, 2011, 2015, 2019)
-stargazer(models1, column.labels=elections)
+
 
 #------------------------------------------------------------------------------------------------------------
 
@@ -136,8 +136,12 @@ models1 %>%
 #we can save that plot 
 ggsave(here("Plots", "M1_union_both&ndp_coefficients.png"))
 ##Lots of functions to print regression tables
+
 library(stargazer)
+elections<-c('1965', '1968', '1972', '1974', '1979', '1980', '1984', '1988', '1993', '1997', '2000', '2004', '2006', '2008', '2011', '2015', '2019')
+
 ##stargazer works best with the untidied models
+
 stargazer(models1$linear.models1, column.labels=elections, type="text")
 #Can also output models as an html file
 stargazer(models1$linear.models1, column.labels="elections", type="html", out=here("Tables", "M1_Blais_replication.html"))
