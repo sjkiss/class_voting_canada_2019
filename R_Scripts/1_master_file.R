@@ -296,6 +296,12 @@ names(ces)
 ces$election
 table(ces$union)
 
+library(car)
+#To model party voting we need to create party vote dummy variables
+ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
+ces$liberal<-Recode(ces$vote, "1=1; 2:5=0; NA=NA")
+ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
+
 ####
 #This command calls the file 2_diagnostics.R
 source("R_scripts/3_recode_diagnostics.R", echo=T)
