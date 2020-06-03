@@ -31,15 +31,17 @@ ces %>%
   filter(union==1& vote==3) %>% 
   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Percent of Union Members Voting NDP")
 
-## What is the public/private share of 
+## What is the public/private share of NDP voters
 ces %>% 
-  group_by(election, union, sector) %>% 
+  group_by(election, union, sector,ndp) %>% 
   summarize(n=n()) %>% 
   filter(is.na(sector)==F) %>% 
   filter(is.na(union)==F) %>% 
+  filter(is.na(ndp)==F) %>% 
   mutate(percent=n/sum(n)) %>% 
   filter(union==1) %>% 
-  ggplot(., aes(x=election, y=percent, fill=as_factor(sector)))+geom_col()+labs(title="Share of Public and PRivate sector union respondents in the CES")
+  filter(ndp==1) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(sector)))+geom_col(position="dodge")+labs(title="Share of Public and PRivate sector union respondents voting NDP")
 
 ## Let's check the private / public sector share
 ces %>% 
@@ -56,13 +58,42 @@ ces %>%
   filter(sector==1& vote==3) %>% 
   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Percent of Public Sector Employees voting NDP")
 
-#Voting NDP by degree
+####  Degree status
+#What is the degree status of the Canadian electorate
 ces %>% 
-  group_by(election, degree, vote) %>% 
+  group_by(election,degree) %>% 
   summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)) %>% 
+ggplot(., aes(x=election, y=pct, fill=as.factor(degree)))+geom_col()
+ggsave(here("PLots", "share_degree_ces.png"))
+#Voting Party by degree
+
+#start with data frame and pipe
+ces %>% 
+  #form groups of interest; we want to examine the share of people voting for parties, by degree status for each election
+  group_by(election, degree, vote) %>% 
+  #summrize each group calculating a variable n using the function n()
+  summarize(n=n()) %>% 
+  #mutate the dataframe created above by calculating a new variable called pct which takes the value of each n and dividing it by the sum of n which
   mutate(pct=n/sum(n)) %>%
-  filter(degree==1& vote==3) %>% 
-  ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Percent of Degree Holders Voting NDP")
+  #filter(degree==1& vote==3) %>% 
+  #filter out non-degree holders and include only Liberal, Conservative and NDP voters
+  filter(degree==1 & (vote<4 & vote>0)) %>% 
+  #ggplot
+  #Note that election has to be turned numeric to support the smoothing
+  #x-axis is the election, y is the pct variable created above
+  ggplot(.,aes(x=as.numeric(election), y=pct))+
+  #add points
+  geom_point()+
+  #add the smooth, method=regular linear model, y on x
+  #se=F so that standard error bands are not included
+  geom_smooth(method="lm", se=F)+
+  #make a panel for each party, use as_factor to use the party labels
+  facet_grid(~as_factor(vote))+
+  #Add a title 
+  labs(title="Piketty Plot: Share of Degree holders voting for political parties over time")
+ggsave(here("Plots", "piketty_party_vote_by_degree.png"))
+
 
 #Voting NDP by Party ID
 ces %>% 
