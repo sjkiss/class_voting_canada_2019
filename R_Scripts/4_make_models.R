@@ -31,6 +31,16 @@ ces %>%
   filter(union==1& vote==3) %>% 
   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Percent of Union Members Voting NDP")
 
+## What is the public/private share of 
+ces %>% 
+  group_by(election, union, sector) %>% 
+  summarize(n=n()) %>% 
+  filter(is.na(sector)==F) %>% 
+  filter(is.na(union)==F) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  filter(union==1) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(sector)))+geom_col()+labs(title="Share of Public and PRivate sector union respondents in the CES")
+
 ## Let's check the private / public sector share
 ces %>% 
   group_by(election, vote, sector) %>% 
