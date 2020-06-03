@@ -50,6 +50,8 @@ val_labels(ces7980$language80)<-c(French=0, English=1)
 val_labels(ces7980$language80)
 table(ces7980$language80)
 
+#No Non-Charter Language variable
+
 #No Employment variable
 
 #No Sector variable

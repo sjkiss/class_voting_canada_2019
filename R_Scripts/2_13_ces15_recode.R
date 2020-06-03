@@ -71,13 +71,21 @@ val_labels(ces15phone$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 val_labels(ces15phone$religion)
 table(ces15phone$religion)
 
-#recode Language (CPS15_90)
+#recode Language (CPS15_INTLANG)
 look_for(ces15phone, "language")
-ces15phone$language<-Recode(ces15phone$CPS15_90, "5=0; 1=1; else=NA")
+ces15phone$language<-Recode(ces15phone$CPS15_INTLANG, "5=0; 1=1; else=NA")
 val_labels(ces15phone$language)<-c(French=0, English=1)
 #checks
 val_labels(ces15phone$language)
 table(ces15phone$language)
+
+#recode Non-charter Language (CPS15_90)
+look_for(ces15phone, "language")
+ces15phone$non_charter_language15<-Recode(ces15phone$CPS15_90, "1:5=0; 8:64=1; 65=0; 95:97=1; else=NA")
+val_labels(ces15phone$non_charter_language15)<-c(Charter=0, Non_Charter=1)
+#checks
+val_labels(ces15phone$non_charter_language15)
+table(ces15phone$non_charter_language15)
 
 #recode Employment (CPS15_91)
 look_for(ces15phone, "employment")

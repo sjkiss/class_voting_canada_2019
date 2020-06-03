@@ -34,6 +34,7 @@ table(ces$election, ces$income_12)
 table(ces$election, ces$income_345)
 table(ces$election, ces$occupation_12)
 table(ces$election, ces$occupation_345)
+table(ces$election, ces$working_class)
 
 ### Creating regional dummy variables 
 # Atlantic
@@ -110,7 +111,7 @@ ces %>%
   ))->ces
 
 #Info: Missing variable in the following elections:
-#Sector 1965, 68 and 72
+#Sector 1965 and 1972
 #Occupation 2000 and 2019
 
 #By election
@@ -127,12 +128,12 @@ ces %>%
   #form the groups of interest
   group_by(election) %>% 
   #we need to filter out years where there are missing variables
-  filter(election!=1965 & election!=1968& election!=1972) %>%  
+  filter(election!=1965 & election!=1972 & election!=2000 & election!=2019) %>%  
   #nest all the other data columns into "list columns", one for each election (group)
   nest(variables=-election) %>% 
   #mutate adds a new column called models
   #To create that we are mapping onto each instance of the column data the function that follows 
-  mutate(linear.models1=map(variables, function(x) lm(ndp~region2+catholic+no_religion+union_both+age+female+sector, data=x)),
+  mutate(linear.models1=map(variables, function(x) lm(ndp~region2+catholic+no_religion+working_class+union_both+age+female+sector, data=x)),
          
          #Then we are using the tidy function applied to the new column mods to tidy up those models
          #and storing everything into an object called models
@@ -160,7 +161,7 @@ ggsave(here("Plots", "M1_ndp_by_sector.png"))
 ##Lots of functions to print regression tables
 
 library(stargazer)
-elections<-c( '1974', '1979', '1980', '1984', '1988', '1993', '1997', '2000', '2004', '2006', '2008', '2011', '2015', '2019')
+elections<-c( '1968', '1974', '1979', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015')
 elections
 ##stargazer works best with the untidied models
 stargazer(models1$linear.models1, column.labels=elections, type="text")

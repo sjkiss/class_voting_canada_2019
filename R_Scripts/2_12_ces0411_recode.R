@@ -51,6 +51,7 @@ table( as_factor(ces0411$ces04_CPS_S6B), as_factor(ces0411$union_both04))
 table(as_factor(ces0411$union04), as_factor(ces0411$ces04_CPS_S6B))
 table(as_factor(ces0411$union_both04), as_factor(ces0411$ces04_CPS_S6A))
 table(as_factor(ces0411$union_both04), as_factor(ces0411$ces04_CPS_S6B))
+
 #recode Education (ces04_CPS_S3)
 look_for(ces0411, "education")
 ces0411$degree04<-Recode(ces0411$ces04_CPS_S3, "9:11=1; 1:8=0; else=NA")
@@ -103,13 +104,21 @@ val_labels(ces0411$religion04)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 val_labels(ces0411$religion04)
 table(ces0411$religion04)
 
-#recode Language (ces04_CPS_S17)
+#recode Language (ces04_CPS_INTLANG)
 look_for(ces0411, "language")
-ces0411$language04<-Recode(ces0411$ces04_CPS_S17, "5=0; 1=1; else=NA")
+ces0411$language04<-Recode(ces0411$ces04_CPS_INTLANG, "2=0; 1=1; else=NA")
 val_labels(ces0411$language04)<-c(French=0, English=1)
 #checks
 val_labels(ces0411$language04)
 table(ces0411$language04)
+
+#recode Non-charter Language (ces04_CPS_S17)
+look_for(ces0411, "language")
+ces0411$non_charter_language04<-Recode(ces0411$ces04_CPS_S17, "1:5=0; 8:64=1; 65:66=0; 95:97=1; else=NA")
+val_labels(ces0411$non_charter_language04)<-c(Charter=0, Non_Charter=1)
+#checks
+val_labels(ces0411$non_charter_language04)
+table(ces0411$non_charter_language04)
 
 #recode Employment (ces04_CPS_S4)
 look_for(ces0411, "employed")
@@ -243,13 +252,21 @@ val_labels(ces0411$religion06)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 val_labels(ces0411$religion06)
 table(ces0411$religion06)
 
-#recode Language (ces06_CPS_S17)
+#recode Language (ces06_CPS_INTLANG)
 look_for(ces0411, "language")
-ces0411$language06<-Recode(ces0411$ces06_CPS_S17, "5=0; 1=1; else=NA")
+ces0411$language06<-Recode(ces0411$ces06_CPS_INTLANG, "2=0; 1=1; else=NA")
 val_labels(ces0411$language06)<-c(French=0, English=1)
 #checks
 val_labels(ces0411$language06)
 table(ces0411$language06)
+
+#recode Non-charter Language (ces06_CPS_S17)
+look_for(ces0411, "language")
+ces0411$non_charter_language06<-Recode(ces0411$ces06_CPS_S17, "1:5=0; 8:64=1; 65:66=0; 95:97=1; else=NA")
+val_labels(ces0411$non_charter_language06)<-c(Charter=0, Non_Charter=1)
+#checks
+val_labels(ces0411$non_charter_language06)
+table(ces0411$non_charter_language06)
 
 #recode Employment (ces06_CPS_S4)
 look_for(ces0411, "employed")
@@ -392,13 +409,21 @@ val_labels(ces0411$religion08)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 val_labels(ces0411$religion08)
 table(ces0411$religion08)
 
-#recode Language (ces08_CPS_S17)
+#recode Language (ces08_CPS_INTLANG)
 look_for(ces0411, "language")
-ces0411$language08<-Recode(ces0411$ces08_CPS_S17, "5=0; 1=1; else=NA")
+ces0411$language08<-Recode(ces0411$ces08_CPS_INTLANG, "2=0; 1=1; else=NA")
 val_labels(ces0411$language08)<-c(French=0, English=1)
 #checks
 val_labels(ces0411$language08)
 table(ces0411$language08)
+
+#recode Non-charter Language (ces08_CPS_S17)
+look_for(ces0411, "language")
+ces0411$non_charter_language08<-Recode(ces0411$ces08_CPS_S17, "1:5=0; 8:64=1; 65:66=0; 95:97=1; else=NA")
+val_labels(ces0411$non_charter_language08)<-c(Charter=0, Non_Charter=1)
+#checks
+val_labels(ces0411$non_charter_language08)
+table(ces0411$non_charter_language08)
 
 #recode Employment (ces08_CPS_S4)
 look_for(ces0411, "employed")
@@ -537,13 +562,21 @@ val_labels(ces0411$religion11)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 val_labels(ces0411$religion11)
 table(ces0411$religion11)
 
-#recode Language (CPS11_90)
+#recode Language (CPS_INTLANG11)
 look_for(ces0411, "language")
-ces0411$language11<-Recode(ces0411$CPS11_90, "5=0; 1=1; else=NA")
+ces0411$language11<-Recode(ces0411$CPS_INTLANG11, "5=0; 1=1; else=NA")
 val_labels(ces0411$language11)<-c(French=0, English=1)
 #checks
 val_labels(ces0411$language11)
 table(ces0411$language11)
+
+#recode Non-charter Language (CPS11_90)
+look_for(ces0411, "language")
+ces0411$non_charter_language11<-Recode(ces0411$CPS11_90, "0=1; 1:5=0; 8:64=1; 65=0; 95:97=1; else=NA")
+val_labels(ces0411$non_charter_language11)<-c(Charter=0, Non_Charter=1)
+#checks
+val_labels(ces0411$non_charter_language11)
+table(ces0411$non_charter_language11)
 
 #recode Employment (CPS11_91)
 look_for(ces0411, "employment")
