@@ -64,13 +64,21 @@ val_labels(ces88$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 val_labels(ces88$religion)
 table(ces88$religion)
 
-#recode Language (n17)
+#recode Language (intlang)
 look_for(ces88, "language")
-ces88$language<-Recode(ces88$n17, "1=0; 3=1; else=NA")
+ces88$language<-Recode(ces88$intlang, "1=1; 2=0; else=NA")
 val_labels(ces88$language)<-c(French=0, English=1)
 #checks
 val_labels(ces88$language)
 table(ces88$language)
+
+#recode Non-charter Language (n16)
+look_for(ces88, "language")
+ces88$non_charter_language<-Recode(ces88$n16, "1:3=0; 5=1; else=NA")
+val_labels(ces88$non_charter_language)<-c(Charter=0, Non_Charter=1)
+#checks
+val_labels(ces88$non_charter_language)
+table(ces88$non_charter_language)
 
 #recode Employment (n5)
 look_for(ces88, "employment")
