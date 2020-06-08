@@ -84,6 +84,14 @@ val_labels(ces68$language)<-c(French=0, English=1)
 val_labels(ces68$language)
 table(ces68$language)
 
+#recode Non-charter Language (var357)
+look_for(ces68, "language")
+ces68$non_charter_language<-Recode(ces68$var357, "1:2=0; 8=0; 0=1; 3:7=1; 9=1; else=NA")
+val_labels(ces68$non_charter_language)<-c(Charter=0, Non_Charter=1)
+#checks
+val_labels(ces68$non_charter_language)
+table(ces68$non_charter_language)
+
 #recode Employment (var324)
 look_for(ces68, "employ")
 ces68$employment<-Recode(ces68$var324, "0=0; 8:9=0; 1:7=1; else=NA")
@@ -92,7 +100,14 @@ val_labels(ces68$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces68$employment)
 table(ces68$employment)
 
-#No Sector variable
+#recode Sector (var326)
+look_for(ces68, "sector")
+look_for(ces68, "business")
+ces68$sector<-Recode(ces68$var326, "1:2=1; 4=1; 3=0; 0=0; 5:9=0; else=NA")
+val_labels(ces68$sector)<-c(Private=0, Public=1)
+#checks
+val_labels(ces68$sector)
+table(ces68$sector)
 
 #recode Party ID (var122)
 look_for(ces68, "affiliation")

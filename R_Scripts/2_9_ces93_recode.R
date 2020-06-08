@@ -77,18 +77,27 @@ val_labels(ces93$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
 val_labels(ces93$religion)
 table(ces93$religion)
 
-#recode Language (CPSO14 and REFN15)
+#recode Language (PESLANG)
 look_for(ces93, "language")
-ces93 %>% 
-  mutate(language=case_when(
-    RTYPE4==1 & (CPSO14==3 | REFN15==3)~ 1,
-    RTYPE4==1 & (CPSO14==1 | REFN15==1)~ 0,
-  ))->ces93
-
+ces93$language<-Recode(ces93$PESLANG, "'E'=1; 'F'=0; else=NA")
 val_labels(ces93$language)<-c(French=0, English=1)
 #checks
 val_labels(ces93$language)
 table(ces93$language)
+
+#recode Non-charter Language (CPSO16 and REFN16)
+look_for(ces93, "language")
+ces93 %>% 
+  mutate(non_charter_language=case_when(
+    RTYPE4==1 & (CPSO15==5 | REFN16==5)~ 1,
+    RTYPE4==1 & (CPSO15==3 | REFN16==3)~ 0,
+    RTYPE4==1 & (CPSO15==1 | REFN16==1)~ 0,
+  ))->ces93
+
+val_labels(ces93$non_charter_language)<-c(Charter=0, Non_Charter=1)
+#checks
+val_labels(ces93$non_charter_language)
+table(ces93$non_charter_language)
 
 #recode Employment (CPSJOB1)
 look_for(ces93, "employment")

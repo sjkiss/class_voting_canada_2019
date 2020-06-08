@@ -72,6 +72,14 @@ val_labels(ces72_nov$language)<-c(French=0, English=1)
 val_labels(ces72_nov$language)
 table(ces72_nov$language)
 
+#recode Non-charter Language (qixb)
+look_for(ces72_nov, "language")
+ces72_nov$non_charter_language<-Recode(ces72_nov$qixb, "1:2=0; 3=1; else=NA")
+val_labels(ces72_nov$non_charter_language)<-c(Charter=0, Non_Charter=1)
+#checks
+val_labels(ces72_nov$non_charter_language)
+table(ces72_nov$non_charter_language)
+
 #recode Employment (qiv)
 look_for(ces72_nov, "employ")
 look_for(ces72_nov, "occupation")

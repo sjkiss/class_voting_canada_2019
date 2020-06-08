@@ -18,6 +18,8 @@ ces %>%
   group_by(union, union_both) %>% 
   summarize(n=n())
   
+
+
 ##### SPLITTING THE 1979-1980 FILE
 table(ces7980$male80)
 names(ces7980)
@@ -85,7 +87,7 @@ table(ces80$region, ces80$region80)
 table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
 ces80 %>% 
-  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, religion)->ces80
+  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, religion, non_charter_language)->ces80
 names(ces80)
 #####SPLITTING THE 04-11 FILE
 
@@ -161,6 +163,8 @@ ces04 %>%
   rename(occupation=occupation04)->ces04
 ces04 %>% 
   rename(income=income04)->ces04
+ces04 %>% 
+  rename(non_charter_language=non_charter_language04)->ces04
 
 ### CES06
 
@@ -192,6 +196,8 @@ ces06 %>%
   rename(occupation=occupation06)->ces06
 ces06 %>% 
   rename(income=income06)->ces06
+ces06 %>% 
+  rename(non_charter_language=non_charter_language06)->ces06
 
 ###CES08
 
@@ -223,6 +229,8 @@ ces08 %>%
   rename(occupation=occupation08)->ces08
 ces08 %>% 
   rename(income=income08)->ces08
+ces08 %>% 
+  rename(non_charter_language=non_charter_language08)->ces08
 
 ###CES11
 
@@ -254,6 +262,8 @@ ces11 %>%
   rename(occupation=occupation11)->ces11
 ces11 %>% 
   rename(income=income11)->ces11
+ces11 %>% 
+  rename(non_charter_language=non_charter_language11)->ces11
 
 
 ######REJOINING THE FILES
@@ -330,6 +340,7 @@ ces %>%
            "vote", 
            "occupation",
           "income", 
+          "non_charter_language", 
           "election") )-> ces
 ##
 
@@ -340,9 +351,19 @@ table(str_detect(names(ces00), "survey"))
 names(ces)
 ces$election
 table(ces$union)
+library(car)
+#To model party voting we need to create party vote dummy variables
+ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
+ces$liberal<-Recode(ces$vote, "1=1; 2:5=0; NA=NA")
+ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
 
+### assign value labels
+val_labels(ces$sector)<-c(Private=0, Public=1)
+val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3)
 ####
+
+
 #This command calls the file 2_diagnostics.R
 source("R_scripts/3_recode_diagnostics.R", echo=T)
 source("R_scripts/4_make_models.R", echo=T)
-
+table(ces$non_charter_language, ces$election)

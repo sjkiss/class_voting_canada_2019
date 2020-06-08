@@ -71,6 +71,14 @@ val_labels(ces65$language)<-c(French=0, English=1)
 val_labels(ces65$language)
 table(ces65$language)
 
+#recode Non-charter Language (v314)
+look_for(ces65, "language")
+ces65$non_charter_language<-Recode(ces65$v314, "1:2=0; 3:8=1; else=NA")
+val_labels(ces65$non_charter_language)<-c(Charter=0, Non_Charter=1)
+#checks
+val_labels(ces65$non_charter_language)
+table(ces65$non_charter_language)
+
 #recode Employment (v54)
 look_for(ces65, "employ")
 ces65$employment<-Recode(ces65$v54, "2=1; 1=0; else=NA")
