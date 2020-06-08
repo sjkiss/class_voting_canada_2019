@@ -103,6 +103,9 @@ table(ces68$employment)
 #recode Sector (var326)
 look_for(ces68, "sector")
 look_for(ces68, "business")
+ces68$var326
+table(ces68$var326)
+table(as_factor(ces68$var326))
 ces68$sector<-Recode(ces68$var326, "1:2=1; 4=1; 3=0; 0=0; 5:9=0; else=NA")
 val_labels(ces68$sector)<-c(Private=0, Public=1)
 #checks

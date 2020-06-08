@@ -102,6 +102,7 @@ table(ces7980$employment)
 #recode Sector (V1473)
 look_for(ces7980, "sector")
 look_for(ces7980, "company")
+table(ces7980$V1473)
 ces7980$sector<-Recode(ces7980$V1473, "13=1; 1:12=0; else=NA")
 val_labels(ces7980$sector)<-c(Private=0, Public=1)
 #checks
