@@ -81,11 +81,11 @@ table(ces15phone$language)
 
 #recode Non-charter Language (CPS15_90)
 look_for(ces15phone, "language")
-ces15phone$non_charter_language15<-Recode(ces15phone$CPS15_90, "1:5=0; 8:64=1; 65=0; 95:97=1; else=NA")
+ces15phone$non_charter_language<-Recode(ces15phone$CPS15_90, "1:5=0; 8:64=1; 65=0; 95:97=1; else=NA")
 val_labels(ces15phone$non_charter_language15)<-c(Charter=0, Non_Charter=1)
 #checks
-val_labels(ces15phone$non_charter_language15)
-table(ces15phone$non_charter_language15)
+val_labels(ces15phone$non_charter_language)
+table(ces15phone$non_charter_language)
 
 #recode Employment (CPS15_91)
 look_for(ces15phone, "employment")

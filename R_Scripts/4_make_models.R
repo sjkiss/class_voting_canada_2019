@@ -76,7 +76,6 @@ ces %>%
   summarize(n=n()) %>% 
   #mutate the dataframe created above by calculating a new variable called pct which takes the value of each n and dividing it by the sum of n which
   mutate(pct=n/sum(n)) %>%
-<<<<<<< HEAD
   #filter(degree==1& vote==3) %>% 
   #filter out non-degree holders and include only Liberal, Conservative and NDP voters
   filter(degree==1 & (vote<4 & vote>0)) %>% 
@@ -95,12 +94,6 @@ ces %>%
   labs(title="Piketty Plot: Share of Degree holders voting for political parties over time")
 ggsave(here("Plots", "piketty_party_vote_by_degree.png"))
 
-=======
-  filter(degree==1& vote==3) %>% 
-  ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Percent of Degree Holders Voting NDP")
-#we can save that plot 
-ggsave(here("Plots", "percent_ndp_degree.png"))
->>>>>>> blais1
 
 #Voting NDP by Party ID
 ces %>% 

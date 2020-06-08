@@ -118,6 +118,8 @@ ces04 %>%
   rename(occupation=occupation04)->ces04
 ces04 %>% 
   rename(income=income04)->ces04
+ces04 %>% 
+  rename(non_charter_language=non_charter_language04)->ces04
 
 ### CES06
 
@@ -149,6 +151,8 @@ ces06 %>%
   rename(occupation=occupation06)->ces06
 ces06 %>% 
   rename(income=income06)->ces06
+ces06 %>% 
+  rename(non_charter_language=non_charter_language06)->ces06
 
 ###CES08
 
@@ -180,6 +184,8 @@ ces08 %>%
   rename(occupation=occupation08)->ces08
 ces08 %>% 
   rename(income=income08)->ces08
+ces08 %>% 
+  rename(non_charter_language=non_charter_language08)->ces08
 
 ###CES11
 
@@ -211,6 +217,8 @@ ces11 %>%
   rename(occupation=occupation11)->ces11
 ces11 %>% 
   rename(income=income11)->ces11
+ces11 %>% 
+  rename(non_charter_language=non_charter_language11)->ces11
 
 
 ######REJOINING THE FILES
@@ -313,4 +321,4 @@ val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3)
 #This command calls the file 2_diagnostics.R
 source("R_scripts/3_recode_diagnostics.R", echo=T)
 source("R_scripts/4_make_models.R", echo=T)
-
+table(ces$non_charter_language, ces$election)

@@ -75,11 +75,12 @@ table(ces19phone$language)
 
 #recode Non-charter Language (q67)
 look_for(ces19phone, "language")
-ces19phone$non_charter_language19<-Recode(ces19phone$q67, "1=0; 2:3=1; 4=0; 5:31=1; else=NA")
-val_labels(ces19phone$non_charter_language19)<-c(Charter=0, Non_Charter=1)
+ces19phone$non_charter_language<-Recode(ces19phone$q67, "1=0; 2:3=1; 4=0; 5:31=1; else=NA")
+val_labels(ces19phone$non_charter_language)<-c(Charter=0, Non_Charter=1)
+table(as_factor(ces19phone$q67),ces19phone$non_charter_language )
 #checks
-val_labels(ces19phone$non_charter_language19)
-table(ces19phone$non_charter_language19)
+val_labels(ces19phone$non_charter_language)
+table(ces19phone$non_charter_language)
 
 #recode Employment (q68)
 look_for(ces19phone, "employment")
