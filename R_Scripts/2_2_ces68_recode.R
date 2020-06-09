@@ -28,7 +28,8 @@ ces68 %>%
     var363==3 | var379==3 ~ 1,
     var363==4 | var379==4 ~ 1,
     #This should only be missing if BOTH are not members, right?
-    var363==1 & var379==1 ~ 0,
+    #Note var379 is the spousal activity variable, by setting it to be less than zero, I am including people who anaswered 1 (not a member) and 0 the mysterious unknown category
+    var363==1 & var379<2 ~ 0,
     #This should only be missing if BOTH are no reply, right?
     var363==5 & var379==5 ~ NA_real_,
   ))->ces68
