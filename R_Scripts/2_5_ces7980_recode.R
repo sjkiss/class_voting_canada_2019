@@ -24,8 +24,7 @@ table(ces7980$union)
 ces7980 %>% 
   mutate(union_both=case_when(
     V1512==1 | V1514==1 ~ 1,
-    V1512==8 | V1512==9 ~ NA_real_,
-    V1514==8 | V1514==9 ~ NA_real_,
+    V1512==9 | V1514==9 ~ NA_real_,
     TRUE~ 0
   ))->ces7980
 
@@ -99,11 +98,18 @@ val_labels(ces7980$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces7980$employment)
 table(ces7980$employment)
 
-#recode Sector (V1473)
+#recode Sector (V1473 & V1471)
 look_for(ces7980, "sector")
 look_for(ces7980, "company")
 table(ces7980$V1473)
-ces7980$sector<-Recode(ces7980$V1473, "13=1; 1:12=0; else=NA")
+ces7980 %>% 
+  mutate(sector=case_when(
+    V1473==13 ~ 1,
+    V1473> 0 & V1473 < 13 ~ 0,
+    V1471> 0 & V1471 < 7 ~ 0,
+    V1471> 42 & V1471 < 51 ~ 0,
+  ))->ces7980
+
 val_labels(ces7980$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces7980$sector)
@@ -140,6 +146,14 @@ val_labels(ces7980$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4
 #checks
 val_labels(ces7980$income)
 table(ces7980$income)
+
+#recode Community Size (V1536)
+look_for(ces7980, "community")
+ces7980$size<-Recode(ces7980$V1536, "8:9=1; 7=2; 5:6=3; 4=4; 1:3=5; else=NA")
+val_labels(ces7980$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, City=5)
+#checks
+val_labels(ces7980$size)
+table(ces7980$size)
 
 
 ####1980
@@ -218,3 +232,4 @@ table(ces7980$vote, ces7980$vote80)
 
 # No Income variable
 
+#No Community Size variable

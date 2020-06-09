@@ -12,7 +12,7 @@ table(ces84$male)
 
 #recode Union Household (VAR381)
 look_for(ces84, "union")
-ces84$union<-Recode(ces84$VAR381, "1=1; 2=0; else=NA")
+ces84$union<-Recode(ces84$VAR381, "1=1; 2=0; 8=0; else=NA")
 val_labels(ces84$union)<-c(None=0, Union=1)
 #checks
 val_labels(ces84$union)
@@ -22,8 +22,7 @@ table(ces84$union)
 ces84 %>% 
   mutate(union_both=case_when(
     VAR378==1 | VAR381==1 ~ 1,
-    VAR378==8  ~ NA_real_,
-    VAR381==8  ~ NA_real_,
+    VAR378==8 | VAR381==8 ~ 0,
     TRUE~ 0
   ))->ces84
 
@@ -94,14 +93,15 @@ val_labels(ces84$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces84$employment)
 table(ces84$employment)
 
-#recode Sector (VAR530 and VAR526)
+#recode Sector (VAR530, VAR526 and VAR525)
 look_for(ces84, "company")
 look_for(ces84, "occupation")
 ces84 %>% 
   mutate(sector=case_when(
     VAR530==13 ~1,
-      VAR526> 2710 & VAR526 < 2800 ~ 1,
+    VAR526> 2710 & VAR526 < 2800 ~ 1,
     VAR526> 3129 & VAR526 < 3136 ~ 1,
+    VAR525> 5 & VAR525 < 12 ~ 0,
     VAR530==99 ~NA_real_ ,
     TRUE ~ 0
   ))->ces84
@@ -163,3 +163,13 @@ val_labels(ces84$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, 
 #checks
 val_labels(ces84$income)
 table(ces84$income)
+
+#recode Community Size (VAR464)
+look_for(ces84, "community")
+look_for(ces84, "city")
+ces84$size<-Recode(ces84$VAR464, "6=1; 5=2; 3:4=3; 2=4; 1=5; else=NA")
+val_labels(ces84$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, City=5)
+#checks
+val_labels(ces84$size)
+table(ces84$size)
+
