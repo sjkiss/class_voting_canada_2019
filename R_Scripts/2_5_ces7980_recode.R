@@ -151,6 +151,13 @@ val_labels(ces7980$male80)<-c(Female=0, Male=1)
 val_labels(ces7980$male80)
 table(ces7980$male, ces7980$male80)
 
+#recode Community Size (V1536)
+look_for(ces7980, "community")
+ces7980$size<-Recode(ces7980$V1536, "8:9=1; 7=2; 5:6=3; 4=4; 1:3=5; else=NA")
+val_labels(ces7980$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, City=5)
+#checks
+val_labels(ces7980$size)
+table(ces7980$size)
 
 #No Union Household variable
 

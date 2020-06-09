@@ -163,3 +163,12 @@ val_labels(ces84$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, 
 #checks
 val_labels(ces84$income)
 table(ces84$income)
+
+#recode Community Size (VAR464)
+look_for(ces84, "community")
+look_for(ces84, "city")
+ces84$size<-Recode(ces84$VAR464, "6=1; 5=2; 3:4=3; 2=4; 1=5; else=NA")
+val_labels(ces84$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, City=5)
+#checks
+val_labels(ces84$size)
+table(ces84$size)
