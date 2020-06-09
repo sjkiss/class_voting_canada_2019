@@ -10,9 +10,9 @@ val_labels(ces15phone$male)<-c(Female=0, Male=1)
 val_labels(ces15phone$male)
 table(ces15phone$male)
 
-#recode Respondent (PES15_93)
+#recode Union Household (PES15_94)
 look_for(ces15phone, "union")
-ces15phone$union<-Recode(ces15phone$PES15_93, "1=1; 5:8=0; else=NA")
+ces15phone$union<-Recode(ces15phone$PES15_93, "1=1; 5=0; else=NA")
 val_labels(ces15phone$union)<-c(None=0, Union=1)
 #checks
 val_labels(ces15phone$union)
@@ -22,9 +22,9 @@ table(ces15phone$union)
 ces15phone %>% 
   mutate(union_both=case_when(
     PES15_93==1 | PES15_94==1 ~ 1,
-    PES15_93==5 | PES15_94==5 ~ 0,
-    PES15_93==8 | PES15_94==8 ~ 0,
-    PES15_93==9 | PES15_94==9 ~ NA_real_,
+    PES15_93==5 & PES15_94==5 ~ 0,
+    PES15_93==8 | PES15_94==9 ~ NA_real_,
+    PES15_93==8 | PES15_94==9 ~ NA_real_,
   ))->ces15phone
 
 val_labels(ces15phone$union_both)<-c(None=0, Union=1)

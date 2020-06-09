@@ -87,7 +87,7 @@ table(ces80$region, ces80$region80)
 table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
 ces80 %>% 
-  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, religion, non_charter_language, size)->ces80
+  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, religion, non_charter_language)->ces80
 names(ces80)
 #####SPLITTING THE 04-11 FILE
 
@@ -341,7 +341,6 @@ ces %>%
            "occupation",
           "income", 
           "non_charter_language", 
-          "size", 
           "election") )-> ces
 ##
 

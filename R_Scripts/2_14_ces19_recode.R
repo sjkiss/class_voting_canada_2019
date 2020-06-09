@@ -10,9 +10,9 @@ val_labels(ces19phone$male)<-c(Female=0, Male=1)
 val_labels(ces19phone$male)
 table(ces19phone$male)
 
-#recode Union Respondent (p51)
+#recode Union Household (p51)
 look_for(ces19phone, "union")
-ces19phone$union<-Recode(ces19phone$p51, "1=1; 2=0; -8=0; else=NA")
+ces19phone$union<-Recode(ces19phone$p51, "1=1; 2=0; else=NA")
 val_labels(ces19phone$union)<-c(None=0, Union=1)
 #checks
 val_labels(ces19phone$union)
