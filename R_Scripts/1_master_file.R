@@ -31,7 +31,7 @@ look_for(ces74, "respondent")
 look_for(ces7980, "respondent")
 look_for(ces74, "respondent")
 look_for(ces7980, "filter")
-
+table(ces7980$V4020, ces$790)
 #Get a summary of V9 sector and V4020
 ces7980 %>% 
   select(V9, sector, V4020) %>% 
