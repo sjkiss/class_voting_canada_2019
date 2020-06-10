@@ -34,8 +34,8 @@ ces0411 %>%
     ces04_CPS_S6A==1 | ces04_CPS_S6B==1 ~ 1,
     #If the person is not in a union AND if the household is not in a union then thety get a 0 
     ces04_CPS_S6A==5 & ces04_CPS_S6B==5 ~ 0,
-    ces04_CPS_S6A==8 | ces04_CPS_S6A==9 ~ NA_real_,
-    ces04_CPS_S6B==8 | ces04_CPS_S6A==9 ~ NA_real_,
+    ces04_CPS_S6A==8 & ces04_CPS_S6B==9 ~ NA_real_,
+    ces04_CPS_S6B==8 & ces04_CPS_S6A==9 ~ NA_real_,
   ))->ces0411
 
 val_labels(ces0411$union_both04)<-c(None=0, Union=1)
@@ -200,8 +200,8 @@ ces0411 %>%
     ces06_CPS_S6A==1 | ces06_CPS_S6B==1 ~ 1,
     #If the person is not in a union AND if the household is in a union, then they get a 0
     ces06_CPS_S6A==5 & ces06_CPS_S6B==5 ~ 0,
-    ces06_CPS_S6A==8 | ces06_CPS_S6A==9 ~ NA_real_,
-    ces06_CPS_S6B==8 | ces06_CPS_S6A==9 ~ NA_real_,
+    ces06_CPS_S6A==8 & ces06_CPS_S6B==9 ~ NA_real_,
+    ces06_CPS_S6B==8 & ces06_CPS_S6A==9 ~ NA_real_,
   ))->ces0411
 
 val_labels(ces0411$union_both06)<-c(None=0, Union=1)
@@ -356,8 +356,8 @@ ces0411 %>%
     ces08_CPS_S6A==1 | ces08_CPS_S6B==1 ~ 1,
     #If the person is in a union AND if the household is in a union, then they get a 1
     ces08_CPS_S6A==5 & ces08_CPS_S6B==5 ~ 0,
-    ces08_CPS_S6A==8 | ces08_CPS_S6A==9 ~ NA_real_,
-    ces08_CPS_S6B==8 | ces08_CPS_S6A==9 ~ NA_real_,
+    ces08_CPS_S6A==8 & ces08_CPS_S6A==9 ~ NA_real_,
+    ces08_CPS_S6B==8 & ces08_CPS_S6A==9 ~ NA_real_,
   ))->ces0411
 
 val_labels(ces0411$union_both08)<-c(None=0, Union=1)
@@ -507,8 +507,8 @@ ces0411 %>%
     #If the person is in a union OR if the household is in a union, then they get a 1
     PES11_93==1 | PES11_94==1 ~ 1,
     PES11_93==5 | PES11_94==5 ~ 0,
-    PES11_93==8 | PES11_94==9 ~ NA_real_,
-    PES11_93==8 | PES11_94==9 ~ NA_real_,
+    PES11_93==8 & PES11_94==9 ~ NA_real_,
+    PES11_93==8 & PES11_94==9 ~ NA_real_,
   ))->ces0411
 table(as_factor(ces0411$union_both11), as_factor(ces0411$PES11_93))
 

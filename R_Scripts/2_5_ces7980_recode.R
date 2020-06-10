@@ -14,26 +14,29 @@ table(ces7980$male)
 
 #recode Union Household (V1514)
 look_for(ces7980, "union")
-ces7980$union<-Recode(ces7980$V1514, "1=1; 2:8=0; 9=NA")
+ces7980$V1514
+ces7980$union<-Recode(ces7980$V1514, "1=1; 2=0; 8:9=NA")
 val_labels(ces7980$union)<-c(None=0, Union=1)
 #checks
 val_labels(ces7980$union)
 table(ces7980$union)
-
 #recode Union Combined (V1512 and V1514)
 ces7980 %>% 
   mutate(union_both=case_when(
+    #If either one is union then one
     V1512==1 | V1514==1 ~ 1,
-    V1512==8 | V1512==9 ~ NA_real_,
-    V1514==8 | V1514==9 ~ NA_real_,
-    TRUE~ 0
+    #If both are non union then 0 
+        V1512==2 & V1514==2 ~ 0,
+    #if one is don't know and one is refused then missing
+    V1512>7 & V1514>7 ~ NA_real_
   ))->ces7980
-
+table(ces7980$V1512)
+table(ces7980$V1514)
 val_labels(ces7980$union_both)<-c(None=0, Union=1)
 #checks
 val_labels(ces7980$union_both)
 table(ces7980$union_both)
-
+table(ces7980$union_both, useNA = "ifany")
 #recode Education (V1502)
 look_for(ces7980, "school")
 look_for(ces7980, "degree")
