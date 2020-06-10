@@ -64,13 +64,12 @@ ces %>%
            election==1984) %>% 
 select(non_charter_language, working_class, no_religion, sector, catholic, union_both, size) %>% 
 summary()
+##Count missing values
 ces %>% 
   group_by(election) %>% 
   summarise_all(function(x) sum(is.na(x))) %>% 
   View()
 
-  filter(election==1984) %>% 
-  summary()
 ###Model 1 - Blais replication (all elections with region)
 ##NDP
 table(ces$sector, ces$election)
@@ -93,7 +92,6 @@ stargazer(blais_models$mods,
           star.cutoffs=c(0.05))
 
 
-# 
 # table(ces$election, ces$sector)
 # #AS always start witht the data frame
 # ces %>% 

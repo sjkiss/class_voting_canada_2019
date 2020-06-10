@@ -1,5 +1,5 @@
 ##load recoded ces files
-load("Data/recoded_cesdata.Rdata")
+#load("Data/recoded_cesdata.Rdata")
 
 library(tidyverse)
 library(labelled)
@@ -308,7 +308,8 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 #bind_rows binds the rows of each element in the list together
 #.id="survey"creates a new variable called "survey" and its values are the names of the list items. 
 
-
+names(ces.list)
+table(ces.list[["1984"]]$union_both)
 #Start with the list
 ces.list %>% 
   #Bind the rows, making a new variable called survey that will be populated with the names of the list items
@@ -391,4 +392,5 @@ val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3)
 #This command calls the file 2_diagnostics.R
 source("R_scripts/3_recode_diagnostics.R", echo=T)
 source("R_scripts/4_make_models.R", echo=T)
+source("R_scripts/5_blais.R", echo=T)
 

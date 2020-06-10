@@ -13,6 +13,7 @@ table(ces74$male)
 
 #recode Union Household (V477)
 look_for(ces74, "union")
+
 ces74$union<-Recode(ces74$V476, "1=1; 2=0; 8=NA")
 val_labels(ces74$union)<-c(None=0, Union=1)
 #checks
@@ -20,10 +21,12 @@ val_labels(ces74$union)
 table(ces74$union)
 
 #Union Combined variable (identical copy of union)
-ces74$union_both<-ces74$union
-#checks
-val_labels(ces74$union_both)
-table(ces74$union_both)
+ces74 %>% 
+  mutate(union_both=case_when(
+    V476==1 |V477 ==1~ 1,
+    V476==2 & V477==2 ~2,
+    V476==8&V477==8~NA_real_
+  ))->ces74
 
 #recode Education (V414)
 look_for(ces74, "school")
