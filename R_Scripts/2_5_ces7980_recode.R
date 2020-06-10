@@ -99,16 +99,29 @@ val_labels(ces7980$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces7980$employment)
 table(ces7980$employment)
 
-#recode Sector (V1473)
+#recode Sector (V1473 & V1471)
 look_for(ces7980, "sector")
 look_for(ces7980, "company")
-table(ces7980$V1473)
-ces7980$sector<-Recode(ces7980$V1473, "13=1; 1:12=0; else=NA")
+ces7980$V1471
+table(ces7980$V1471)
+ces7980 %>% 
+  mutate(sector=case_when(
+    #all government employees go to public sector
+    V1473==13 ~ 1,
+    #all non-government employees go to zero
+    V1473> 0 & V1473 < 13 ~ 0,
+    #all people on the margins of the labour market (e.g. retired) go to zero, as per Blais, presumably
+    V1471> 0 & V1471 < 7 ~ 0,
+    #Farmers go to zero
+    V1471 ==50 ~ 0,
+  ))->ces7980
+
+table(ces7980$V1471, ces7980$V1473)
 val_labels(ces7980$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces7980$sector)
 table(ces7980$sector)
-
+table(ces7980$sector, ces7980$V4020)
 #recode Party ID (V1192)
 look_for(ces7980, "federal")
 ces7980$party_id<-Recode(ces7980$V1192, "1=1; 2=2; 3=3; 0=0; 4:7=0; else=NA")

@@ -97,15 +97,21 @@ table(ces84$employment)
 #recode Sector (VAR530 and VAR526)
 look_for(ces84, "company")
 look_for(ces84, "occupation")
+look_for(ces84, "employment")
+
 ces84 %>% 
   mutate(sector=case_when(
     VAR530==13 ~1,
       VAR526> 2710 & VAR526 < 2800 ~ 1,
     VAR526> 3129 & VAR526 < 3136 ~ 1,
+    VAR524 >1 ~ 0,
     VAR530==99 ~NA_real_ ,
     TRUE ~ 0
   ))->ces84
-
+ces84$VAR524
+ces84$VAR530
+table(ces84$VAR524, ces84$sector, useNA='ifany')
+table(ces84$VAR524, ces84$VAR530, useNA="ifany")
 val_labels(ces84$sector)<-c(Private=0, Public=1)
 ces84$sector
 #checks

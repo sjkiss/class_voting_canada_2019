@@ -93,6 +93,7 @@ table(ces74$employment)
 #recode Sector (V386)
 look_for(ces74, "sector")
 look_for(ces74, "business")
+
 ces74$sector<-Recode(ces74$V386, "13=1; 1:12=0; else=NA")
 val_labels(ces74$sector)<-c(Private=0, Public=1)
 #checks
@@ -134,7 +135,9 @@ names(ces74)
 
 #recode Community Size (V9)
 look_for(ces74, "community")
-ces74$size<-Recode(ces74$V480, "8:9=1; 7=2; 5:6=3; 4=4; 1:3=5; else=NA")
+ces74$V480
+nrow(ces74)
+ces74$size<-Recode(ces74$V9, "8:9=1; 7=2; 5:6=3; 4=4; 1:3=5; else=NA")
 val_labels(ces74$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, City=5)
 #checks
 val_labels(ces74$size)

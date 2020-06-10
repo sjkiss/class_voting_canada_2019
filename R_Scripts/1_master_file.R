@@ -5,21 +5,13 @@ library(tidyverse)
 library(labelled)
 library(here)
 
-
-##### 
-#Checks
-ces %>% 
-  filter(election==1997) %>% 
-  group_by(union, union_both) %>% 
-  summarize(n=n())
-
-ces %>% 
-  filter(election==1968) %>% 
-  group_by(union, union_both) %>% 
-  summarize(n=n())
-  
-
-
+### Checks
+nrow(ces74)==2562 #TRUE
+table(ces68$var323, ces68$var379)
+table(ces68$var379, ces68$union_both)
+table(ces74$size)
+table(ces68$var379)
+look_for(ces68, "marital")
 ##### SPLITTING THE 1979-1980 FILE
 table(ces7980$male80)
 names(ces7980)
@@ -45,6 +37,7 @@ ces74%>%
 ###### Blais took the responses for the 79 question for the ces74 respondents who were reinterviewed in ces79 and made it to be their 74 response. So he went backward. 
 ###### All our other demographic variables were created from the pure cross-sectional survey, so I didn't want to waste all that work. 
 ###### When we get close to fully being able to replicate Blais, we can execute this code to create ces74 Until then we keep it off. 
+table(ces7980$sector)
 ces7980 %>%
   #Select V9, sector and panel
   select(V9, sector, V4020) %>%
@@ -52,6 +45,8 @@ ces7980 %>%
   inner_join(., ces74, by=c("V9"="V2")) ->ces74.out
 #how many respondents in ces74
 nrow(ces74.out)
+table(ces74.out$sector.x)
+table(ces74.out$sector.y)
 #The technical documentation says that there are 1295 CES74 panel respondents reinterviewed in CES79
 ## 1298 is close, but not exact
 table(ces74.out$V4020)#
@@ -61,19 +56,24 @@ ces74.out %>%
   filter(V4020==1)->ces74.out
 
 names(ces74.out)
+table(ces74.out$sector.x)
+table(ces74.out$sector.y)
 #take ces74.out
 ces74.out %>%
-  #delete sector.x which is the sector variable from the pure ces74 study
-  select(-sector.x) %>%
-  #sector sector.y to be sector to match all the other variables
-  rename(sector=sector.y)
+  #delete sector.y which is the sector variable from the pure ces74 study
+  select(-sector.y) %>%
+  #sector sector.x to be sector to match all the other variables
+  rename(sector=sector.x)->ces74.out
 #rename
 ces74<-ces74.out
+
+table(ces74$sector)
 
 ces7980 %>% 
   filter(V4002==1)->ces79
 ces7980 %>% 
   filter(V4008==1)->ces80
+
 options(max.print=1500)
 names(ces80)
 names(ces7980)
@@ -316,8 +316,8 @@ ces.list %>%
 #Do a summary
 summary(ces)
 #Check the names
-names(ces)
-
+tail(names(ces))
+names(ces68)
 #You see how this has *all* the variables from both 1993 and 1997. 
 #So here we just select out names variables that we want. 
 # ces %>% 
@@ -341,7 +341,7 @@ ces %>%
            "occupation",
           "income", 
           "non_charter_language", 
-          "election") )-> ces
+          "election", "size") )-> ces
 ##
 
 library(stringr)
@@ -351,18 +351,43 @@ table(str_detect(names(ces00), "survey"))
 names(ces)
 ces$election
 table(ces$union)
+
+
+#### Currently region is regions of English Canada only
+#### quebec is dichotomous Quebec v. non-quebec
+#### Create region2 which is one region variable for all of Canada
+ces %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces
+
+####Turn region2 into factor with Quebec as reference case
+#### This can be changed anytime very easily 
+ces$region2<-factor(ces$region2, levels=c("Quebec", "Atlantic", "Ontario", "West"))
+levels(ces$region2)
+##Create female variable
+## Sometimes we may want to report male dichotomous variable, sometimes female. 
+ces %>% 
+  mutate(female=case_when(
+    male==1~0,
+    male==0~1
+  ))->ces
 library(car)
 #To model party voting we need to create party vote dummy variables
 ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
 ces$liberal<-Recode(ces$vote, "1=1; 2:5=0; NA=NA")
 ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
 
+### Value labels often go missing in the creation of the ces data frame
 ### assign value labels
 val_labels(ces$sector)<-c(Private=0, Public=1)
 val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3)
 ####
 
-
+###
 #This command calls the file 2_diagnostics.R
 source("R_scripts/3_recode_diagnostics.R", echo=T)
 source("R_scripts/4_make_models.R", echo=T)
