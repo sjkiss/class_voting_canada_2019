@@ -19,15 +19,11 @@ val_labels(ces74$union)<-c(None=0, Union=1)
 #checks
 val_labels(ces74$union)
 table(ces74$union)
-
+table(ces74$V476,ces74$V477)
+ces74$V477
+ces74$V478
 #Union Combined variable (identical copy of union)
-ces74 %>% 
-  mutate(union_both=case_when(
-    V476==1 |V477 ==1~ 1,
-    V476==2 & V477==2 ~2,
-    V476==8&V477==8~NA_real_
-  ))->ces74
-
+ces74$union_both<-ces74$union
 #recode Education (V414)
 look_for(ces74, "school")
 look_for(ces74, "degree")
