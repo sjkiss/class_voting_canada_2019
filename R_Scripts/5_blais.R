@@ -1,13 +1,8 @@
 #Replicating 'The public-private sector cleavage in North America (Blais et al 1990)'
-
 #Run master file to load up data
+
 #Instead of typing Recode everytime, we can just load the car library here
 library(car)
-
-#To model party voting we need to create party vote dummy variables
-ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
-ces$liberal<-Recode(ces$vote, "1=1; 2:5=0; NA=NA")
-ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
 
 #Create other relevant dummy variables (Catholic, no_religion, ndp_id, low income x2, lower occupations)
 ces$catholic<-Recode(ces$religion, "1=1; 2:3=0; 0=0; NA=NA")
@@ -83,13 +78,20 @@ ces %>%
   nest(variables=-election) %>% 
   mutate(mods=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+size+sector, data=x)),
          tidied=map(mods, tidy))->blais_models
+
 library(stargazer)
 #stargazer(blais_models$mods, type="text")
 stargazer(blais_models$mods, 
+          #print out html file
           type="html", 
+          #file path where table should be printed and file name
           out=here("Tables", "M1_Blais_replication.html"), 
+          #label the model columns
           column.labels=c("1968", "1974", "1979", "1980", "1984"), 
-          star.cutoffs=c(0.05))
+          #set the cutoffs for one star to be 0.05
+          star.cutoffs=c(0.05), 
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time())))
 
 
 # table(ces$election, ces$sector)
