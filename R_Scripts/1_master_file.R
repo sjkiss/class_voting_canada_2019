@@ -38,34 +38,34 @@ ces74%>%
 ###### All our other demographic variables were created from the pure cross-sectional survey, so I didn't want to waste all that work. 
 ###### When we get close to fully being able to replicate Blais, we can execute this code to create ces74 Until then we keep it off. 
 table(ces7980$sector)
-ces7980 %>%
-  #Select V9, sector and panel
-  select(V9, sector, V4020) %>%
-  #inner join (return all rows from 7980 that have values in V9 that match in ces74 on V2)
-  inner_join(., ces74, by=c("V9"="V2")) ->ces74.out
-#how many respondents in ces74
-nrow(ces74.out)
-table(ces74.out$sector.x)
-table(ces74.out$sector.y)
-#The technical documentation says that there are 1295 CES74 panel respondents reinterviewed in CES79
-## 1298 is close, but not exact
-table(ces74.out$V4020)#
-#There are 3 people who are not part of the ces74-79 panel that got caught with the same respondent IDS
-ces74.out %>%
-  #Filter in respondents who have a value of 1 on the 74-79 panel filter
-  filter(V4020==1)->ces74.out
-
-names(ces74.out)
-table(ces74.out$sector.x)
-table(ces74.out$sector.y)
-#take ces74.out
-ces74.out %>%
-  #delete sector.y which is the sector variable from the pure ces74 study
-  select(-sector.y) %>%
-  #sector sector.x to be sector to match all the other variables
-  rename(sector=sector.x)->ces74.out
-#rename
-ces74<-ces74.out
+# ces7980 %>%
+#   #Select V9, sector and panel
+#   select(V9, sector, V4020) %>%
+#   #inner join (return all rows from 7980 that have values in V9 that match in ces74 on V2)
+#   inner_join(., ces74, by=c("V9"="V2")) ->ces74.out
+# #how many respondents in ces74
+# nrow(ces74.out)
+# table(ces74.out$sector.x)
+# table(ces74.out$sector.y)
+# #The technical documentation says that there are 1295 CES74 panel respondents reinterviewed in CES79
+# ## 1298 is close, but not exact
+# table(ces74.out$V4020)#
+# #There are 3 people who are not part of the ces74-79 panel that got caught with the same respondent IDS
+# ces74.out %>%
+#   #Filter in respondents who have a value of 1 on the 74-79 panel filter
+#   filter(V4020==1)->ces74.out
+# 
+# names(ces74.out)
+# table(ces74.out$sector.x)
+# table(ces74.out$sector.y)
+# #take ces74.out
+# ces74.out %>%
+#   #delete sector.y which is the sector variable from the pure ces74 study
+#   select(-sector.y) %>%
+#   #sector sector.x to be sector to match all the other variables
+#   rename(sector=sector.x)->ces74.out
+# #rename
+# ces74<-ces74.out
 
 table(ces74$sector)
 
