@@ -1,5 +1,5 @@
 ##load recoded ces files
-#load("Data/recoded_cesdata.Rdata")
+load("Data/recoded_cesdata.Rdata")
 
 library(tidyverse)
 library(labelled)
