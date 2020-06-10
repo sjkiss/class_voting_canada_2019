@@ -1,5 +1,5 @@
 #File to Recode 1974 CES Data for 1974 election 
-
+library(cesdata)
 #load data
 data("ces74")
 nrow(ces74)
@@ -13,7 +13,7 @@ table(ces74$male)
 
 #recode Union Household (V477)
 look_for(ces74, "union")
-ces74$union<-Recode(ces74$V477, "1=1; 2=0; 8=NA")
+ces74$union<-Recode(ces74$V476, "1=1; 2=0; 8=NA")
 val_labels(ces74$union)<-c(None=0, Union=1)
 #checks
 val_labels(ces74$union)
@@ -28,7 +28,7 @@ table(ces74$union_both)
 #recode Education (V414)
 look_for(ces74, "school")
 look_for(ces74, "degree")
-ces74$degree<-Recode(ces74$V414, "25=1; 0:13=0")
+ces74$degree<-Recode(ces74$V417, "25=1; 0:13=0")
 val_labels(ces74$degree)<-c(nodegree=0, degree=1)
 #checks
 val_labels(ces74$degree)
