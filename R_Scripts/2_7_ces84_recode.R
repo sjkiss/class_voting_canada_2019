@@ -97,15 +97,21 @@ table(ces84$employment)
 #recode Sector (VAR530 and VAR526)
 look_for(ces84, "company")
 look_for(ces84, "occupation")
+look_for(ces84, "employment")
+
 ces84 %>% 
   mutate(sector=case_when(
     VAR530==13 ~1,
       VAR526> 2710 & VAR526 < 2800 ~ 1,
     VAR526> 3129 & VAR526 < 3136 ~ 1,
+    VAR524 >1 ~ 0,
     VAR530==99 ~NA_real_ ,
     TRUE ~ 0
   ))->ces84
-
+ces84$VAR524
+ces84$VAR530
+table(ces84$VAR524, ces84$sector, useNA='ifany')
+table(ces84$VAR524, ces84$VAR530, useNA="ifany")
 val_labels(ces84$sector)<-c(Private=0, Public=1)
 ces84$sector
 #checks
@@ -163,3 +169,12 @@ val_labels(ces84$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, 
 #checks
 val_labels(ces84$income)
 table(ces84$income)
+
+#recode Community Size (VAR464)
+look_for(ces84, "community")
+look_for(ces84, "city")
+ces84$size<-Recode(ces84$VAR464, "6=1; 5=2; 3:4=3; 2=4; 1=5; else=NA")
+val_labels(ces84$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, City=5)
+#checks
+val_labels(ces84$size)
+table(ces84$size)

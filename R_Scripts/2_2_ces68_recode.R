@@ -28,7 +28,8 @@ ces68 %>%
     var363==3 | var379==3 ~ 1,
     var363==4 | var379==4 ~ 1,
     #This should only be missing if BOTH are not members, right?
-    var363==1 & var379==1 ~ 0,
+    #Note var379 is the spousal activity variable, by setting it to be less than zero, I am including people who anaswered 1 (not a member) and 0 the mysterious unknown category
+    var363==1 & var379<2 ~ 0,
     #This should only be missing if BOTH are no reply, right?
     var363==5 & var379==5 ~ NA_real_,
   ))->ces68
@@ -103,6 +104,9 @@ table(ces68$employment)
 #recode Sector (var326)
 look_for(ces68, "sector")
 look_for(ces68, "business")
+ces68$var326
+table(ces68$var326)
+table(as_factor(ces68$var326))
 ces68$sector<-Recode(ces68$var326, "1:2=1; 4=1; 3=0; 0=0; 5:9=0; else=NA")
 val_labels(ces68$sector)<-c(Private=0, Public=1)
 #checks
@@ -140,3 +144,13 @@ val_labels(ces68$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, 
 #checks
 val_labels(ces68$income)
 table(ces68$income)
+
+#recode Community Size (var002)
+look_for(ces68, "community")
+ces68$size<-Recode(ces68$var002, "8:9=1; 7=2; 5:6=3; 4=4; 1:3=5; else=NA")
+val_labels(ces68$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, City=5)
+#checks
+val_labels(ces68$size)
+table(ces68$size)
+
+

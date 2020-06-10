@@ -99,15 +99,29 @@ val_labels(ces7980$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces7980$employment)
 table(ces7980$employment)
 
-#recode Sector (V1473)
+#recode Sector (V1473 & V1471)
 look_for(ces7980, "sector")
 look_for(ces7980, "company")
-ces7980$sector<-Recode(ces7980$V1473, "13=1; 1:12=0; else=NA")
+ces7980$V1471
+table(ces7980$V1471)
+ces7980 %>% 
+  mutate(sector=case_when(
+    #all government employees go to public sector
+    V1473==13 ~ 1,
+    #all non-government employees go to zero
+    V1473> 0 & V1473 < 13 ~ 0,
+    #all people on the margins of the labour market (e.g. retired) go to zero, as per Blais, presumably
+    V1471> 0 & V1471 < 7 ~ 0,
+    #Farmers go to zero
+    V1471 ==50 ~ 0,
+  ))->ces7980
+
+table(ces7980$V1471, ces7980$V1473)
 val_labels(ces7980$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces7980$sector)
 table(ces7980$sector)
-
+table(ces7980$sector, ces7980$V4020)
 #recode Party ID (V1192)
 look_for(ces7980, "federal")
 ces7980$party_id<-Recode(ces7980$V1192, "1=1; 2=2; 3=3; 0=0; 4:7=0; else=NA")
@@ -150,6 +164,13 @@ val_labels(ces7980$male80)<-c(Female=0, Male=1)
 val_labels(ces7980$male80)
 table(ces7980$male, ces7980$male80)
 
+#recode Community Size (V1536)
+look_for(ces7980, "community")
+ces7980$size<-Recode(ces7980$V1536, "8:9=1; 7=2; 5:6=3; 4=4; 1:3=5; else=NA")
+val_labels(ces7980$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, City=5)
+#checks
+val_labels(ces7980$size)
+table(ces7980$size)
 
 #No Union Household variable
 
