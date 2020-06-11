@@ -11,7 +11,7 @@ val_labels(ces88$male)<-c(Female=0, Male=1)
 val_labels(ces88$male)
 table(ces88$male)
 
-#recode Union Household (n9)
+#recode Union Respondent (n9)
 look_for(ces88, "union")
 ces88$union<-Recode(ces88$n9, "1=1; 5=0; else=NA")
 val_labels(ces88$union)<-c(None=0, Union=1)

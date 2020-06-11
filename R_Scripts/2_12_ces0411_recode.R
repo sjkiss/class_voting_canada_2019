@@ -20,7 +20,7 @@ table(ces0411$male)
 #------------------------------------------------------------------------------
 ###Recode 2004 1st
 
-#recode Union Household (ces04_CPS_S6B)
+#recode Union Respondent (ces04_CPS_S6A)
 ces0411$union04<-Recode(ces0411$ces04_CPS_S6A, "1=1; 5=0; else=NA")
 val_labels(ces0411$union04)<-c(None=0, Union=1)
 #checks
@@ -33,9 +33,9 @@ ces0411 %>%
     #If the person is in a union OR if the household is in a union, then they get a 1
     ces04_CPS_S6A==1 | ces04_CPS_S6B==1 ~ 1,
     #If the person is not in a union AND if the household is not in a union then thety get a 0 
-    ces04_CPS_S6A==5 & ces04_CPS_S6B==5 ~ 0,
-    ces04_CPS_S6A==8 & ces04_CPS_S6B==9 ~ NA_real_,
-    ces04_CPS_S6B==8 & ces04_CPS_S6A==9 ~ NA_real_,
+    ces04_CPS_S6A==5 | ces04_CPS_S6B==5 ~ 0,
+    ces04_CPS_S6A==8 & ces04_CPS_S6B==8 ~ NA_real_,
+    ces04_CPS_S6A==9 & ces04_CPS_S6B==9 ~ NA_real_,
   ))->ces0411
 
 val_labels(ces0411$union_both04)<-c(None=0, Union=1)
@@ -195,7 +195,7 @@ table(ces0411$income04)
 
 # Gender done at top
 
-#recode Union Household (ces06_CPS_S6B)
+#recode Union Respondent (ces06_CPS_S6B)
 
 ces0411$union06<-Recode(ces0411$ces06_CPS_S6A, "1=1; 5=0; else=NA")
 val_labels(ces0411$union06)<-c(None=0, Union=1)
@@ -209,9 +209,9 @@ ces0411 %>%
     #If the person is in a union OR if the household is in a union, then they get a 1
     ces06_CPS_S6A==1 | ces06_CPS_S6B==1 ~ 1,
     #If the person is not in a union AND if the household is in a union, then they get a 0
-    ces06_CPS_S6A==5 & ces06_CPS_S6B==5 ~ 0,
-    ces06_CPS_S6A==8 & ces06_CPS_S6B==9 ~ NA_real_,
-    ces06_CPS_S6B==8 & ces06_CPS_S6A==9 ~ NA_real_,
+    ces06_CPS_S6A==5 | ces06_CPS_S6B==5 ~ 0,
+    ces06_CPS_S6A==8 & ces06_CPS_S6B==8 ~ NA_real_,
+    ces06_CPS_S6A==9 & ces06_CPS_S6B==9 ~ NA_real_,
   ))->ces0411
 
 val_labels(ces0411$union_both06)<-c(None=0, Union=1)
@@ -360,7 +360,7 @@ table(ces0411$income06)
 
 # Gender done at top
 
-#recode Union Household (ces08_CPS_S6B)
+#recode Union Respondent (ces08_CPS_S6B)
 look_for(ces0411, "union")
 #Make sure the union variable is coming from the respondent question
 ces0411$union08<-Recode(ces0411$ces08_CPS_S6A, "1=1; 5=0; else=NA")
@@ -375,9 +375,9 @@ ces0411 %>%
     #If the person is in a union OR if the household is in a union, then they get a 1
     ces08_CPS_S6A==1 | ces08_CPS_S6B==1 ~ 1,
     #If the person is in a union AND if the household is in a union, then they get a 1
-    ces08_CPS_S6A==5 & ces08_CPS_S6B==5 ~ 0,
-    ces08_CPS_S6A==8 & ces08_CPS_S6A==9 ~ NA_real_,
-    ces08_CPS_S6B==8 & ces08_CPS_S6A==9 ~ NA_real_,
+    ces08_CPS_S6A==5 | ces08_CPS_S6B==5 ~ 0,
+    ces08_CPS_S6A==8 & ces08_CPS_S6B==8 ~ NA_real_,
+    ces08_CPS_S6A==9 & ces08_CPS_S6B==9 ~ NA_real_,
   ))->ces0411
 
 val_labels(ces0411$union_both08)<-c(None=0, Union=1)
@@ -523,7 +523,7 @@ table(ces0411$income08)
 
 # Gender done at top
 
-#recode Union Household (PES11_94)
+#recode Union Respondent (PES11_93)
 look_for(ces0411, "union")
 ces0411$union11<-Recode(ces0411$PES11_93, "1=1; 5=0; else=NA")
 val_labels(ces0411$union11)<-c(None=0, Union=1)
@@ -537,11 +537,11 @@ ces0411 %>%
     #If the person is in a union OR if the household is in a union, then they get a 1
     PES11_93==1 | PES11_94==1 ~ 1,
     PES11_93==5 | PES11_94==5 ~ 0,
-    PES11_93==8 & PES11_94==9 ~ NA_real_,
-    PES11_93==8 & PES11_94==9 ~ NA_real_,
+    PES11_93==8 & PES11_94==8 ~ NA_real_,
+    PES11_93==9 & PES11_94==9 ~ NA_real_,
   ))->ces0411
-table(as_factor(ces0411$union_both11), as_factor(ces0411$PES11_93))
 
+table(as_factor(ces0411$union_both11), as_factor(ces0411$PES11_93))
 table(as_factor(ces0411$union_both11), as_factor(ces0411$PES11_94))
 val_labels(ces0411$union_both11)<-c(None=0, Union=1)
 #checks

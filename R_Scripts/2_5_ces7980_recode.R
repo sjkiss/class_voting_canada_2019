@@ -12,7 +12,7 @@ val_labels(ces7980$male)<-c(Female=0, Male=1)
 val_labels(ces7980$male)
 table(ces7980$male)
 
-#recode Union Household (V1514)
+#recode Union Respondent (V1514)
 look_for(ces7980, "union")
 ces7980$V1514
 ces7980$union<-Recode(ces7980$V1514, "1=1; 2=0; 8:9=NA")
@@ -20,6 +20,7 @@ val_labels(ces7980$union)<-c(None=0, Union=1)
 #checks
 val_labels(ces7980$union)
 table(ces7980$union)
+
 #recode Union Combined (V1512 and V1514)
 ces7980 %>% 
   mutate(union_both=case_when(
@@ -30,6 +31,7 @@ ces7980 %>%
     #if one is don't know and one is refused then missing
     V1512>7 & V1514>7 ~ NA_real_
   ))->ces7980
+
 table(ces7980$V1512)
 table(ces7980$V1514)
 val_labels(ces7980$union_both)<-c(None=0, Union=1)
@@ -37,6 +39,7 @@ val_labels(ces7980$union_both)<-c(None=0, Union=1)
 val_labels(ces7980$union_both)
 table(ces7980$union_both)
 table(ces7980$union_both, useNA = "ifany")
+
 #recode Education (V1502)
 look_for(ces7980, "school")
 look_for(ces7980, "degree")
@@ -125,6 +128,7 @@ val_labels(ces7980$sector)<-c(Private=0, Public=1)
 val_labels(ces7980$sector)
 table(ces7980$sector)
 table(ces7980$sector, ces7980$V4020)
+
 #recode Party ID (V1192)
 look_for(ces7980, "federal")
 ces7980$party_id<-Recode(ces7980$V1192, "1=1; 2=2; 3=3; 0=0; 4:7=0; else=NA")
@@ -175,7 +179,7 @@ val_labels(ces7980$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, Ci
 val_labels(ces7980$size)
 table(ces7980$size)
 
-#No Union Household variable
+#No Union Respondent variable
 
 #No Union Combined variable
 
@@ -236,6 +240,7 @@ val_labels(ces7980$vote80)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4,
 val_labels(ces7980$vote80)
 table(ces7980$vote80)
 table(ces7980$vote, ces7980$vote80)
+
 ##### See the script 1_master_file.R There I turned the values for the 79 variables into 1980 variables for the 1980 respondents
 # No Occupation variable
 

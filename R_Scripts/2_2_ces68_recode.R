@@ -12,7 +12,7 @@ names(ces68)
 val_labels(ces68$male)
 table(ces68$male)
 
-#recode Union Household (var363)
+#recode Union Respondent (var363)
 look_for(ces68, "union")
 ces68$var363
 ces68$union<-Recode(ces68$var363, "1=0; 2:4=1; 5=NA")
@@ -30,9 +30,10 @@ ces68 %>%
     var363==4 | var379==4 ~ 1,
     #This should only be missing if BOTH are not members, right?
     #Note var379 is the spousal activity variable, by setting it to be less than zero, I am including people who anaswered 1 (not a member) and 0 the mysterious unknown category
-    var363==1 & var379==1 ~ 0,
+    var363==1 | var379==1 ~ 0,
     #This should only be missing if BOTH are no reply, right?
-    var363==5 & var379==5 ~ NA_real_,
+    var363==5 | var379==5 ~ NA_real_,
+    var379==0 ~ 0,
   ))->ces68
 
 val_labels(ces68$union_both)<-c(None=0, Union=1)

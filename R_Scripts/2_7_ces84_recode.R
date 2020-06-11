@@ -10,7 +10,7 @@ val_labels(ces84$male)<-c(Female=0, Male=1)
 val_labels(ces84$male)
 table(ces84$male)
 
-#recode Union Household (VAR381)
+#recode Union Respondent (VAR381)
 look_for(ces84, "union")
 table(ces84$VAR381)
 ces84$union<-Recode(ces84$VAR381, "1=1; 2:8=0; else=NA")
@@ -20,11 +20,12 @@ val_labels(ces84$union)
 table(ces84$union)
 table(ces84$VAR378, ces84$VAR381)
 ces84$VAR378
+
 #recode Union Combined (VAR378 and VAR381)
 ces84 %>% 
   mutate(union_both=case_when(
-    VAR378==1 |VAR381==1 ~ 1,
-       VAR378==2 &VAR381==2 ~ 0, 
+    VAR378==1 | VAR381==1 ~ 1,
+    VAR378==2 | VAR381==2 ~ 0, 
     VAR378==8  ~ NA_real_,
     VAR381==8  ~ NA_real_
   ))->ces84
