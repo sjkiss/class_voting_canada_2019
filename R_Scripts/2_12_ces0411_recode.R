@@ -128,9 +128,19 @@ val_labels(ces0411$employment04)<-c(Unemployed=0, Employed=1)
 val_labels(ces0411$employment04)
 table(ces0411$employment04)
 
-#recode Sector (ces04_CPS_S5)
+#recode Sector (ces04_CPS_S5 & ces04_CPS_S4)
 look_for(ces0411, "self-employed")
-ces0411$sector04<-Recode(ces0411$ces04_CPS_S5, "5=1; 0:1=0; else=NA")
+ces0411 %>% 
+  mutate(sector04=case_when(
+    ces04_CPS_S5==5 ~1,
+    ces04_CPS_S5==1 ~0,
+    ces04_CPS_S5==0 ~0,
+    ces04_CPS_S4==1 ~0,
+    ces04_CPS_S4> 2 & ces04_CPS_S4< 12 ~ 0,
+    ces04_CPS_S5==9 ~NA_real_ ,
+    ces04_CPS_S5==8 ~NA_real_ ,
+  ))->ces0411
+
 val_labels(ces0411$sector04)<-c(Private=0, Public=1)
 #checks
 val_labels(ces0411$sector04)
@@ -276,9 +286,19 @@ val_labels(ces0411$employment06)<-c(Unemployed=0, Employed=1)
 val_labels(ces0411$employment06)
 table(ces0411$employment06)
 
-#recode Sector (ces06_CPS_S5)
+#recode Sector (ces06_CPS_S5 & ces06_CPS_S4)
 look_for(ces0411, "self-employed")
-ces0411$sector06<-Recode(ces0411$ces06_CPS_S5, "5=1; 0:1=0; else=NA")
+ces0411 %>% 
+  mutate(sector06=case_when(
+    ces06_CPS_S5==5 ~1,
+    ces06_CPS_S5==1 ~0,
+    ces06_CPS_S5==0 ~0,
+    ces06_CPS_S4==1 ~0,
+    ces06_CPS_S4> 2 & ces06_CPS_S4< 16 ~ 0,
+    ces06_CPS_S5==9 ~NA_real_ ,
+    ces06_CPS_S5==8 ~NA_real_ ,
+  ))->ces0411
+
 val_labels(ces0411$sector06)<-c(Private=0, Public=1)
 #checks
 val_labels(ces0411$sector06)
@@ -433,9 +453,19 @@ val_labels(ces0411$employment08)<-c(Unemployed=0, Employed=1)
 val_labels(ces0411$employment08)
 table(ces0411$employment08)
 
-#recode Sector (ces08_CPS_S5)
+#recode Sector (ces08_CPS_S5 & ces08_CPS_S4)
 look_for(ces0411, "self-employed")
-ces0411$sector08<-Recode(ces0411$ces08_CPS_S5, "5=1; 0:1=0; else=NA")
+ces0411 %>% 
+  mutate(sector08=case_when(
+    ces08_CPS_S5==5 ~1,
+    ces08_CPS_S5==1 ~0,
+    ces08_CPS_S5==0 ~0,
+    ces08_CPS_S4==1 ~0,
+    ces08_CPS_S4> 2 & ces08_CPS_S4< 12 ~ 0,
+    ces08_CPS_S5==9 ~NA_real_ ,
+    ces08_CPS_S5==8 ~NA_real_ ,
+  ))->ces0411
+
 val_labels(ces0411$sector08)<-c(Private=0, Public=1)
 #checks
 val_labels(ces0411$sector08)
@@ -586,9 +616,19 @@ val_labels(ces0411$employment11)<-c(Unemployed=0, Employed=1)
 val_labels(ces0411$employment11)
 table(ces0411$employment11)
 
-#recode Sector (PES11_92)
+#recode Sector (PES11_92 & CPS11_91)
 look_for(ces0411, "company")
-ces0411$sector11<-Recode(ces0411$PES11_92, "5=1; 0:1=0; else=NA")
+ces0411 %>% 
+  mutate(sector11=case_when(
+    PES11_92==5 ~1,
+    PES11_92==1 ~0,
+    PES11_92==0 ~0,
+    CPS11_91==1 ~0,
+    CPS11_91> 2 & CPS11_91< 12 ~ 0,
+    PES11_92==9 ~NA_real_ ,
+    PES11_92==8 ~NA_real_ ,
+  ))->ces0411
+
 val_labels(ces0411$sector11)<-c(Private=0, Public=1)
 #checks
 val_labels(ces0411$sector11)

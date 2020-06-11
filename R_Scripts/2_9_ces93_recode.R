@@ -107,9 +107,19 @@ val_labels(ces93$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces93$employment)
 table(ces93$employment)
 
-#recode Sector (CPSJOB5)
+#recode Sector (CPSJOB5 & CPSJOB1)
 look_for(ces93, "sector")
-ces93$sector<-Recode(ces93$CPSJOB5, "3:7=1; 1=0; else=NA")
+ces93 %>% 
+  mutate(sector=case_when(
+    CPSJOB5==3 ~1,
+    CPSJOB5==5 ~1,
+    CPSJOB5==7 ~1,
+    CPSJOB5==1 ~0,
+    CPSJOB1> 1 & CPSJOB1< 8 ~ 0,
+    CPSJOB5==9 ~NA_real_ ,
+    CPSJOB5==8 ~NA_real_ ,
+  ))->ces93
+
 val_labels(ces93$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces93$sector)

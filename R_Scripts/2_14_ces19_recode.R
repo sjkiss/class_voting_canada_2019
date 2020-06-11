@@ -90,9 +90,19 @@ val_labels(ces19phone$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces19phone$employment)
 table(ces19phone$employment)
 
-#recode Sector (p53)
+#recode Sector (p53 & q68)
 look_for(ces19phone, "public")
-ces19phone$sector<-Recode(ces19phone$p53, "1=1; 4=1; 2=0; else=NA")
+ces19phone %>% 
+  mutate(sector=case_when(
+    p53==1 ~1,
+    p53==2 ~0,
+    p53==3 ~0,
+    p53==4 ~0,
+    q68>2 & q68< 12 ~ 0,
+    p53==-9 ~NA_real_ ,
+    p53==-8 ~NA_real_ ,
+  ))->ces19phone
+
 val_labels(ces19phone$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces19phone$sector)

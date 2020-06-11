@@ -96,7 +96,7 @@ val_labels(ces84$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces84$employment)
 table(ces84$employment)
 
-#recode Sector (VAR530 and VAR526)
+#recode Sector (VAR530, VAR526, VAR525 & VAR524)
 look_for(ces84, "company")
 look_for(ces84, "occupation")
 look_for(ces84, "employment")

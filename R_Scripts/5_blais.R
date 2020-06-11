@@ -65,7 +65,8 @@ ces %>%
   summarise_all(function(x) sum(is.na(x))) %>% 
   View()
 
-###Model 1 - Blais replication (all elections with region)
+-------------------------------------------------------------------------------------------------------------
+### Blais replication
 ##NDP
 table(ces$sector, ces$election)
 ces %>% 
@@ -93,51 +94,56 @@ stargazer(blais_models$mods,
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time())))
 
+#-----------------------------------------------------------------------------------------------------------
+### Blais replication extended all years (without community size)
+##NDP
 
-# table(ces$election, ces$sector)
-# #AS always start witht the data frame
-# ces %>% 
-#   #form the groups of interest
-#   group_by(election) %>% 
-#   #we need to filter out years where there are missing variables
-#   filter(election!=1965 & election!=1972 & election!=2000 & election!=2019) %>%  
-#   #nest all the other data columns into "list columns", one for each election (group)
-#   nest(variables=-election) %>% 
-#   #mutate adds a new column called models
-#   #To create that we are mapping onto each instance of the column data the function that follows 
-#   mutate(linear.models1=map(variables, function(x) lm(ndp~region2+catholic+no_religion+working_class+union_both+age+female+sector, data=x)),
-#          
-#          #Then we are using the tidy function applied to the new column mods to tidy up those models
-#          #and storing everything into an object called models
-#          
-#          tidied=map(linear.models1, tidy)
-#          )->models1
-# ces$region2
-# table(ces$sector)
-# #take a look at models
-# head(models1)
-# models1$linear.models1
-# models1$tidied
+ table(ces$election, ces$sector)
+ 
+ #AS always start witht the data frame
+ ces %>% 
+   #form the groups of interest
+   group_by(election) %>% 
+   #we need to filter out years where there are missing variables
+   filter(election!=1965 & election!=1972 & election!=2000 & election!=2019) %>%  
+   #nest all the other data columns into "list columns", one for each election (group)
+   nest(variables=-election) %>% 
+   #mutate adds a new column called models
+   #To create that we are mapping onto each instance of the column data the function that follows 
+   mutate(linear.models1=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector , data=x)),
+          
+          #Then we are using the tidy function applied to the new column mods to tidy up those models
+          #and storing everything into an object called models
+          
+          tidied=map(linear.models1, tidy)
+          )->models1
+ 
+ces$region2
+table(ces$sector)
+#take a look at models
+head(models1)
+models1$linear.models1
+models1$tidied
+
+#as always start with the data frame and pipe
+models1 %>% 
+#unnest takes the tidied column and spreads it out for viewing
+unnest(tidied) %>% 
+#filter only the union_both coefficients
+filter(term=="sector") %>% 
+#plot
+ggplot(., aes(x=election,y=estimate ))+geom_point()+labs(title="M1: Linear Coefficients of voting NDP by sector")
 # 
-# #as always start with the data frame and pipe
-# models1 %>% 
-#   #unnest takes the tidied column and spreads it out for viewing
-#   unnest(tidied) %>% 
-#   #filter only the union_both coefficients
-#   filter(term=="sector") %>% 
-#   #plot
-#   ggplot(., aes(x=election,y=estimate ))+geom_point()+labs(title="M1: Linear Coefficients of voting NDP by sector")
+#we can save that plot 
+ggsave(here("Plots", "M1_ndp_by_sector.png"))
+##Lots of functions to print regression tables
 # 
-# #we can save that plot 
-# ggsave(here("Plots", "M1_ndp_by_sector.png"))
-# ##Lots of functions to print regression tables
-# 
-# library(stargazer)
-# elections<-c( '1968', '1974', '1979', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015')
-# elections
-# ##stargazer works best with the untidied models
-# stargazer(models1$linear.models1, column.labels=elections, type="text")
-# #Can also output models as an html file
-# stargazer(models1$linear.models1, column.labels=elections, type="html", out=here("Tables", "M1_Blais_extension.html"), digits=2)
+library(stargazer)
+elections<-c( '1968', '1974', '1979', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015')
+elections
+##stargazer works best with the untidied models
+stargazer(models1$linear.models1, column.labels=elections, type="text")
+#Can also output models as an html file
+stargazer(models1$linear.models1, column.labels=elections, type="html", out=here("Tables", "M1_Blais_extension.html"), digits=2)
 # 
 # #
