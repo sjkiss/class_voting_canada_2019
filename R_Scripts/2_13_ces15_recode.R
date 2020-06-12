@@ -10,7 +10,7 @@ val_labels(ces15phone$male)<-c(Female=0, Male=1)
 val_labels(ces15phone$male)
 table(ces15phone$male)
 
-#recode Union Household (PES15_94)
+#recode Union Respondent (PES15_93)
 look_for(ces15phone, "union")
 ces15phone$union<-Recode(ces15phone$PES15_93, "1=1; 5=0; else=NA")
 val_labels(ces15phone$union)<-c(None=0, Union=1)
@@ -22,9 +22,9 @@ table(ces15phone$union)
 ces15phone %>% 
   mutate(union_both=case_when(
     PES15_93==1 | PES15_94==1 ~ 1,
-    PES15_93==5 & PES15_94==5 ~ 0,
-    PES15_93==8 & PES15_94==9 ~ NA_real_,
-    PES15_93==9 & PES15_94==8 ~ NA_real_,
+    PES15_93==5 | PES15_94==5 ~ 0,
+    PES15_93==8 & PES15_94==8 ~ NA_real_,
+    PES15_93==9 & PES15_94==9 ~ NA_real_,
   ))->ces15phone
 
 val_labels(ces15phone$union_both)<-c(None=0, Union=1)
@@ -95,9 +95,20 @@ val_labels(ces15phone$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces15phone$employment)
 table(ces15phone$employment)
 
-#recode Sector (PES15_92)
+#recode Sector (PES15_92 & CPS15_91)
 look_for(ces15phone, "company")
-ces15phone$sector<-Recode(ces15phone$PES15_92, "5=1; 0:1=0; else=NA")
+look_for(ces15phone, "private")
+ces15phone %>% 
+  mutate(sector=case_when(
+    PES15_92==5 ~1,
+    PES15_92==1 ~0,
+    PES15_92==0 ~0,
+    CPS15_91==1 ~0,
+    CPS15_91>2 & CPS15_91< 12 ~ 0,
+    PES15_92==9 ~NA_real_ ,
+    PES15_92==8 ~NA_real_ ,
+  ))->ces15phone
+
 val_labels(ces15phone$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces15phone$sector)
