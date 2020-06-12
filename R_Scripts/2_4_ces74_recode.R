@@ -1,8 +1,9 @@
 #File to Recode 1974 CES Data for 1974 election 
-library(cesdata)
+
 #load data
 data("ces74")
 nrow(ces74)
+
 #recode Gender (V480)
 look_for(ces74, "sex")
 ces74$male<-Recode(ces74$V480, "1=1; 2=0; 9=NA")
@@ -13,8 +14,7 @@ table(ces74$male)
 
 #recode Union Household (V477)
 look_for(ces74, "union")
-
-ces74$union<-Recode(ces74$V476, "1=1; 2=0; 8=NA")
+ces74$union<-Recode(ces74$V477, "1=1; 2=0; 8=0")
 val_labels(ces74$union)<-c(None=0, Union=1)
 #checks
 val_labels(ces74$union)
@@ -22,12 +22,17 @@ table(ces74$union)
 table(ces74$V476,ces74$V477)
 ces74$V477
 ces74$V478
+
 #Union Combined variable (identical copy of union)
 ces74$union_both<-ces74$union
+#checks
+val_labels(ces74$union_both)
+table(ces74$union_both)
+
 #recode Education (V414)
 look_for(ces74, "school")
 look_for(ces74, "degree")
-ces74$degree<-Recode(ces74$V417, "25=1; 0:13=0")
+ces74$degree<-Recode(ces74$V414, "25=1; 0:13=0")
 val_labels(ces74$degree)<-c(nodegree=0, degree=1)
 #checks
 val_labels(ces74$degree)
@@ -92,8 +97,14 @@ table(ces74$employment)
 #recode Sector (V386)
 look_for(ces74, "sector")
 look_for(ces74, "business")
+ces74 %>% 
+  mutate(sector=case_when(
+    V386==13 ~ 1,
+    V386> 0 & V386 < 13 ~ 0,
+    V381> 0 & V381 < 7 ~ 0,
+    V381==50 ~ 0,
+  ))->ces74
 
-ces74$sector<-Recode(ces74$V386, "13=1; 1:12=0; else=NA")
 val_labels(ces74$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces74$sector)
@@ -130,7 +141,6 @@ val_labels(ces74$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, 
 #checks
 val_labels(ces74$income)
 table(ces74$income)
-names(ces74)
 
 #recode Community Size (V9)
 look_for(ces74, "community")
@@ -141,3 +151,5 @@ val_labels(ces74$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, City
 #checks
 val_labels(ces74$size)
 table(ces74$size)
+
+names(ces74)
