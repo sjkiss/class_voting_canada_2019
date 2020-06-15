@@ -99,6 +99,8 @@ look_for(ces74, "sector")
 look_for(ces74, "business")
 ces74 %>% 
   mutate(sector=case_when(
+    V395==69.25 ~ 1,
+    V395==71.77 ~ 1,
     V386==13 ~ 1,
     V386> 0 & V386 < 13 ~ 0,
     V381> 0 & V381 < 7 ~ 0,

@@ -17,13 +17,18 @@ nrow(ces7980)==2761
 nrow(ces84)==3377
 nrow(ces88)==3609
 ####Check that the datasets do not contain the recoded variable names
+tail(names(ces74))
 tail(names(ces84))
 tail(names(ces0411))
 tail(names(ces15phone))
-
+#extra checks for ces74
+table(ces74$sector)
+table(ces74$union)
 ## Note: If it appears that the loaded datasets include recoded variable names at this point you may  neee do uncomment the next line, and run it once
 #rm(list = ls(all.names = TRUE)) #will clear all objects includes hidden objects.
 #### and then go back up and re-run the code, not re-running the rm() line above again. 
+
+
 #load the here() library
 library(here)
 ###How to use the here()package

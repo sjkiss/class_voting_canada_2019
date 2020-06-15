@@ -32,20 +32,31 @@ ces7980 %>%
 ces74%>% 
   select(V2) %>% 
   summary()
+
 ###### This code section creates a ces74 data frame from the ces74-79-80 panel survey
 ###### It does this because sector was only asked of non-manual respondents in ces74, but it was asked of everybody in ces79
 ###### Blais took the responses for the 79 question for the ces74 respondents who were reinterviewed in ces79 and made it to be their 74 response. So he went backward. 
 ###### All our other demographic variables were created from the pure cross-sectional survey, so I didn't want to waste all that work. 
 ###### When we get close to fully being able to replicate Blais, we can execute this code to create ces74 Until then we keep it off. 
-table(ces7980$sector)
+# table(ces7980$sector)
+# table(ces74$V2)
+# data("ces7980")
 # ces7980 %>%
 #   #Select V9, sector and panel
+#   #V9 is joint ces74 and ces7990 respondent id, sector is sector variablef rom ces7980 and 
+#   #V4020 is filter variable 1= ces7980 respondents who filled out ces74 surve
 #   select(V9, sector, V4020) %>%
 #   #inner join (return all rows from 7980 that have values in V9 that match in ces74 on V2)
 #   inner_join(., ces74, by=c("V9"="V2")) ->ces74.out
+# #ces74.out is a reduced ces7980 dataframe; it now only includes ces7980 respondents who respondend to ces74 survey
+# tail(names(ces74.out))
+# table(ces7980$V9)
 # #how many respondents in ces74
 # nrow(ces74.out)
+# #sector.x is the sector variable from 7980; should be a lot larger than sector.y
 # table(ces74.out$sector.x)
+# #setor.7 is the sector variable from ces74; only asked of non-manual respondents, see note in Blais (1990)
+# #should be a lot smaller than sector.x
 # table(ces74.out$sector.y)
 # #The technical documentation says that there are 1295 CES74 panel respondents reinterviewed in CES79
 # ## 1298 is close, but not exact
@@ -55,20 +66,20 @@ table(ces7980$sector)
 #   #Filter in respondents who have a value of 1 on the 74-79 panel filter
 #   filter(V4020==1)->ces74.out
 # 
-# names(ces74.out)
-# table(ces74.out$sector.x)
-# table(ces74.out$sector.y)
 # #take ces74.out
 # ces74.out %>%
 #   #delete sector.y which is the sector variable from the pure ces74 study
 #   select(-sector.y) %>%
-#   #sector sector.x to be sector to match all the other variables
+#   #sector sector.x which is the sector variable from ces7980 to be sector to match all the other variables
 #   rename(sector=sector.x)->ces74.out
-# #rename
+# ces74.out$sector
+# nrow(ces74.out)
+# #rename the whole ces74.out data frame to be ces74; old ces74 will now be gone. 
 # ces74<-ces74.out
+# 
+# table(ces74$sector)
 
-table(ces74$sector)
-
+#Seprate ces79 and ces80 to two separate files
 ces7980 %>% 
   filter(V4002==1)->ces79
 ces7980 %>% 
@@ -89,6 +100,10 @@ table(ces80$vote, ces80$vote80)
 ces80 %>% 
   select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, religion, non_charter_language, size)->ces80
 names(ces80)
+
+### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
+  ces93[!is.na(ces93$RTYPE4), ] -> ces93
+           
 #####SPLITTING THE 04-11 FILE
 
 ### STEP 1

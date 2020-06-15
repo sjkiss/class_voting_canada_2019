@@ -112,6 +112,10 @@ ces7980$V1471
 table(ces7980$V1471)
 ces7980 %>% 
   mutate(sector=case_when(
+    #teachers and nurses are added to public sector
+    V1484==6925 ~ 1,
+    V1484==7177 ~ 1,
+    V1484==7230 ~ 1,
     #all government employees go to public sector
     V1473==13 ~ 1,
     #all non-government employees go to zero
@@ -161,7 +165,7 @@ val_labels(ces7980$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4
 val_labels(ces7980$income)
 table(ces7980$income)
 
-
+#--------------------------------------------------------------------------------------------------------------------
 ####1980
 #recode Gender (V2156)
 look_for(ces7980, "sex")
@@ -232,6 +236,7 @@ val_labels(ces7980$party_id80)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces7980$party_id80)
 table(ces7980$party_id80)
 table(ces7980$party_id, ces7980$party_id80)
+
 #recode Vote (V2062)
 look_for(ces7980, "vote")
 ces7980$vote80<-Recode(ces7980$V2062, "1=1; 2=2; 3=3; 4:5=0; else=NA")
