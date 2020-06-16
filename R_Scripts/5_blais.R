@@ -66,8 +66,8 @@ ces %>%
   View()
 
 -------------------------------------------------------------------------------------------------------------
-### Blais replication
-##NDP
+
+#### Blais replication NDP Models ####
 table(ces$sector, ces$election)
 ces %>% 
   group_by(election) %>% 
@@ -77,73 +77,118 @@ ces %>%
            election==1980|
            election==1984) %>% 
   nest(variables=-election) %>% 
-  mutate(mods=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+size+sector, data=x)),
-         tidied=map(mods, tidy))->blais_models
+  mutate(ndp=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+size+sector, data=x)),
+         tidied=map(ndp, tidy))->ndp_models
 
 library(stargazer)
-#stargazer(blais_models$mods, type="text")
-stargazer(blais_models$mods, 
+#stargazer(blais_models$ndp, type="text")
+stargazer(ndp_models$ndp, 
           #print out html file
           type="html", 
           #file path where table should be printed and file name
-          out=here("Tables", "M1_Blais_replication.html"), 
+          out=here("Tables", "M1_Blais_replication_ndp.html"), 
+          #label the model columns
+          column.labels=c("1968", "1974", "1979", "1980", "1984"), 
+          #set the cutoffs for one star to be 0.05
+        #  star.cutoffs=c(0.05), 
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+#### Blais replication Conservative models #### 
+table(ces$sector, ces$election)
+ces %>% 
+  group_by(election) %>% 
+  filter(election==1968|
+           election==1974|
+           election==1979|
+           election==1980|
+           election==1984) %>% 
+  nest(variables=-election) %>% 
+  mutate(con=map(variables, function(x) lm(conservative~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+size+sector, data=x)),
+         tidied=map(con, tidy))->con_models
+
+library(stargazer)
+#stargazer(blais_models$con, type="text")
+stargazer(con_models$con, 
+          #print out html file
+          type="html", 
+          #file path where table should be printed and file name
+          out=here("Tables", "M1_Blais_replication_con.html"), 
           #label the model columns
           column.labels=c("1968", "1974", "1979", "1980", "1984"), 
           #set the cutoffs for one star to be 0.05
           star.cutoffs=c(0.05), 
           #print some notes to show when the table is constructed
-          notes=paste("Printed on", as.character(Sys.time())))
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+#### Blais Replication Liberal Models ####
+table(ces$sector, ces$election)
+ces %>% 
+  group_by(election) %>% 
+  filter(election==1968|
+           election==1974|
+           election==1979|
+           election==1980|
+           election==1984) %>% 
+  nest(variables=-election) %>% 
+  mutate(liberal=map(variables, function(x) lm(liberal~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+size+sector, data=x)),
+         tidied=map(liberal, tidy))->liberal_models
 
-#-----------------------------------------------------------------------------------------------------------
-### Blais replication extended all years (without community size)
-##NDP
-
- table(ces$election, ces$sector)
- 
- #AS always start witht the data frame
- ces %>% 
-   #form the groups of interest
-   group_by(election) %>% 
-   #we need to filter out years where there are missing variables
-   filter(election!=1965 & election!=1972 & election!=2000 & election!=2019) %>%  
-   #nest all the other data columns into "list columns", one for each election (group)
-   nest(variables=-election) %>% 
-   #mutate adds a new column called models
-   #To create that we are mapping onto each instance of the column data the function that follows 
-   mutate(linear.models1=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector , data=x)),
-          
-          #Then we are using the tidy function applied to the new column mods to tidy up those models
-          #and storing everything into an object called models
-          
-          tidied=map(linear.models1, tidy)
-          )->models1
- 
-ces$region2
-table(ces$sector)
-#take a look at models
-head(models1)
-models1$linear.models1
-models1$tidied
-
-#as always start with the data frame and pipe
-models1 %>% 
-#unnest takes the tidied column and spreads it out for viewing
-unnest(tidied) %>% 
-#filter only the union_both coefficients
-filter(term=="sector") %>% 
-#plot
-ggplot(., aes(x=election,y=estimate ))+geom_point()+labs(title="M1: Linear Coefficients of voting NDP by sector")
-# 
-#we can save that plot 
-ggsave(here("Plots", "M1_ndp_by_sector.png"))
-##Lots of functions to print regression tables
-# 
 library(stargazer)
-elections<-c( '1968', '1974', '1979', '1980', '1984', '1988', '1993', '1997', '2004', '2006', '2008', '2011', '2015')
-elections
-##stargazer works best with the untidied models
-stargazer(models1$linear.models1, column.labels=elections, type="text")
-#Can also output models as an html file
-stargazer(models1$linear.models1, column.labels=elections, type="html", out=here("Tables", "M1_Blais_extension.html"), digits=2)
-# 
-# #
+stargazer(liberal_models$liberal, 
+          #print out html file
+          type="html", 
+          #file path where table should be printed and file name
+          out=here("Tables", "M1_Blais_replication_liberal.html"), 
+          #label the model columns
+          column.labels=c("1968", "1974", "1979", "1980", "1984"), 
+          #set the cutoffs for one star to be 0.05
+        #  star.cutoffs=c(0.05), 
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+#### Blais Replication Extension ####
+table(ces$election, ces$sector)
+ces %>% 
+   filter(election!=1965 & election!=2019&election!=1972) %>%
+   nest(variables=-election) %>% 
+mutate(ndp=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector, data=x)), 
+       tidied=map(ndp, tidy))->ndp_models_complete
+ces %>% 
+   filter(election!=1965 & election!=2019&election!=1972) %>%
+   nest(variables=-election) %>% 
+mutate(conservative=map(variables, function(x) lm(conservative~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector, data=x)), 
+       tidied=map(conservative, tidy))->conservative_models_complete
+
+ces %>% 
+   filter(election!=1965 & election!=2019&election!=1972) %>%
+   nest(variables=-election) %>% 
+mutate(liberal=map(variables, function(x) lm(liberal~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+sector, data=x)), 
+       tidied=map(liberal, tidy))->liberal_models_complete
+
+stargazer(ndp_models_complete$ndp, 
+          type="html", 
+          out=here("Tables", "NDP_Models_1968_2015.html"),
+          column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015"), 
+          #set the cutoffs for one star to be 0.05
+          star.cutoffs=c(0.05), 
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(liberal_models_complete$liberal, 
+          type="html", 
+          out=here("Tables", "liberal_Models_1968_2015.html"),
+          column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015"), 
+          #set the cutoffs for one star to be 0.05
+          star.cutoffs=c(0.05), 
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+
+stargazer(conservative_models_complete$conservative, 
+          type="html", 
+          out=here("Tables", "conservative_Models_1968_2015.html"),
+          column.labels=c("1968", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015"), 
+          #set the cutoffs for one star to be 0.05
+          star.cutoffs=c(0.05), 
+          #print some notes to show when the table is constructed
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+

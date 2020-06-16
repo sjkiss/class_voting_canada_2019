@@ -38,46 +38,46 @@ ces74%>%
 ###### Blais took the responses for the 79 question for the ces74 respondents who were reinterviewed in ces79 and made it to be their 74 response. So he went backward. 
 ###### All our other demographic variables were created from the pure cross-sectional survey, so I didn't want to waste all that work. 
 ###### When we get close to fully being able to replicate Blais, we can execute this code to create ces74 Until then we keep it off. 
-# table(ces7980$sector)
-# table(ces74$V2)
-# data("ces7980")
-# ces7980 %>%
-#   #Select V9, sector and panel
-#   #V9 is joint ces74 and ces7990 respondent id, sector is sector variablef rom ces7980 and 
-#   #V4020 is filter variable 1= ces7980 respondents who filled out ces74 surve
-#   select(V9, sector, V4020) %>%
-#   #inner join (return all rows from 7980 that have values in V9 that match in ces74 on V2)
-#   inner_join(., ces74, by=c("V9"="V2")) ->ces74.out
-# #ces74.out is a reduced ces7980 dataframe; it now only includes ces7980 respondents who respondend to ces74 survey
-# tail(names(ces74.out))
-# table(ces7980$V9)
-# #how many respondents in ces74
-# nrow(ces74.out)
-# #sector.x is the sector variable from 7980; should be a lot larger than sector.y
-# table(ces74.out$sector.x)
-# #setor.7 is the sector variable from ces74; only asked of non-manual respondents, see note in Blais (1990)
-# #should be a lot smaller than sector.x
-# table(ces74.out$sector.y)
-# #The technical documentation says that there are 1295 CES74 panel respondents reinterviewed in CES79
-# ## 1298 is close, but not exact
-# table(ces74.out$V4020)#
-# #There are 3 people who are not part of the ces74-79 panel that got caught with the same respondent IDS
-# ces74.out %>%
-#   #Filter in respondents who have a value of 1 on the 74-79 panel filter
-#   filter(V4020==1)->ces74.out
-# 
-# #take ces74.out
-# ces74.out %>%
-#   #delete sector.y which is the sector variable from the pure ces74 study
-#   select(-sector.y) %>%
-#   #sector sector.x which is the sector variable from ces7980 to be sector to match all the other variables
-#   rename(sector=sector.x)->ces74.out
-# ces74.out$sector
-# nrow(ces74.out)
-# #rename the whole ces74.out data frame to be ces74; old ces74 will now be gone. 
-# ces74<-ces74.out
-# 
-# table(ces74$sector)
+table(ces7980$sector)
+table(ces74$V2)
+data("ces7980")
+ces7980 %>%
+  #Select V9, sector and panel
+  #V9 is joint ces74 and ces7990 respondent id, sector is sector variablef rom ces7980 and
+  #V4020 is filter variable 1= ces7980 respondents who filled out ces74 surve
+  select(V9, sector, V4020) %>%
+  #inner join (return all rows from 7980 that have values in V9 that match in ces74 on V2)
+  inner_join(., ces74, by=c("V9"="V2")) ->ces74.out
+#ces74.out is a reduced ces7980 dataframe; it now only includes ces7980 respondents who respondend to ces74 survey
+tail(names(ces74.out))
+table(ces7980$V9)
+#how many respondents in ces74
+nrow(ces74.out)
+#sector.x is the sector variable from 7980; should be a lot larger than sector.y
+table(ces74.out$sector.x)
+#setor.7 is the sector variable from ces74; only asked of non-manual respondents, see note in Blais (1990)
+#should be a lot smaller than sector.x
+table(ces74.out$sector.y)
+#The technical documentation says that there are 1295 CES74 panel respondents reinterviewed in CES79
+## 1298 is close, but not exact
+table(ces74.out$V4020)#
+#There are 3 people who are not part of the ces74-79 panel that got caught with the same respondent IDS
+ces74.out %>%
+  #Filter in respondents who have a value of 1 on the 74-79 panel filter
+  filter(V4020==1)->ces74.out
+
+#take ces74.out
+ces74.out %>%
+  #delete sector.y which is the sector variable from the pure ces74 study
+  select(-sector.y) %>%
+  #sector sector.x which is the sector variable from ces7980 to be sector to match all the other variables
+  rename(sector=sector.x)->ces74.out
+ces74.out$sector
+nrow(ces74.out)
+#rename the whole ces74.out data frame to be ces74; old ces74 will now be gone.
+ces74<-ces74.out
+
+table(ces74$sector)
 
 #Seprate ces79 and ces80 to two separate files
 ces7980 %>% 
@@ -407,5 +407,5 @@ val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3)
 #This command calls the file 2_diagnostics.R
 source("R_scripts/3_recode_diagnostics.R", echo=T)
 source("R_scripts/4_make_models.R", echo=T)
-
+source("R_scripts/5_blais.R", echo=T)
 
