@@ -28,29 +28,38 @@ val_labels(ces0411$union04)
 table(ces0411$union04)
 
 #recode Union Combined (ces04_CPS_S6A and ces04_CPS_S6B)
-ces0411 %>% 
+look_for(ces0411, "union") %>% 
+  View()
+ces0411$ces04_CPS_S6A
+ces0411$ces04_CPS_S6B
+table(ces0411$ces04_CPS_S6A, ces0411$ces04_CPS_S6B, useNA = "ifany")
+
+# Note! The household union question was only asked if the respondent was not a member of a union or if they didn't answer!!
+ces0411 %>%
   mutate(union_both04=case_when(
     #If the person is in a union OR if the household is in a union, then they get a 1
-    ces04_CPS_S6A==1 | ces04_CPS_S6B==1 ~ 1,
-    #If the person is not in a union AND if the household is not in a union then thety get a 0 
-    ces04_CPS_S6A==5 | ces04_CPS_S6B==5 ~ 0,
+    ces04_CPS_S6A==1 |    ces04_CPS_S6B==1 ~ 1,
+    #If the person is not in a union AND if the household is not in a union then thety get a 0
+     ces04_CPS_S6B==5 ~ 0,
     ces04_CPS_S6A==8 & ces04_CPS_S6B==8 ~ NA_real_,
-    ces04_CPS_S6A==9 & ces04_CPS_S6B==9 ~ NA_real_,
+    ces04_CPS_S6A==9 & ces04_CPS_S6B==9 ~ NA_real_
   ))->ces0411
+
+table(ces0411$union_both04, useNA = "ifany")
 
 val_labels(ces0411$union_both04)<-c(None=0, Union=1)
 
 #checks
 val_labels(ces0411$union_both04)<-c(None=0, Union=1)
 table(ces0411$union_both04)
-table( as_factor(ces0411$ces04_CPS_S6A), as_factor(ces0411$union04))
-table( as_factor(ces0411$ces04_CPS_S6B), as_factor(ces0411$union04))
-table( as_factor(ces0411$ces04_CPS_S6A), as_factor(ces0411$union_both04))
-table( as_factor(ces0411$ces04_CPS_S6B), as_factor(ces0411$union_both04))
-
-table(as_factor(ces0411$union04), as_factor(ces0411$ces04_CPS_S6B))
-table(as_factor(ces0411$union_both04), as_factor(ces0411$ces04_CPS_S6A))
-table(as_factor(ces0411$union_both04), as_factor(ces0411$ces04_CPS_S6B))
+ces0411 %>% 
+  select(ces04_CPS_S6A, ces04_CPS_S6B, union_both04) %>% 
+  group_by(ces04_CPS_S6A, ces04_CPS_S6B, union_both04) %>% 
+  summarize(n=n())
+# Some checks
+table( as_factor(ces0411$ces04_CPS_S6A), as_factor(ces0411$ces04_CPS_S6B), useNA = "ifany")
+table(as_factor(ces0411$union_both04), as_factor(ces0411$ces04_CPS_S6A), useNA = "ifany")
+table(as_factor(ces0411$union_both04), as_factor(ces0411$ces04_CPS_S6B), useNA = "ifany")
 
 #recode Education (ces04_CPS_S3)
 look_for(ces0411, "education")
@@ -218,7 +227,7 @@ val_labels(ces0411$union_both06)<-c(None=0, Union=1)
 #checks
 val_labels(ces0411$union_both06)
 table(ces0411$union_both06)
-
+table(as_factor(ces0411$ces06_CPS_S6A), as_factor(ces0411$union_both06), useNA = "ifany")
 #recode Education (ces06_CPS_S3)
 look_for(ces0411, "education")
 ces0411$degree06<-Recode(ces0411$ces06_CPS_S3, "9:11=1; 1:8=0; else=NA")
@@ -324,6 +333,7 @@ table(ces0411$party_id06)
 
 #recode Vote (ces06_PES_B4A and ces06_PES_B4B) 
 look_for(ces0411, "party did you vote")
+ces0411$ces06_PES_B4A
 ces0411 %>% 
   mutate(vote06=case_when(
     ces06_PES_B4A==1 | ces06_PES_B4B==1 ~ 1,
@@ -333,7 +343,7 @@ ces0411 %>%
     ces06_PES_B4A==0 | ces06_PES_B4B==0 ~ 0,
     ces06_PES_B4A==4 | ces06_PES_B4B==4 ~ 0,
   ))->ces0411
-
+table(ces0411$ces06_PES_B4A, ces0411$vote06)
 val_labels(ces0411$vote06)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
 val_labels(ces0411$vote06)
@@ -384,7 +394,7 @@ val_labels(ces0411$union_both08)<-c(None=0, Union=1)
 #checks
 val_labels(ces0411$union_both08)
 table(ces0411$union_both08)
-
+table(as_factor(ces0411$ces08_CPS_S6A), as_factor(ces0411$union_both08), useNA = "ifany")
 #recode Education (ces08_CPS_S3)
 look_for(ces0411, "education")
 ces0411$degree08<-Recode(ces0411$ces08_CPS_S3, "9:11=1; 1:8=0; else=NA")
@@ -674,3 +684,4 @@ val_labels(ces0411$income11)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle
 #checks
 val_labels(ces0411$income11)
 table(ces0411$income11)
+

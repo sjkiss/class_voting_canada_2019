@@ -192,3 +192,48 @@ stargazer(conservative_models_complete$conservative,
           #print some notes to show when the table is constructed
           notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
 
+#### Check for massive drop in missing values in mid 2000s ####
+ces%>% 
+  filter(election==2000) %>% 
+  select(no_religion, region2, catholic, sector, female, non_charter_language, union_both) %>% 
+  summary()
+#### Check for massive drop in missing values in mid 2000s ####
+ces%>% 
+  filter(election==2004) %>% 
+  select(no_religion, region2, catholic, sector, female, non_charter_language, union_both) %>% 
+  summary()
+ces%>% 
+  filter(election==2006) %>% 
+  select(no_religion, region2, catholic, sector, female, non_charter_language, union_both) %>% 
+  summary()
+ces%>% 
+  filter(election==2008) %>% 
+  select(no_religion, region2, catholic, sector, female, non_charter_language, union_both) %>% 
+  summary()
+
+ces%>% 
+  filter(election==2011) %>% 
+  select(no_religion, region2, catholic, sector, female, non_charter_language, union_both) %>% 
+  summary()
+
+look_for(ces0411, "union")
+
+#### Blais Plots ####
+# Set theme
+theme_set(theme_bw())
+ndp_models_complete %>% 
+unnest(tidied) %>% 
+  filter(term=="sector") %>% 
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on NDP Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+  ggsave(here("Plots", "sector_ndp_1968_2015.png"))
+liberal_models_complete %>% 
+unnest(tidied) %>% 
+  filter(term=="sector") %>% 
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on Liberal Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+    ggsave(here("Plots", "sector_liberal_1968_2015.png"))
+conservative_models_complete %>% 
+unnest(tidied) %>% 
+  filter(term=="sector") %>% 
+  ggplot(., aes(x=election, y=estimate))+geom_point()+labs(title="OLS Coefficients of Public Sector on Conservative Vote")+geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+ylim(c(-0.2,0.2))
+ggsave(here("Plots", "sector_conservative_1968_2015.png"))
+  
