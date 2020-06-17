@@ -79,7 +79,7 @@ ces %>%
   nest(variables=-election) %>% 
   mutate(ndp=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+working_class+union_both+age+female+size+sector, data=x)),
          tidied=map(ndp, tidy))->ndp_models
-
+table(ces$election, ces$sector)
 library(stargazer)
 #stargazer(blais_models$ndp, type="text")
 stargazer(ndp_models$ndp, 
@@ -200,7 +200,7 @@ ces%>%
 #### Check for massive drop in missing values in mid 2000s ####
 ces%>% 
   filter(election==2004) %>% 
-  select(no_religion, region2, catholic, sector, female, non_charter_language, union_both) %>% 
+  select(no_religion, region2, catholic, sector, female, non_charter_language, union_both, working_class) %>% 
   summary()
 ces%>% 
   filter(election==2006) %>% 

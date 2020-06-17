@@ -31,7 +31,7 @@ ces %>%
   filter(union==1& vote==3) %>% 
   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Percent of Union Members Voting NDP")
 
-## What is the public/private share of NDP voters
+## What Share of Private and Public Sector Union Members vote NDP
 ces %>% 
   group_by(election, union, sector,ndp) %>% 
   summarize(n=n()) %>% 
@@ -43,20 +43,21 @@ ces %>%
   filter(ndp==1) %>% 
   ggplot(., aes(x=election, y=percent, fill=as_factor(sector)))+geom_col(position="dodge")+labs(title="Share of Public and PRivate sector union respondents voting NDP")
 
-## Let's check the private / public sector share
+## Let's check the private / public sector share of the NDP universe
 ces %>% 
   group_by(election, vote, sector) %>% 
   summarize(n=n()) %>% 
   mutate(pct=n/sum(n)) %>%
   filter(sector==1& vote==3) %>% 
-  ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Percent of NDP Voters in publid sector")
+  ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Percent of NDP Voters in public sector")
 
 ces %>% 
   group_by(election, sector, vote) %>% 
   summarize(n=n()) %>% 
+  filter(is.na(sector)==F) %>% 
   mutate(pct=n/sum(n)) %>%
-  filter(sector==1& vote==3) %>% 
-  ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Percent of Public Sector Employees voting NDP")
+  filter(vote==3) %>% 
+  ggplot(., aes(x=election, y=pct, fill=as_factor(sector)))+geom_bar(stat="identity", position="dodge")+labs(title="Percent of Public Sector Employees voting NDP")
 
 ####  Degree status
 #What is the degree status of the Canadian electorate
@@ -126,7 +127,7 @@ ces %>%
   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Percent of Low Income Voting NDP")
 
 
-##Let's make some models
+#### Union Logistic Model #### 
 ## Let's just fit a binomial logistic regression of voting NDP by union membership
 #To model the NDPO we need to create a dichotomous NDP variable 
 # I would do it this way, but I am curious where you found the way that you did it. 
@@ -145,7 +146,7 @@ ces %>%
   #form the groups of interest
   group_by(election) %>% 
   #we need to filter out years where there are missing variables
-  filter(election!=1965 & election!=1968) %>%  
+  filter(election!=1965 ) %>%  
   #nest all the other data columns into "list columns", one for each election (group)
   nest() %>% 
   #mutate adds a new column called models
@@ -153,26 +154,58 @@ ces %>%
   mutate(mods=map(data, function(x) glm(ndp~union, data=x, family="binomial")), 
          #Then we are using the tidy function applied to the new column mods to tidy up those models
          #and storing everything into an object called models
-         tidied=map(mods, tidy)) -> models
+         tidied=map(mods, tidy)) -> union
 #take a look at models
-head(models)
+head(union)
 #as always start with the data frame and pipe
-models %>% 
+union %>% 
   #unnest takes the tidied column and spreads it out for viewing
   unnest(tidied) %>% 
   #filter only the union coefficients
   filter(term=="union") %>% 
   #plot
-  ggplot(., aes(x=election,y=estimate ))+geom_point()+labs(title="Logit Coefficients of voting NDP vote by union")
+  ggplot(., aes(x=as.numeric(election),y=estimate ))+geom_point()+labs(title="Logit Coefficients of voting NDP vote by union")+geom_smooth(method="loess", se=F)
 
 #we can save that plot 
 ggsave(here("Plots", "union_ndp_coefficients.png"))
+
 ##Lots of functions to print regression tables
 library(stargazer)
 ##stargazer works best with the untidied models
-stargazer(models$mods, type="text")
+stargazer(union$mods, type="text")
 #Can also output models as an html file
-stargazer(models$mods, type="html", out=here("Tables", "union_models.html"))
+stargazer(union$mods,
+          type="html", 
+          out=here("Tables", "union_models.html"), col.labels=c("1968", "1972", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"))
+#### Degree Logit Model #### 
+ces %>% 
+  #form the groups of interest
+  group_by(election) %>% 
+  #we need to filter out years where there are missing variables
+  #filter(election!=1965 ) %>%  
+  #nest all the other data columns into "list columns", one for each election (group)
+  nest() %>% 
+  #mutate adds a new column called models
+  #To create that we are mapping onto each instance of the column data the function that follows 
+  mutate(mods=map(data, function(x) glm(ndp~degree, data=x, family="binomial")), 
+         #Then we are using the tidy function applied to the new column mods to tidy up those models
+         #and storing everything into an object called models
+         tidied=map(mods, tidy)) -> degree
+#take a look at models
+head(degree)
+degree
+#as always start with the data frame and pipe
+degree %>% 
+  #unnest takes the tidied column and spreads it out for viewing
+  unnest(tidied) %>% 
+  #filter only the union coefficients
+  filter(term=="degree") %>% 
+  #plot
+  ggplot(., aes(x=as.numeric(election),y=estimate ))+geom_point()+labs(title="Logit Coefficients of voting NDP vote by degree")+geom_smooth(method="loess", se=F)
+
+ggsave(here("Plots", "degree_ndp_coefficients.png"))
+
+
 
 #How to print the exponentiated
 #The tidy function has a lot of useful functions
@@ -186,33 +219,48 @@ head(models)
 #compare
 models$tidied[1]
 models$odds[1]
-### How to add an interaction
+#### How to add an interaction ####
 ces %>% 
   group_by(election) %>% 
   #There are no sector variables for 1972, so we have to delete those
-  filter(election!=1965 & election!=1968 & election!=1972) %>%  
+  filter(election!=1965 & election!=1972) %>%  
   nest() %>% 
   mutate(mods=map(data, function(x) glm(ndp~union+sector+union:sector, data=x, family="binomial")), 
-         tidied=map(mods, tidy)) -> interaction_models
-interaction_models
-table(ces$election, ces$sector)
-#take a look at models
-head(interaction_models)
-#We can look at specfic models in the list columns using square brackets
-interaction_models$tidied[1]
-
+         tidied=map(mods, tidy)) -> union_sector
 #We could also filter out the significant ones
 interaction_models %>% 
   unnest(tidied) %>% 
   filter(p.value<0.05)
-##
-interaction_models %>% 
+##Plot the interaction coefficients
+union_sector %>% 
   unnest(tidied) %>% 
   filter(term=="union:sector") %>% 
   ggplot(., aes(x=election,y=estimate ))+geom_point()+labs(title="Interaction Coefficients for sector and union")
+#Install this package
+#install.packages("ggeffects")
+#Load
+library(ggeffects)
+#It works on a list of models, in this case union_sector$mods
+union_sector$mods %>% 
+  #pass the function ggpredict, select the terms you want the probabilities for
+  # set the values for other terms inthe interaction in square brackets
+  map(., ggpredict,terms=c('union', 'sector [0]')) %>% 
+  #bind rows together
+  bind_rows() %>% 
+  #now x= union value, Predicted is the predicted probability of voting NDP for union and non-union members for the private sector (because sector ==0)
+  ##this function just adds an election year variable, repeating each year from union_sector (above) twice
+mutate(election=rep(union_sector$election, each=2)) %>% 
+  #now we can plot
+  #x is election, y is predicted, turn x into a factor and color the point
+  ggplot(., aes(x=election, y=predicted, col=as.factor(x)))+
+  geom_point()+
+  labs(title="PRedicted Probabilities of Union (1) members and non-union (0) voting NDP for Private Sector Workers")
 
 
-### How to subset groups (i.e. income)
+
+
+
+#### How to subset groups (i.e. income) ####
 ces %>% 
   filter(income==1 & election!=1965&election!=1968) %>% 
   group_by(election) %>% 
@@ -226,10 +274,4 @@ ces %>%
   #Remember income is stored as a number, need to turn it into a factor on the fly
   mutate(mods=map(data, function(x) glm(ndp~union+as.factor(income), data=x, family="binomial")))->poor_models
 
-##Lots of functions to print regression tables
-library(stargazer)
-##stargazer works best with the untidied models
-stargazer(models$mods, type="text")
-#Can also output models as an html file
-stargazer(models$mods, type="html", out=here("Tables", "union_models.html"))
-##The other way would be to turn the election variable into a series of dichotommous variables. 
+
