@@ -496,7 +496,7 @@ ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
 ### assign value labels
 val_labels(ces$sector)<-c(Private=0, Public=1)
 val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3)
-<<<<<<< HEAD
+
 ####
 
 ###
