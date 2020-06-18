@@ -504,12 +504,4 @@ val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3)
 source("R_scripts/3_recode_diagnostics.R", echo=T)
 source("R_scripts/4_make_models.R", echo=T)
 
-=======
-table(ces79$sector)
-#### Call other Scripts ####
-#This command calls the file 2_diagnostics.R
-source("R_scripts/3_recode_diagnostics.R", echo=T)
-source("R_scripts/4_make_models.R", echo=T)
-source("R_scripts/5_blais.R", echo=T)
->>>>>>> blais_replication
 
