@@ -2,14 +2,14 @@
 library(tidyverse)
 library(car)
 library(labelled)
-library(cesdata)
+
 #load data
 data("ces0411")
 
-#------------------------------------------------------------------------------
-# Gender is the same variable for all elections 2004-11
 
-#recode Gender (GENDER)
+####recode Gender (GENDER)####
+#Gender is the same variable for all elections 2004-11
+
 look_for(ces0411, "sex")
 ces0411$male<-Recode(ces0411$GENDER, "1=1; 5=0")
 val_labels(ces0411$male)<-c(Female=0, Male=1)
@@ -17,42 +17,65 @@ val_labels(ces0411$male)<-c(Female=0, Male=1)
 val_labels(ces0411$male)
 table(ces0411$male)
 
+<<<<<<< HEAD
 #------------------------------------------------------------------------------
 ###Recode 2004 1st
 
 #recode Union Respondent (ces04_CPS_S6A)
 ces0411$union04<-Recode(ces0411$ces04_CPS_S6A, "1=1; 5=0; else=NA")
+=======
+##### Union ####
+#recode Union Respondent (ces04_CPS_S6A)
+ces0411$union04<-Recode(ces0411$ces04_CPS_S6A, 
+                        "1=1; 5=0; else=NA")
+>>>>>>> blais_replication
 val_labels(ces0411$union04)<-c(None=0, Union=1)
 #checks
 val_labels(ces0411$union04)
 table(ces0411$union04)
 
 #recode Union Combined (ces04_CPS_S6A and ces04_CPS_S6B)
-ces0411 %>% 
+table(ces0411$ces04_CPS_S6A, ces0411$ces04_CPS_S6B, useNA = "ifany")
+802+259+982
+# Note! The household union question was only asked if the respondent was not a member of a union or if they didn't answer!!
+ces0411 %>%
   mutate(union_both04=case_when(
     #If the person is in a union OR if the household is in a union, then they get a 1
+<<<<<<< HEAD
     ces04_CPS_S6A==1 | ces04_CPS_S6B==1 ~ 1,
     #If the person is not in a union AND if the household is not in a union then thety get a 0 
     ces04_CPS_S6A==5 | ces04_CPS_S6B==5 ~ 0,
     ces04_CPS_S6A==8 & ces04_CPS_S6B==8 ~ NA_real_,
     ces04_CPS_S6A==9 & ces04_CPS_S6B==9 ~ NA_real_,
+=======
+    ces04_CPS_S6A==1 |    ces04_CPS_S6B==1 ~ 1,
+    #If the person is not in a union AND if the household is not in a union then theyy get a 0
+     ces04_CPS_S6B==5 ~ 0,
+    ces04_CPS_S6A==8 & ces04_CPS_S6B==8 ~ NA_real_,
+    ces04_CPS_S6A==9 & ces04_CPS_S6B==9 ~ NA_real_,
+    TRUE ~0
+>>>>>>> blais_replication
   ))->ces0411
 
+table(ces0411$union_both04, useNA = "ifany")
+1061+984
 val_labels(ces0411$union_both04)<-c(None=0, Union=1)
 
 #checks
 val_labels(ces0411$union_both04)<-c(None=0, Union=1)
 table(ces0411$union_both04)
-table( as_factor(ces0411$ces04_CPS_S6A), as_factor(ces0411$union04))
-table( as_factor(ces0411$ces04_CPS_S6B), as_factor(ces0411$union04))
-table( as_factor(ces0411$ces04_CPS_S6A), as_factor(ces0411$union_both04))
-table( as_factor(ces0411$ces04_CPS_S6B), as_factor(ces0411$union_both04))
 
-table(as_factor(ces0411$union04), as_factor(ces0411$ces04_CPS_S6B))
-table(as_factor(ces0411$union_both04), as_factor(ces0411$ces04_CPS_S6A))
-table(as_factor(ces0411$union_both04), as_factor(ces0411$ces04_CPS_S6B))
+ces0411 %>% 
+  select(ces04_CPS_S6A, ces04_CPS_S6B, union_both04) %>% 
+  group_by(ces04_CPS_S6A, ces04_CPS_S6B, union_both04) %>% 
+  summarize(n=n())
 
-#recode Education (ces04_CPS_S3)
+# Some checks
+table( as_factor(ces0411$ces04_CPS_S6A), as_factor(ces0411$ces04_CPS_S6B), useNA = "ifany")
+table(as_factor(ces0411$union_both04), as_factor(ces0411$ces04_CPS_S6A), useNA = "ifany")
+table(as_factor(ces0411$union_both04), as_factor(ces0411$ces04_CPS_S6B), useNA = "ifany")
+
+####Education (ces04_CPS_S3)####
 look_for(ces0411, "education")
 ces0411$degree04<-Recode(ces0411$ces04_CPS_S3, "9:11=1; 1:8=0; else=NA")
 val_labels(ces0411$degree04)<-c(nodegree=0, degree=1)
@@ -60,7 +83,7 @@ val_labels(ces0411$degree04)<-c(nodegree=0, degree=1)
 val_labels(ces0411$degree04)
 table(ces0411$degree04)
 
-#recode Region (ces04_PROVINCE)
+#####Region (ces04_PROVINCE)####
 look_for(ces0411, "province")
 ces0411$region04<-Recode(ces0411$ces04_PROVINCE, "10:13=1; 35=2; 46:59=3; 4=NA; else=NA")
 val_labels(ces0411$region04)<-c(Atlantic=1, Ontario=2, West=3)
@@ -209,16 +232,23 @@ ces0411 %>%
     #If the person is in a union OR if the household is in a union, then they get a 1
     ces06_CPS_S6A==1 | ces06_CPS_S6B==1 ~ 1,
     #If the person is not in a union AND if the household is in a union, then they get a 0
+<<<<<<< HEAD
     ces06_CPS_S6A==5 | ces06_CPS_S6B==5 ~ 0,
     ces06_CPS_S6A==8 & ces06_CPS_S6B==8 ~ NA_real_,
     ces06_CPS_S6A==9 & ces06_CPS_S6B==9 ~ NA_real_,
+=======
+ces06_CPS_S6B==5 ~ 0,
+    ces06_CPS_S6A==8 & ces06_CPS_S6B==8 ~ NA_real_,
+    ces06_CPS_S6A==9 & ces06_CPS_S6B==9 ~ NA_real_,
+        TRUE ~0
+>>>>>>> blais_replication
   ))->ces0411
 
 val_labels(ces0411$union_both06)<-c(None=0, Union=1)
 #checks
 val_labels(ces0411$union_both06)
 table(ces0411$union_both06)
-
+table(as_factor(ces0411$ces06_CPS_S6A), as_factor(ces0411$union_both06), useNA = "ifany")
 #recode Education (ces06_CPS_S3)
 look_for(ces0411, "education")
 ces0411$degree06<-Recode(ces0411$ces06_CPS_S3, "9:11=1; 1:8=0; else=NA")
@@ -272,11 +302,14 @@ table(ces0411$language06)
 
 #recode Non-charter Language (ces06_CPS_S17)
 look_for(ces0411, "language")
+table(ces0411$ces06_CPS_S17)
 ces0411$non_charter_language06<-Recode(ces0411$ces06_CPS_S17, "1:5=0; 8:64=1; 65:66=0; 95:97=1; else=NA")
 val_labels(ces0411$non_charter_language06)<-c(Charter=0, Non_Charter=1)
 #checks
 val_labels(ces0411$non_charter_language06)
-table(ces0411$non_charter_language06)
+table(ces0411$ces06_CPS_S17, ces0411$non_charter_language06, useNA = "ifany")
+
+table(ces0411$survey, ces0411$non_charter_language06)
 
 #recode Employment (ces06_CPS_S4)
 look_for(ces0411, "employed")
@@ -324,6 +357,7 @@ table(ces0411$party_id06)
 
 #recode Vote (ces06_PES_B4A and ces06_PES_B4B) 
 look_for(ces0411, "party did you vote")
+ces0411$ces06_PES_B4A
 ces0411 %>% 
   mutate(vote06=case_when(
     ces06_PES_B4A==1 | ces06_PES_B4B==1 ~ 1,
@@ -333,7 +367,7 @@ ces0411 %>%
     ces06_PES_B4A==0 | ces06_PES_B4B==0 ~ 0,
     ces06_PES_B4A==4 | ces06_PES_B4B==4 ~ 0,
   ))->ces0411
-
+table(ces0411$ces06_PES_B4A, ces0411$vote06)
 val_labels(ces0411$vote06)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
 val_labels(ces0411$vote06)
@@ -375,16 +409,23 @@ ces0411 %>%
     #If the person is in a union OR if the household is in a union, then they get a 1
     ces08_CPS_S6A==1 | ces08_CPS_S6B==1 ~ 1,
     #If the person is in a union AND if the household is in a union, then they get a 1
+<<<<<<< HEAD
     ces08_CPS_S6A==5 | ces08_CPS_S6B==5 ~ 0,
     ces08_CPS_S6A==8 & ces08_CPS_S6B==8 ~ NA_real_,
     ces08_CPS_S6A==9 & ces08_CPS_S6B==9 ~ NA_real_,
+=======
+    ces08_CPS_S6B==5 ~ 0,
+    ces08_CPS_S6A==8 & ces08_CPS_S6B==8 ~ NA_real_,
+    ces08_CPS_S6A==9 & ces08_CPS_S6B==9 ~ NA_real_,
+    TRUE ~ 0
+>>>>>>> blais_replication
   ))->ces0411
 
 val_labels(ces0411$union_both08)<-c(None=0, Union=1)
 #checks
 val_labels(ces0411$union_both08)
 table(ces0411$union_both08)
-
+table(as_factor(ces0411$ces08_CPS_S6A), as_factor(ces0411$union_both08), useNA = "ifany")
 #recode Education (ces08_CPS_S3)
 look_for(ces0411, "education")
 ces0411$degree08<-Recode(ces0411$ces08_CPS_S3, "9:11=1; 1:8=0; else=NA")
@@ -444,6 +485,7 @@ val_labels(ces0411$non_charter_language08)<-c(Charter=0, Non_Charter=1)
 #checks
 val_labels(ces0411$non_charter_language08)
 table(ces0411$non_charter_language08)
+table(ces0411$survey, ces0411$non_charter_language08)
 
 #recode Employment (ces08_CPS_S4)
 look_for(ces0411, "employed")
@@ -536,9 +578,16 @@ ces0411 %>%
   mutate(union_both11=case_when(
     #If the person is in a union OR if the household is in a union, then they get a 1
     PES11_93==1 | PES11_94==1 ~ 1,
+<<<<<<< HEAD
     PES11_93==5 | PES11_94==5 ~ 0,
     PES11_93==8 & PES11_94==8 ~ NA_real_,
     PES11_93==9 & PES11_94==9 ~ NA_real_,
+=======
+     PES11_94==5 ~ 0,
+    PES11_93==8 & PES11_94==8 ~ NA_real_,
+    PES11_93==9 & PES11_94==9 ~ NA_real_,
+    TRUE~0
+>>>>>>> blais_replication
   ))->ces0411
 
 table(as_factor(ces0411$union_both11), as_factor(ces0411$PES11_93))
@@ -674,3 +723,4 @@ val_labels(ces0411$income11)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle
 #checks
 val_labels(ces0411$income11)
 table(ces0411$income11)
+
