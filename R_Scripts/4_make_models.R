@@ -1,4 +1,8 @@
-#### Here's how we can make some basic proportions. 
+#Install this package
+#install.packages("ggeffects")
+#Load
+library(ggeffects)
+#### Basic Proportions ####
 ##Start with the data frame and pipe
 ces %>% 
   #Form groups of the variables you're trying to tabulate
@@ -129,17 +133,10 @@ ces %>%
 
 #### Union Logistic Model #### 
 ## Let's just fit a binomial logistic regression of voting NDP by union membership
-#To model the NDPO we need to create a dichotomous NDP variable 
-# I would do it this way, but I am curious where you found the way that you did it. 
-ces$ndp<-car::Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
-ndp_model<-glm(ndp~union, data=ces, family="binomial")
 
-summary(ndp_model)
-str(ndp_model)
 
 ##broom is a package that aids in the reporting of models
 ## https://cran.r-project.org/web/packages/broom/vignettes/broom.html
-
 library(broom)
 #AS always start witht hte data frame
 ces %>% 
@@ -151,12 +148,15 @@ ces %>%
   nest() %>% 
   #mutate adds a new column called models
   #To create that we are mapping onto each instance of the column data the function that follows 
-  mutate(mods=map(data, function(x) glm(ndp~union, data=x, family="binomial")), 
+  mutate(mods=map(data, function(x) glm(ndp~union, data=x, family=binomial(link="probit"))), 
          #Then we are using the tidy function applied to the new column mods to tidy up those models
          #and storing everything into an object called models
          tidied=map(mods, tidy)) -> union
 #take a look at models
 head(union)
+summary(union$mods[[1]])
+union$election
+
 #as always start with the data frame and pipe
 union %>% 
   #unnest takes the tidied column and spreads it out for viewing
@@ -168,6 +168,27 @@ union %>%
 
 #we can save that plot 
 ggsave(here("Plots", "union_ndp_coefficients.png"))
+
+#Let's get the predicted probabilities
+#start with the list of models 
+union$mods %>% 
+#map_df returns a nice dataframe; ggpredict is the function that we are mapping onto each linear model
+#terms is the argument that we are sending to ggpreict
+  #Reading this vignette https://cran.r-project.org/web/packages/ggeffects/vignettes/practical_logisticmixedmodel.html reports that the retruned values of ggpredict on a binomial model are predicted probabilities
+  #By specifying "union" we only want the probabilities for union membership
+  map_df(., ggpredict, terms=c('union')) %>% 
+  #We have to add an election column; so we mutate making a new variable called election. 
+  #We use the rep() function which repeats union$election and specifying each=2 means it repeats each element twice
+  #A person would need to play with this in order to get the right number of elements
+  mutate(election=rep(union$election, each=2)) %>% 
+  #wE only want to report the probabilities of union membership
+  filter(x==1) %>% 
+  #we ggplot x=election, y is the predicted value; make it a piont plot
+  ggplot(., aes(x=election, y=predicted))+geom_point()+
+  #add an errorbar
+  geom_errorbar(width=0, aes(ymin=conf.low, ymax=conf.high))+labs(title="Predicted Probabilities of Voting NDP by Union")
+## Degree By Probit
+
 
 ##Lots of functions to print regression tables
 library(stargazer)
@@ -236,10 +257,7 @@ union_sector %>%
   unnest(tidied) %>% 
   filter(term=="union:sector") %>% 
   ggplot(., aes(x=election,y=estimate ))+geom_point()+labs(title="Interaction Coefficients for sector and union")
-#Install this package
-#install.packages("ggeffects")
-#Load
-library(ggeffects)
+
 #It works on a list of models, in this case union_sector$mods
 union_sector$mods %>% 
   #pass the function ggpredict, select the terms you want the probabilities for
