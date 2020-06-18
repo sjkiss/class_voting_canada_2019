@@ -164,16 +164,16 @@ union %>%
   #filter only the union coefficients
   filter(term=="union") %>% 
   #plot
-  ggplot(., aes(x=as.numeric(election),y=estimate ))+geom_point()+labs(title="Logit Coefficients of voting NDP vote by union")+geom_smooth(method="loess", se=F)
+  ggplot(., aes(x=as.numeric(election),y=estimate ))+geom_point()+labs(title="Probit Coefficients of voting NDP vote by union")+geom_smooth(method="loess", se=F)
 
 #we can save that plot 
-ggsave(here("Plots", "union_ndp_coefficients.png"))
+ggsave(here("Plots", "union_ndp_probit_coefficients.png"))
 
 #Let's get the predicted probabilities
 #start with the list of models 
 union$mods %>% 
 #map_df returns a nice dataframe; ggpredict is the function that we are mapping onto each linear model
-#terms is the argument that we are sending to ggpreict
+#terms is the argument that we are sending to ggpredict
   #Reading this vignette https://cran.r-project.org/web/packages/ggeffects/vignettes/practical_logisticmixedmodel.html reports that the retruned values of ggpredict on a binomial model are predicted probabilities
   #By specifying "union" we only want the probabilities for union membership
   map_df(., ggpredict, terms=c('union')) %>% 
@@ -187,6 +187,7 @@ union$mods %>%
   ggplot(., aes(x=election, y=predicted))+geom_point()+
   #add an errorbar
   geom_errorbar(width=0, aes(ymin=conf.low, ymax=conf.high))+labs(title="Predicted Probabilities of Voting NDP by Union")
+ggsave(here("Plots", "predicted_probabilities_ndp_by_union.png"))
 ## Degree By Probit
 
 
@@ -232,9 +233,10 @@ ggsave(here("Plots", "degree_ndp_coefficients.png"))
 #The tidy function has a lot of useful functions
 #Because we have the object models that has the models already stored, we can just run tidy on them
 #As always start with the data frame
-models %>% 
+union
+union %>% 
   #mutate adds a new column
-  mutate(odds=map(mods, function(x) tidy(x, exponentiate=T)))->models
+  mutate(odds=map(mods, function(x) tidy(x, exponentiate=T)))->union
 head(models)
 
 #compare
