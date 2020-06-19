@@ -17,18 +17,11 @@ val_labels(ces0411$male)<-c(Female=0, Male=1)
 val_labels(ces0411$male)
 table(ces0411$male)
 
-<<<<<<< HEAD
-#------------------------------------------------------------------------------
-###Recode 2004 1st
-
-#recode Union Respondent (ces04_CPS_S6A)
-ces0411$union04<-Recode(ces0411$ces04_CPS_S6A, "1=1; 5=0; else=NA")
-=======
 ##### Union ####
 #recode Union Respondent (ces04_CPS_S6A)
 ces0411$union04<-Recode(ces0411$ces04_CPS_S6A, 
                         "1=1; 5=0; else=NA")
->>>>>>> blais_replication
+
 val_labels(ces0411$union04)<-c(None=0, Union=1)
 #checks
 val_labels(ces0411$union04)
@@ -41,20 +34,14 @@ table(ces0411$ces04_CPS_S6A, ces0411$ces04_CPS_S6B, useNA = "ifany")
 ces0411 %>%
   mutate(union_both04=case_when(
     #If the person is in a union OR if the household is in a union, then they get a 1
-<<<<<<< HEAD
-    ces04_CPS_S6A==1 | ces04_CPS_S6B==1 ~ 1,
-    #If the person is not in a union AND if the household is not in a union then thety get a 0 
-    ces04_CPS_S6A==5 | ces04_CPS_S6B==5 ~ 0,
-    ces04_CPS_S6A==8 & ces04_CPS_S6B==8 ~ NA_real_,
-    ces04_CPS_S6A==9 & ces04_CPS_S6B==9 ~ NA_real_,
-=======
+
     ces04_CPS_S6A==1 |    ces04_CPS_S6B==1 ~ 1,
     #If the person is not in a union AND if the household is not in a union then theyy get a 0
      ces04_CPS_S6B==5 ~ 0,
     ces04_CPS_S6A==8 & ces04_CPS_S6B==8 ~ NA_real_,
     ces04_CPS_S6A==9 & ces04_CPS_S6B==9 ~ NA_real_,
     TRUE ~0
->>>>>>> blais_replication
+
   ))->ces0411
 
 table(ces0411$union_both04, useNA = "ifany")
@@ -232,16 +219,10 @@ ces0411 %>%
     #If the person is in a union OR if the household is in a union, then they get a 1
     ces06_CPS_S6A==1 | ces06_CPS_S6B==1 ~ 1,
     #If the person is not in a union AND if the household is in a union, then they get a 0
-<<<<<<< HEAD
-    ces06_CPS_S6A==5 | ces06_CPS_S6B==5 ~ 0,
-    ces06_CPS_S6A==8 & ces06_CPS_S6B==8 ~ NA_real_,
-    ces06_CPS_S6A==9 & ces06_CPS_S6B==9 ~ NA_real_,
-=======
 ces06_CPS_S6B==5 ~ 0,
     ces06_CPS_S6A==8 & ces06_CPS_S6B==8 ~ NA_real_,
     ces06_CPS_S6A==9 & ces06_CPS_S6B==9 ~ NA_real_,
         TRUE ~0
->>>>>>> blais_replication
   ))->ces0411
 
 val_labels(ces0411$union_both06)<-c(None=0, Union=1)
@@ -409,16 +390,10 @@ ces0411 %>%
     #If the person is in a union OR if the household is in a union, then they get a 1
     ces08_CPS_S6A==1 | ces08_CPS_S6B==1 ~ 1,
     #If the person is in a union AND if the household is in a union, then they get a 1
-<<<<<<< HEAD
-    ces08_CPS_S6A==5 | ces08_CPS_S6B==5 ~ 0,
-    ces08_CPS_S6A==8 & ces08_CPS_S6B==8 ~ NA_real_,
-    ces08_CPS_S6A==9 & ces08_CPS_S6B==9 ~ NA_real_,
-=======
     ces08_CPS_S6B==5 ~ 0,
     ces08_CPS_S6A==8 & ces08_CPS_S6B==8 ~ NA_real_,
     ces08_CPS_S6A==9 & ces08_CPS_S6B==9 ~ NA_real_,
     TRUE ~ 0
->>>>>>> blais_replication
   ))->ces0411
 
 val_labels(ces0411$union_both08)<-c(None=0, Union=1)
@@ -578,16 +553,10 @@ ces0411 %>%
   mutate(union_both11=case_when(
     #If the person is in a union OR if the household is in a union, then they get a 1
     PES11_93==1 | PES11_94==1 ~ 1,
-<<<<<<< HEAD
-    PES11_93==5 | PES11_94==5 ~ 0,
-    PES11_93==8 & PES11_94==8 ~ NA_real_,
-    PES11_93==9 & PES11_94==9 ~ NA_real_,
-=======
      PES11_94==5 ~ 0,
     PES11_93==8 & PES11_94==8 ~ NA_real_,
     PES11_93==9 & PES11_94==9 ~ NA_real_,
     TRUE~0
->>>>>>> blais_replication
   ))->ces0411
 
 table(as_factor(ces0411$union_both11), as_factor(ces0411$PES11_93))

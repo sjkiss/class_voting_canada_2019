@@ -181,13 +181,19 @@ union$mods %>%
   #We use the rep() function which repeats union$election and specifying each=2 means it repeats each element twice
   #A person would need to play with this in order to get the right number of elements
   mutate(election=rep(union$election, each=2)) %>% 
-  #wE only want to report the probabilities of union membership
+  #We need to subtract the probability of non-union members voting NDP from the probability of voting NDP for union members
+  #we use mutate to make a new variable called difference
+  #It takes the value of predicted - lag(predicted)
+  mutate(difference=predicted-lag(predicted)) %>% 
   filter(x==1) %>% 
+  ##Johnston's plot stops at 2011
+#  filter(election<2012) %>% 
   #we ggplot x=election, y is the predicted value; make it a piont plot
-  ggplot(., aes(x=election, y=predicted))+geom_point()+
+  ggplot(., aes(x=election, y=difference))+geom_point()+
   #add an errorbar
-  geom_errorbar(width=0, aes(ymin=conf.low, ymax=conf.high))+labs(title="Predicted Probabilities of Voting NDP by Union")
+  geom_errorbar(width=0, aes(ymin=difference-(1.96*std.error), ymax=difference+(1.96*std.error)))+labs(title="Effect of Union Family Membership on NDP vote")+ylim(c(0,0.2))
 ggsave(here("Plots", "predicted_probabilities_ndp_by_union.png"))
+
 ## Degree By Probit
 
 
@@ -237,11 +243,11 @@ union
 union %>% 
   #mutate adds a new column
   mutate(odds=map(mods, function(x) tidy(x, exponentiate=T)))->union
-head(models)
+head(union)
 
 #compare
-models$tidied[1]
-models$odds[1]
+union$tidied[1]
+union$odds[1]
 #### How to add an interaction ####
 ces %>% 
   group_by(election) %>% 
@@ -251,7 +257,7 @@ ces %>%
   mutate(mods=map(data, function(x) glm(ndp~union+sector+union:sector, data=x, family="binomial")), 
          tidied=map(mods, tidy)) -> union_sector
 #We could also filter out the significant ones
-interaction_models %>% 
+union_sector %>% 
   unnest(tidied) %>% 
   filter(p.value<0.05)
 ##Plot the interaction coefficients

@@ -377,6 +377,7 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 
 names(ces.list)
 table(ces.list[["1984"]]$union_both)
+ces.list[["1984"]]
 #Start with the list
 ces.list %>% 
   #Bind the rows, making a new variable called survey that will be populated with the names of the list items
