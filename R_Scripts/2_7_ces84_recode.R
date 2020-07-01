@@ -118,7 +118,6 @@ ces84 %>%
 
 table(as_factor(ces84$VAR524), ces84$sector, useNA='ifany')
 table(as_factor(ces84$VAR524), as_factor(ces84$VAR530), useNA="ifany")
-
 val_labels(ces84$sector)<-c(Private=0, Public=1)
 ces84$sector
 #checks

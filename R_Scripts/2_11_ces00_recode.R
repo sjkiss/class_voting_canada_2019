@@ -102,6 +102,7 @@ ces00 %>%
     cpsm7==8 ~NA_real_ ,
   ))->ces00
 
+#ces00$sector2<-Recode(ces00$cpsm7, "3:7=1; 0:1=0; else=NA")
 
 val_labels(ces00$sector)<-c(Private=0, Public=1)
 #checks
