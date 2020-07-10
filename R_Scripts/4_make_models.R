@@ -157,6 +157,14 @@ head(union)
 summary(union$mods[[1]])
 union$election
 
+##Lots of functions to print regression tables
+library(stargazer)
+##stargazer works best with the untidied models
+stargazer(union$mods, type="text")
+#Can also output models as an html file
+stargazer(union$mods,
+          type="html", 
+          out=here("Tables", "union.html"), title="PRobit coefficients of union household membership on NDP vote", column.labels=c("1968", "1972", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"))
 #as always start with the data frame and pipe
 union %>% 
   #unnest takes the tidied column and spreads it out for viewing
@@ -168,6 +176,7 @@ union %>%
 
 #we can save that plot 
 ggsave(here("Plots", "union_ndp_probit_coefficients.png"))
+
 
 #Let's get the predicted probabilities
 #start with the list of models 
@@ -194,17 +203,60 @@ union$mods %>%
   geom_errorbar(width=0, aes(ymin=difference-(1.96*std.error), ymax=difference+(1.96*std.error)))+labs(title="Effect of Union Family Membership on NDP vote")+ylim(c(0,0.2))
 ggsave(here("Plots", "predicted_probabilities_ndp_by_union.png"))
 
-## Degree By Probit
+#### Union OLS #### 
+#AS always start witht hte data frame
+ces %>% 
+  #form the groups of interest
+  group_by(election) %>% 
+  #we need to filter out years where there are missing variables
+  filter(election!=1965 ) %>%  
+  #nest all the other data columns into "list columns", one for each election (group)
+  nest() %>% 
+  #mutate adds a new column called models
+  #To create that we are mapping onto each instance of the column data the function that follows 
+  mutate(mods=map(data, function(x) lm(ndp~union, data=x)), 
+         #Then we are using the tidy function applied to the new column mods to tidy up those models
+         #and storing everything into an object called models
+         tidied=map(mods, tidy)) -> union2
+#take a look at models
+head(union2)
+summary(union2$mods[[1]])
+union2$election
 
+#as always start with the data frame and pipe
+union2 %>% 
+  #unnest takes the tidied column and spreads it out for viewing
+  unnest(tidied) %>% 
+  #filter only the union coefficients
+  filter(term=="union") %>% 
+  #plot
+  ggplot(., aes(x=as.numeric(election),y=estimate ))+geom_point()+labs(title="OLS Coefficients of voting NDP vote by union")+geom_smooth(method="loess", se=F)
+
+#we can save that plot 
+ggsave(here("Plots", "union_ndp_OLS_coefficients.png"))
+
+#Let's get the predicted probabilities
+#start with the list of models 
+union2$mods %>% 
+  map_df(., ggpredict, terms=c('union')) %>% 
+   mutate(election=rep(union$election, each=2)) %>% 
+  mutate(difference=predicted-lag(predicted)) %>% 
+  filter(x==1) %>% 
+  ggplot(., aes(x=election, y=difference))+geom_point()+
+  #add an errorbar
+  geom_errorbar(width=0, aes(ymin=difference-(1.96*std.error), ymax=difference+(1.96*std.error)))+labs(title="Effect of Union Family Membership on NDP vote")+ylim(c(0,0.2))
+ggsave(here("Plots", "predicted_probabilities_ndp_by_union.png"))
 
 ##Lots of functions to print regression tables
 library(stargazer)
 ##stargazer works best with the untidied models
-stargazer(union$mods, type="text")
+stargazer(union2$mods, type="text")
 #Can also output models as an html file
-stargazer(union$mods,
+stargazer(union2$mods,
           type="html", 
-          out=here("Tables", "union_models.html"), col.labels=c("1968", "1972", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"))
+          out=here("Tables", "union2.html"), title="OLS coefficients of union household membership on NDP vote", column.labels=c("1968", "1972", "1974", "1979", "1980", "1984", "1988", "1993", "1997", "2000", "2004", "2006", "2008", "2011", "2015", "2019"))
+
+
 #### Degree Logit Model #### 
 ces %>% 
   #form the groups of interest
