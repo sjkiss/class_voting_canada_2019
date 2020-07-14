@@ -78,12 +78,11 @@ ces$election
 ces %>% 
   filter(election!=2000 & election<2006 &vote2!="Green")->ces.out
 table(ces$vote2)
-?mlogit
   #QC
-  andersen1qc<-mlogit(vote2 ~ occupation2+as.factor(election), data = subset(ces.out, quebec==1))
+  andersen1qc<-multinom(vote2 ~ occupation2+as.factor(election), data = subset(ces.out, quebec==1))
   #ROC
     andersen1roc<-multinom(vote2 ~ occupation2+as.factor(election), data = subset(ces.out, quebec!=1))
-summary(andersen1roc)
+
 library(stargazer)
 
 stargazer(andersen1qc, type="html", out=here("Tables", "andersen1qc.html"), title="Multinomial Logistic Regression of Left Vote, QC")
