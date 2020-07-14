@@ -11,6 +11,7 @@ table(ces68$var323, ces68$var379)
 table(ces68$var379, ces68$union_both)
 table(ces74$size)
 table(ces68$var379)
+ces19phone$immigration
 look_for(ces68, "marital")
 ##### SPLITTING THE 1979-1980 FILE
 table(ces7980$male80)
@@ -167,8 +168,8 @@ ces0411 %>%
 nrow(ces06)
 #### CES08
 # Do not use Panel respondents
-ces0411 %>% 
-  filter(str_detect(ces0411$survey, "PES08")&str_detect(ces0411$survey, "Panel", negate=T))->ces08
+# ces0411 %>% 
+#   filter(str_detect(ces0411$survey, "PES08")&str_detect(ces0411$survey, "Panel", negate=T))->ces08
 ## Use Panel Respondents
 ### CES08
 ces0411 %>% 
@@ -178,8 +179,8 @@ ces0411 %>%
 # ces0411 %>% 
 #   filter(survey=="New RDD_2011 CPS11 PES11" | survey=="New RDD_2011 CPS11" | survey=="New RDD_2011 CPS11 PES11 MBS11" | survey=="New RDD_2011 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 CPS11 PES11" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 MBS04 CPS06 CPS11 PES11" | survey=="CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 CPS06 CPS11 PES11 MBS11 WBS11" | survey=="CPS04 PES04 CPS06 CPS11 PES11 MBS11" | survey=="CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11 WBS11")->ces11
 # Do not use Panel respondents
-ces0411 %>% 
-  filter(str_detect(ces0411$survey, "PES11")&str_detect(ces0411$survey, "Panel", negate=T))->ces11
+# ces0411 %>% 
+#   filter(str_detect(ces0411$survey, "PES11")&str_detect(ces0411$survey, "Panel", negate=T))->ces11
 
 #Use Panel respondents
 ces0411 %>% 
@@ -386,10 +387,15 @@ names(ces.list)<-c('1965', '1968', '1972','1974', '1979','1980', '1984', '1988',
 names(ces.list)
 table(ces.list[["1984"]]$union_both)
 ces.list[["1984"]]
-#Start with the list
+
+library(haven)
+#Start with the data frame
 ces.list %>% 
-  #Bind the rows, making a new variable called survey that will be populated with the names of the list items
-  bind_rows(., .id="election") ->ces
+  #WE have to zap the value labels (get rid of them to enable row b inding)
+  map(., zap_labels) %>% 
+  #bind rows creating id variable "election"
+  bind_rows(., .id="election")->ces
+
 #Do a summary
 summary(ces)
 #Check the names
@@ -459,15 +465,15 @@ ces$liberal<-Recode(ces$vote, "1=1; 2:5=0; NA=NA")
 ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
 
 ### Value labels often go missing in the creation of the ces data frame
-### assign value labels
+### assign value label
 val_labels(ces$sector)<-c(Private=0, Public=1)
-val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3)
+val_labels(ces$vote)<-c(Conservative=2,  Liberal=1, NDP=3, Bloc=4, Green=5)
 
 ####
 
 ###
 #This command calls the file 2_diagnostics.R
-source("R_scripts/3_recode_diagnostics.R", echo=T)
-source("R_scripts/4_make_models.R", echo=T)
+#source("R_scripts/3_recode_diagnostics.R", echo=T)
+#source("R_scripts/4_make_models.R", echo=T)
 
 
