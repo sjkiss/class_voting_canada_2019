@@ -1,5 +1,5 @@
 #File to Recode 2019 CES Data 
-#load data
+#Load Data
 data("ces19phone")
 
 #recode Gender (q3)
@@ -128,15 +128,29 @@ table(ces19phone$vote)
 look_for(ces19phone, "occupation")
 ces19phone %>% 
   filter(as.numeric(NOC)<1100)
-ces19phone$occupation<-Recode(as.numeric(ces19phone$NOC), "0:1099=2; 1100:1199=1; 2100:3300=1; 
-                              4100:6399=1; 1200:1400=3; 
-                              6400:6800=3; 3400:3500=3; 7200:7399=4; 
+ces19phone$occupation<-Recode(as.numeric(ces19phone$NOC), "0:1099=2; 
+1100:1199=1;
+2100:2199=1; 
+ 3000:3199=1;
+ 4000:4099=1; 
+ 4100:4199=1;
+ 5100:5199=1;
+ 1200:1599=3; 
+ 2200:2299=3;
+ 3200:3299=3;
+ 3400:3500=3; 
+ 4200:4499=3;
+ 5200:5299=3;
+ 6200:6399=3;
+ 6400:6799=3; 7200:7399=4; 
                               7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
 val_labels(ces19phone$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
 #checks
 val_labels(ces19phone$occupation)
 table(ces19phone$occupation)
-
+ces19phone %>% 
+  filter(is.na(NOC)==F&is.na(occupation)==T) %>% 
+  select(NOC, occupation)
 #recode Income (q70r)
 look_for(ces19phone, "income")
 ces19phone$income<-Recode(ces19phone$q70r, "1:2=1; 3=2; 4=3; 5:6=4; 7:8=5; else=NA")

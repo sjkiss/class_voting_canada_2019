@@ -13,6 +13,14 @@ table(ces74$size)
 table(ces68$var379)
 ces19phone$immigration
 look_for(ces68, "marital")
+#check for missing occupations 
+ces15phone %>% 
+  filter(is.na(PES15_NOC)==F&is.na(occupation)==T) %>% 
+  select(PES15_NOC, occupation) %>% 
+  print(n=264)
+ces19web %>% 
+  filter(is.na(NOC)==F&is.na(occupation)==T) %>% 
+  select(NOC, occupation)
 ##### SPLITTING THE 1979-1980 FILE
 table(ces7980$male80)
 names(ces7980)

@@ -138,7 +138,23 @@ table(ces15phone$vote)
 
 #recode Occupation (PES15_NOC)
 look_for(ces15phone, "occupation")
-ces15phone$occupation<-Recode(ces15phone$PES15_NOC, "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6399=1; 1200:1400=3; 6400:6800=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
+
+ces15phone$occupation<-Recode(as.numeric(ces15phone$PES15_NOC), "0:1099=2; 
+1100:1199=1;
+2100:2199=1; 
+ 3000:3199=1;
+ 4000:4099=1; 
+ 4100:4199=1;
+ 5100:5199=1;
+ 1200:1599=3; 
+ 2200:2299=3;
+ 3200:3299=3;
+ 3400:3500=3; 
+ 4200:4499=3;
+ 5200:5299=3;
+ 6200:6399=3;
+ 6400:6799=3; 7200:7399=4; 
+                              7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
 val_labels(ces15phone$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
 #checks
 val_labels(ces15phone$occupation)
