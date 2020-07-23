@@ -208,9 +208,11 @@ look_for(ces0411, "pinporr")
 #ces0411$occupation04<-Recode(ces0411$ces04_PINPORR, "1:2:=1; 4:5=1; 3=2; 6:7=2; 9=3; 12=3; 14=3; 8=4; 10=4; 13=4; 15:16=5; else=NA")
 #ces0411$occupation08<-Recode(ces0411$ces08_PES_S3_NOCS, "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6300=1; 1200:1500=3; 6400:6700=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
 
+#Panel respondents are added in from ces08 - ces04_rtype1==1 indicates that a respondent participated in the ces04 survey
+#Both Pinporr and NOCS available in ces04
 ces0411 %>% 
   mutate(occupation04=case_when(
-    ces04_PES_SD3 >0 & ces04_PES_SD3 <1001 ~ 2,
+    ces04_PES_SD3 >0 & ces04_PES_SD3 <1100 ~ 2,
     ces04_PINPORR==1 ~ 1,
     ces04_PINPORR==2 ~ 1,
     ces04_PINPORR==4 ~ 1,
@@ -226,18 +228,22 @@ ces0411 %>%
     ces04_PINPORR==13 ~ 5,
     ces04_PINPORR==15 ~ 5,
     ces04_PINPORR==16 ~ 5,
-    ces08_PES_S3_NOCS >0 & ces08_PES_S3_NOCS <1001 & ces04_rtype1==1 ~ 2,
+    ces08_PES_S3_NOCS >0 & ces08_PES_S3_NOCS <1100 & ces04_rtype1==1~ 2,
     ces08_PES_S3_NOCS >1099 & ces08_PES_S3_NOCS <1200 & ces04_rtype1==1~ 1,
-    ces08_PES_S3_NOCS >2099 & ces08_PES_S3_NOCS <3301 & ces04_rtype1==1~ 1,
-    ces08_PES_S3_NOCS >4099 & ces08_PES_S3_NOCS <6301 & ces04_rtype1==1~ 1,
+    ces08_PES_S3_NOCS >2099 & ces08_PES_S3_NOCS <2200 & ces04_rtype1==1~ 1,
+    ces08_PES_S3_NOCS >3099 & ces08_PES_S3_NOCS <3200 & ces04_rtype1==1~ 1,
+    ces08_PES_S3_NOCS >4099 & ces08_PES_S3_NOCS <4200 & ces04_rtype1==1~ 1,
+    ces08_PES_S3_NOCS >5099 & ces08_PES_S3_NOCS <5200 & ces04_rtype1==1~ 1,
     ces08_PES_S3_NOCS >1199 & ces08_PES_S3_NOCS <1501 & ces04_rtype1==1~ 3,
-    ces08_PES_S3_NOCS >6399 & ces08_PES_S3_NOCS <6701 & ces04_rtype1==1~ 3,
-    ces08_PES_S3_NOCS >3399 & ces08_PES_S3_NOCS <3501 & ces04_rtype1==1~ 3,
+    ces08_PES_S3_NOCS >2199 & ces08_PES_S3_NOCS <3100 & ces04_rtype1==1~ 3,
+    ces08_PES_S3_NOCS >3199 & ces08_PES_S3_NOCS <4100 & ces04_rtype1==1~ 3,
+    ces08_PES_S3_NOCS >4199 & ces08_PES_S3_NOCS <5100 & ces04_rtype1==1~ 3,
+    ces08_PES_S3_NOCS >5199 & ces08_PES_S3_NOCS <6701 & ces04_rtype1==1~ 3,
     ces08_PES_S3_NOCS >7199 & ces08_PES_S3_NOCS <7400 & ces04_rtype1==1~ 4,
     ces08_PES_S3_NOCS >7399 & ces08_PES_S3_NOCS <7701 & ces04_rtype1==1~ 5,
     ces08_PES_S3_NOCS >8199 & ces08_PES_S3_NOCS <8400 & ces04_rtype1==1~ 4,
     ces08_PES_S3_NOCS >8399 & ces08_PES_S3_NOCS <8701 & ces04_rtype1==1~ 5,
-    ces08_PES_S3_NOCS >9199 & ces08_PES_S3_NOCS <9600 & ces04_rtype1==1~ 4,
+    ces08_PES_S3_NOCS >9199 & ces08_PES_S3_NOCS <9300 & ces04_rtype1==1~ 4,
     ces08_PES_S3_NOCS >9599 & ces08_PES_S3_NOCS <9701 & ces04_rtype1==1~ 5,
   ))->ces0411
 
@@ -493,9 +499,9 @@ ces0411 %>%
     ces06_PES_B4A==1 | ces06_PES_B4B==1 ~ 1,
     ces06_PES_B4A==2 | ces06_PES_B4B==2 ~ 2,
     ces06_PES_B4A==3 | ces06_PES_B4B==3 ~ 3,
-    ces06_PES_B4A==5 | ces06_PES_B4B==5 ~ 0,
+    ces06_PES_B4A==5 | ces06_PES_B4B==5 ~ 5,
     ces06_PES_B4A==0 | ces06_PES_B4B==0 ~ 0,
-    ces06_PES_B4A==4 | ces06_PES_B4B==4 ~ 0,
+    ces06_PES_B4A==4 | ces06_PES_B4B==4 ~ 4,
   ))->ces0411
 table(ces0411$ces06_PES_B4A, ces0411$vote06)
 val_labels(ces0411$vote06)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
@@ -507,21 +513,27 @@ table(ces0411$vote06)
 look_for(ces0411, "occupation")
 #ces0411$occupation06<-Recode(ces0411$ces06_PES_SD3, "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6300=1; 1200:1500=3; 6400:6700=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
 #ces0411$occupation04<-Recode(ces0411$ces04_PINPORR, "1:2:=1; 4:5=1; 3=2; 6:7=2; 9=3; 12=3; 14=3; 8=4; 10=4; 13=4; 15:16=5; else=NA")
+
+#Panel respondents are added in from both ces04 and ces08 - ces06_RECALL==1 indicates that a respondent participated in the ces06 survey
 ces0411 %>% 
   mutate(occupation06=case_when(
-    ces06_PES_SD3 >0 & ces06_PES_SD3 <1001 ~ 2,
+    ces06_PES_SD3 >0 & ces06_PES_SD3 <1100 ~ 2,
     ces06_PES_SD3 >1099 & ces06_PES_SD3 <1200 ~ 1,
-    ces06_PES_SD3 >2099 & ces06_PES_SD3 <3301 ~ 1,
-    ces06_PES_SD3 >4099 & ces06_PES_SD3 <6301 ~ 1,
+    ces06_PES_SD3 >2099 & ces06_PES_SD3 <2200 ~ 1,
+    ces06_PES_SD3 >3099 & ces06_PES_SD3 <3200 ~ 1,
+    ces06_PES_SD3 >4099 & ces06_PES_SD3 <4200 ~ 1,
+    ces06_PES_SD3 >5099 & ces06_PES_SD3 <5200 ~ 1,
     ces06_PES_SD3 >1199 & ces06_PES_SD3 <1501 ~ 3,
-    ces06_PES_SD3 >6399 & ces06_PES_SD3 <6701 ~ 3,
-    ces06_PES_SD3 >3399 & ces06_PES_SD3 <3501 ~ 3,
+    ces06_PES_SD3 >2199 & ces06_PES_SD3 <3100 ~ 3,
+    ces06_PES_SD3 >3199 & ces06_PES_SD3 <4100 ~ 3,
+    ces06_PES_SD3 >4199 & ces06_PES_SD3 <5100 ~ 3,
+    ces06_PES_SD3 >5199 & ces06_PES_SD3 <6701 ~ 3,
     ces06_PES_SD3 >7199 & ces06_PES_SD3 <7400 ~ 4,
     ces06_PES_SD3 >7399 & ces06_PES_SD3 <7701 ~ 5,
     ces06_PES_SD3 >8199 & ces06_PES_SD3 <8400 ~ 4,
     ces06_PES_SD3 >8399 & ces06_PES_SD3 <8701 ~ 5,
-    ces06_PES_SD3 >9199 & ces06_PES_SD3 <9600 ~ 4,
-    ces06_PES_SD3 >9599 & ces06_PES_SD3 <9701 ~ 5,
+    ces06_PES_SD3 >9199 & ces06_PES_SD3 <9300 ~ 4,
+    ces06_PES_SD3 >9299 & ces06_PES_SD3 <9701 ~ 5,
     ces04_PES_SD3 >0 & ces04_PES_SD3 <1001 & ces06_RECALL==1~ 2,
     ces04_PINPORR==1 & ces06_RECALL==1~ 1,
     ces04_PINPORR==2 & ces06_RECALL==1~ 1,
@@ -538,18 +550,22 @@ ces0411 %>%
     ces04_PINPORR==13 & ces06_RECALL==1~ 5,
     ces04_PINPORR==15 & ces06_RECALL==1~ 5,
     ces04_PINPORR==16 & ces06_RECALL==1~ 5,
-    ces08_PES_S3_NOCS >0 & ces08_PES_S3_NOCS <1001 & ces06_RECALL==1~ 2,
+    ces08_PES_S3_NOCS >0 & ces08_PES_S3_NOCS <1100 & ces06_RECALL==1~ 2,
     ces08_PES_S3_NOCS >1099 & ces08_PES_S3_NOCS <1200 & ces06_RECALL==1~ 1,
-    ces08_PES_S3_NOCS >2099 & ces08_PES_S3_NOCS <3301 & ces06_RECALL==1~ 1,
-    ces08_PES_S3_NOCS >4099 & ces08_PES_S3_NOCS <6301 & ces06_RECALL==1~ 1,
+    ces08_PES_S3_NOCS >2099 & ces08_PES_S3_NOCS <2200 & ces06_RECALL==1~ 1,
+    ces08_PES_S3_NOCS >3099 & ces08_PES_S3_NOCS <3200 & ces06_RECALL==1~ 1,
+    ces08_PES_S3_NOCS >4099 & ces08_PES_S3_NOCS <4200 & ces06_RECALL==1~ 1,
+    ces08_PES_S3_NOCS >5099 & ces08_PES_S3_NOCS <5200 & ces06_RECALL==1~ 1,
     ces08_PES_S3_NOCS >1199 & ces08_PES_S3_NOCS <1501 & ces06_RECALL==1~ 3,
-    ces08_PES_S3_NOCS >6399 & ces08_PES_S3_NOCS <6701 & ces06_RECALL==1~ 3,
-    ces08_PES_S3_NOCS >3399 & ces08_PES_S3_NOCS <3501 & ces06_RECALL==1~ 3,
+    ces08_PES_S3_NOCS >2199 & ces08_PES_S3_NOCS <3100 & ces06_RECALL==1~ 3,
+    ces08_PES_S3_NOCS >3199 & ces08_PES_S3_NOCS <4100 & ces06_RECALL==1~ 3,
+    ces08_PES_S3_NOCS >4199 & ces08_PES_S3_NOCS <5100 & ces06_RECALL==1~ 3,
+    ces08_PES_S3_NOCS >5199 & ces08_PES_S3_NOCS <6701 & ces06_RECALL==1~ 3,
     ces08_PES_S3_NOCS >7199 & ces08_PES_S3_NOCS <7400 & ces06_RECALL==1~ 4,
     ces08_PES_S3_NOCS >7399 & ces08_PES_S3_NOCS <7701 & ces06_RECALL==1~ 5,
     ces08_PES_S3_NOCS >8199 & ces08_PES_S3_NOCS <8400 & ces06_RECALL==1~ 4,
     ces08_PES_S3_NOCS >8399 & ces08_PES_S3_NOCS <8701 & ces06_RECALL==1~ 5,
-    ces08_PES_S3_NOCS >9199 & ces08_PES_S3_NOCS <9600 & ces06_RECALL==1~ 4,
+    ces08_PES_S3_NOCS >9199 & ces08_PES_S3_NOCS <9300 & ces06_RECALL==1~ 4,
     ces08_PES_S3_NOCS >9599 & ces08_PES_S3_NOCS <9701 & ces06_RECALL==1~ 5,
   ))->ces0411
 
@@ -851,34 +867,43 @@ look_for(ces0411, "occupation")
 #ces0411$occupation06<-Recode(ces0411$ces06_PES_SD3, "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6300=1; 1200:1500=3; 6400:6700=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
 #ces0411$occupation04<-Recode(ces0411$ces04_PINPORR, "1:2:=1; 4:5=1; 3=2; 6:7=2; 9=3; 12=3; 14=3; 8=4; 10=4; 13=4; 15:16=5; else=NA")
 
+#Panel respondents are added in from both ces04 and ces06 - ces08_CPS_REPLICATE==9999 indicates that a respondent participated in the ces08 survey
 ces0411 %>% 
   mutate(occupation08=case_when(
-    ces08_PES_S3_NOCS >0 & ces08_PES_S3_NOCS <1001 ~ 2,
+    ces08_PES_S3_NOCS >0 & ces08_PES_S3_NOCS <1100 ~ 2,
     ces08_PES_S3_NOCS >1099 & ces08_PES_S3_NOCS <1200 ~ 1,
-    ces08_PES_S3_NOCS >2099 & ces08_PES_S3_NOCS <3301 ~ 1,
-    ces08_PES_S3_NOCS >4099 & ces08_PES_S3_NOCS <6301 ~ 1,
+    ces08_PES_S3_NOCS >2099 & ces08_PES_S3_NOCS <2200 ~ 1,
+    ces08_PES_S3_NOCS >3099 & ces08_PES_S3_NOCS <3200 ~ 1,
+    ces08_PES_S3_NOCS >4099 & ces08_PES_S3_NOCS <4200 ~ 1,
+    ces08_PES_S3_NOCS >5099 & ces08_PES_S3_NOCS <5200 ~ 1,
     ces08_PES_S3_NOCS >1199 & ces08_PES_S3_NOCS <1501 ~ 3,
-    ces08_PES_S3_NOCS >6399 & ces08_PES_S3_NOCS <6701 ~ 3,
-    ces08_PES_S3_NOCS >3399 & ces08_PES_S3_NOCS <3501 ~ 3,
+    ces08_PES_S3_NOCS >2199 & ces08_PES_S3_NOCS <3100 ~ 3,
+    ces08_PES_S3_NOCS >3199 & ces08_PES_S3_NOCS <4100 ~ 3,
+    ces08_PES_S3_NOCS >4199 & ces08_PES_S3_NOCS <5100 ~ 3,
+    ces08_PES_S3_NOCS >5199 & ces08_PES_S3_NOCS <6701 ~ 3,
     ces08_PES_S3_NOCS >7199 & ces08_PES_S3_NOCS <7400 ~ 4,
     ces08_PES_S3_NOCS >7399 & ces08_PES_S3_NOCS <7701 ~ 5,
     ces08_PES_S3_NOCS >8199 & ces08_PES_S3_NOCS <8400 ~ 4,
     ces08_PES_S3_NOCS >8399 & ces08_PES_S3_NOCS <8701 ~ 5,
-    ces08_PES_S3_NOCS >9199 & ces08_PES_S3_NOCS <9600 ~ 4,
+    ces08_PES_S3_NOCS >9199 & ces08_PES_S3_NOCS <9300 ~ 4,
     ces08_PES_S3_NOCS >9599 & ces08_PES_S3_NOCS <9701 ~ 5,
-    ces06_PES_SD3 >0 & ces06_PES_SD3 <1001 & ces08_CPS_REPLICATE==9999~ 2,
+    ces06_PES_SD3 >0 & ces06_PES_SD3 <1100 & ces08_CPS_REPLICATE==9999~ 2,
     ces06_PES_SD3 >1099 & ces06_PES_SD3 <1200 & ces08_CPS_REPLICATE==9999~ 1,
-    ces06_PES_SD3 >2099 & ces06_PES_SD3 <3301 & ces08_CPS_REPLICATE==9999~ 1,
-    ces06_PES_SD3 >4099 & ces06_PES_SD3 <6301 & ces08_CPS_REPLICATE==9999~ 1,
+    ces06_PES_SD3 >2099 & ces06_PES_SD3 <2200 & ces08_CPS_REPLICATE==9999~ 1,
+    ces06_PES_SD3 >3099 & ces06_PES_SD3 <3200 & ces08_CPS_REPLICATE==9999~ 1,
+    ces06_PES_SD3 >4099 & ces06_PES_SD3 <4200 & ces08_CPS_REPLICATE==9999~ 1,
+    ces06_PES_SD3 >5099 & ces06_PES_SD3 <5200 & ces08_CPS_REPLICATE==9999~ 1,
     ces06_PES_SD3 >1199 & ces06_PES_SD3 <1501 & ces08_CPS_REPLICATE==9999~ 3,
-    ces06_PES_SD3 >6399 & ces06_PES_SD3 <6701 & ces08_CPS_REPLICATE==9999~ 3,
-    ces06_PES_SD3 >3399 & ces06_PES_SD3 <3501 & ces08_CPS_REPLICATE==9999~ 3,
+    ces06_PES_SD3 >2199 & ces06_PES_SD3 <3100 & ces08_CPS_REPLICATE==9999~ 3,
+    ces06_PES_SD3 >3199 & ces06_PES_SD3 <4100 & ces08_CPS_REPLICATE==9999~ 3,
+    ces06_PES_SD3 >4199 & ces06_PES_SD3 <5100 & ces08_CPS_REPLICATE==9999~ 3,
+    ces06_PES_SD3 >5199 & ces06_PES_SD3 <6701 & ces08_CPS_REPLICATE==9999~ 3,
     ces06_PES_SD3 >7199 & ces06_PES_SD3 <7400 & ces08_CPS_REPLICATE==9999~ 4,
     ces06_PES_SD3 >7399 & ces06_PES_SD3 <7701 & ces08_CPS_REPLICATE==9999~ 5,
     ces06_PES_SD3 >8199 & ces06_PES_SD3 <8400 & ces08_CPS_REPLICATE==9999~ 4,
     ces06_PES_SD3 >8399 & ces06_PES_SD3 <8701 & ces08_CPS_REPLICATE==9999~ 5,
-    ces06_PES_SD3 >9199 & ces06_PES_SD3 <9600 & ces08_CPS_REPLICATE==9999~ 4,
-    ces06_PES_SD3 >9599 & ces06_PES_SD3 <9701 & ces08_CPS_REPLICATE==9999~ 5,
+    ces06_PES_SD3 >9199 & ces06_PES_SD3 <9300 & ces08_CPS_REPLICATE==9999~ 4,
+    ces06_PES_SD3 >9299 & ces06_PES_SD3 <9701 & ces08_CPS_REPLICATE==9999~ 5,
     ces04_PES_SD3 >0 & ces04_PES_SD3 <1001 & ces08_CPS_REPLICATE==9999~ 2,
     ces04_PINPORR==1 & ces08_CPS_REPLICATE==9999~ 1,
     ces04_PINPORR==2 & ces08_CPS_REPLICATE==9999~ 1,
@@ -1083,7 +1108,21 @@ table(ces0411$vote11)
 #recode Occupation (NOC_PES11)
 look_for(ces0411, "occupation")
 class(ces0411$NOC_PES11)
-ces0411$occupation11<-Recode(as.numeric(ces0411$NOC_PES11), "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6300=1; 1200:1500=3; 6400:6700=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
+ces0411$occupation11<-Recode(as.numeric(ces0411$NOC_PES11), "1:1099=2; 1100:1199=1;
+2100:2199=1; 
+ 3000:3199=1;
+ 4000:4099=1; 
+ 4100:4199=1;
+ 5100:5199=1;
+ 1200:1599=3; 
+ 2200:2299=3;
+ 3200:3299=3;
+ 3400:3500=3; 
+ 4200:4499=3;
+ 5200:5299=3;
+ 6200:6399=3;
+ 6400:6799=3; 
+ 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9399=4; 9400:9700=5; else=NA")
 val_labels(ces0411$occupation11)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
 #checks
 val_labels(ces0411$occupation11)
