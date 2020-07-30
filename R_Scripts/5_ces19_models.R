@@ -221,20 +221,24 @@ ces19phone %>%
   select(occupation4, Jagmeet_Singh, immigration, redistribution) %>% 
   group_by(occupation4) %>%
   summarise_at(vars(Jagmeet_Singh, immigration, redistribution), mean, na.rm=T) %>% 
-  knitr::kable(., "html") %>% 
-  cat(., file=here('Tables', 'class_attitudes_2019.html'))
-## This is maybe useful, but ideally, I find it more useful to always graph this stuff. 
+  stargazer(., out=here('Tables', 'class_attitudes_2019.html'), type="html")
 
+
+## This is maybe useful, but ideally, I find it more useful to always graph this stuff. 
 ces19phone %>%
   #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
 #  filter(!is.na(occupation4)) %>%
+  #Select the variables for graphing
   select(occupation4, Jagmeet_Singh, immigration, redistribution) %>%
-  gather(Variable, Value, -occupation4) %>% 
+  #they are currently in a wide format, reduce it to long format with pivot_longer
+ pivot_longer(-occupation4,values_to=c("Score"), names_to=c("Variable")) %>% 
+  #Now form groups for each class category and each variable
   group_by(occupation4, Variable) %>% 
-  summarize(Average=mean(Value, na.rm=T), n=n(), sd=sd(Value, na.rm=T), se=sqrt(sd)) %>% 
-  ggplot(., aes(x=Variable, y=Average, col=occupation4))+geom_point()+geom_jitter()
+  #Now summarize those groups, creating the average score, the count of cases n(), the standard deviation, the standard error
+  summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sqrt(sd)/n) %>% 
+  ggplot(., aes(x=Variable, y=Average, col=occupation4))+geom_jitter()
 
-
+## This is your code and it's great; I just showed some ways to aggregate it and present more information
 ces19phone %>%
   filter(!is.na(occupation4)) %>%
   group_by(occupation4) %>%
