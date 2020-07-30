@@ -66,9 +66,25 @@ model4QC<-glm(ndp~working_class+union_both+age+male+sector+immigration, data=ces
 summary(model4ROC)
 summary(model4QC)
 
+#M17 with minority
+model17ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+minorities_help, data=ces19phone, family="binomial")
+ces19phone %>% 
+  filter(quebec==1)->ces.out
+model17QC<-glm(ndp~working_class+union_both+age+male+sector+minorities_help, data=ces.out, family="binomial")
+summary(model17ROC)
+summary(model17QC)
+
+#M18 with immigration2
+model18ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration2, data=ces19phone, family="binomial")
+ces19phone %>% 
+  filter(quebec==1)->ces.out
+model18QC<-glm(ndp~working_class+union_both+age+male+sector+immigration2, data=ces.out, family="binomial")
+summary(model18ROC)
+summary(model18QC)
+
 #Combine 5 models into one table
-stargazer(modelROC, model1ROC, model2ROC, model3ROC, model4ROC, type="html", out=here("Tables", "ROC_ces19_attitudinal_variables.html"))
-stargazer(modelQC, model1QC, model2QC, model3QC, model4QC, type="html", out=here("Tables", "QC_ces19_attitudinal_variables.html"))
+stargazer(modelROC, model1ROC, model2ROC, model3ROC, model4ROC, model17ROC, model18ROC, type="html", out=here("Tables", "ROC_ces19_attitudinal_variables.html"))
+stargazer(modelQC, model1QC, model2QC, model3QC, model4QC, model17QC, model18QC, type="html", out=here("Tables", "QC_ces19_attitudinal_variables.html"))
 
 #### Leadership interactions ####
 #M5 leadership:working class interaction
@@ -138,9 +154,110 @@ model12QC<-glm(ndp~working_class+union_both+age+male+sector+immigration+union_bo
 summary(model12ROC)
 summary(model12QC)
 
-#Combine interaction models into one table
-stargazer(modelROC, model5ROC, model7ROC, model9ROC, model11ROC, type="html", out=here("Tables", "ROC_ces19_attitudinal_workingclass_interactions.html"))
-stargazer(modelQC, model5QC, model7QC, model9QC, model11QC, type="html", out=here("Tables", "QC_ces19_attitudinal_workingclass_interactions.html"))
-stargazer(modelROC, model6ROC, model8ROC, model10ROC, model12ROC, type="html", out=here("Tables", "ROC_ces19_attitudinal_union_interactions.html"))
-stargazer(modelQC, model6QC, model8QC, model10QC, model12QC, type="html", out=here("Tables", "QC_ces19_attitudinal_union_interactions.html"))
+#M13 minority:working class interaction
+model13ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+minorities_help+working_class:minorities_help, data=ces19phone, family="binomial")
+ces19phone %>% 
+  filter(quebec==1)->ces.out
+model13QC<-glm(ndp~working_class+union_both+age+male+sector+minorities_help+working_class:minorities_help, data=ces.out, family="binomial")
+summary(model13ROC)
+summary(model13QC)
 
+#M14 minority:union interaction
+model14ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+minorities_help+union_both:minorities_help, data=ces19phone, family="binomial")
+ces19phone %>% 
+  filter(quebec==1)->ces.out
+model14QC<-glm(ndp~working_class+union_both+age+male+sector+minorities_help+union_both:minorities_help, data=ces.out, family="binomial")
+summary(model14ROC)
+summary(model14QC)
+
+#M15 immigration2:working class interaction
+model15ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration2+working_class:immigration2, data=ces19phone, family="binomial")
+ces19phone %>% 
+  filter(quebec==1)->ces.out
+model15QC<-glm(ndp~working_class+union_both+age+male+sector+immigration2+working_class:immigration2, data=ces.out, family="binomial")
+summary(model15ROC)
+summary(model15QC)
+
+#M16 immigration2:union interaction
+model16ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration2+union_both:immigration2, data=ces19phone, family="binomial")
+ces19phone %>% 
+  filter(quebec==1)->ces.out
+model16QC<-glm(ndp~working_class+union_both+age+male+sector+immigration2+union_both:immigration2, data=ces.out, family="binomial")
+summary(model16ROC)
+summary(model16QC)
+
+#Combine interaction models into one table
+stargazer(modelROC, model5ROC, model7ROC, model9ROC, model11ROC, model13ROC, model15ROC, type="html", out=here("Tables", "ROC_ces19_attitudinal_workingclass_interactions.html"))
+stargazer(modelQC, model5QC, model7QC, model9QC, model11QC, model13QC, model15QC, type="html", out=here("Tables", "QC_ces19_attitudinal_workingclass_interactions.html"))
+stargazer(modelROC, model6ROC, model8ROC, model10ROC, model12ROC, model14ROC, model16ROC, type="html", out=here("Tables", "ROC_ces19_attitudinal_union_interactions.html"))
+stargazer(modelQC, model6QC, model8QC, model10QC, model12QC, model14QC, model16QC, type="html", out=here("Tables", "QC_ces19_attitudinal_union_interactions.html"))
+
+#--------------------------------------------------------------------------------------------------------
+
+#### Summarizing ####
+
+#Redistribution by Class
+ces19phone %>%
+  filter(!is.na(redistribution)) %>%
+  group_by(occupation) %>%
+  summarize(mean_redistribution = mean(redistribution))
+
+ces19phone %>%
+  filter(!is.na(redistribution)) %>%
+  group_by(occupation2) %>%
+  summarize(mean_redistribution = mean(redistribution))
+
+#Redistribution by Class and Union
+ces19phone %>%
+  filter(!is.na(redistribution)) %>%
+  group_by(occupation, union_both) %>%
+  summarize(mean_redistribution = mean(redistribution))
+
+ces19phone %>%
+  filter(!is.na(redistribution)) %>%
+  group_by(occupation2, union_both) %>%
+  summarize(mean_redistribution = mean(redistribution))
+
+#Immigration by Class
+ces19phone %>%
+  filter(!is.na(immigration)) %>%
+  group_by(occupation) %>%
+  summarize(mean_immigration = mean(immigration))
+
+ces19phone %>%
+  filter(!is.na(immigration)) %>%
+  group_by(occupation2) %>%
+  summarize(mean_immigration = mean(immigration))
+
+#Immigration by Class and Union
+ces19phone %>%
+  filter(!is.na(immigration)) %>%
+  group_by(occupation, union_both) %>%
+  summarize(mean_immigration = mean(immigration))
+
+ces19phone %>%
+  filter(!is.na(immigration)) %>%
+  group_by(occupation2, union_both) %>%
+  summarize(mean_immigration = mean(immigration))
+
+####Leadership by Class
+ces19phone %>%
+  filter(!is.na(Jagmeet_Singh)) %>%
+  group_by(occupation) %>%
+  summarize(mean_leadership = mean(Jagmeet_Singh))
+
+ces19phone %>%
+  filter(!is.na(Jagmeet_Singh)) %>%
+  group_by(occupation2) %>%
+  summarize(mean_leadership = mean(Jagmeet_Singh))
+
+#Leadership by Class and Union
+ces19phone %>%
+  filter(!is.na(Jagmeet_Singh)) %>%
+  group_by(occupation, union_both) %>%
+  summarize(mean_leadership = mean(Jagmeet_Singh))
+
+ces19phone %>%
+  filter(!is.na(Jagmeet_Singh)) %>%
+  group_by(occupation2, union_both) %>%
+  summarize(mean_leadership = mean(Jagmeet_Singh))

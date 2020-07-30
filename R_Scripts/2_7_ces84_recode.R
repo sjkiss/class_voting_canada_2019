@@ -146,10 +146,12 @@ val_labels(ces84$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Gre
 val_labels(ces84$vote)
 table(ces84$vote)
 
-#recode Occupation (VAR525)
+#recode Occupation (VAR525, VAR533)
 look_for(ces84, "occupation")
+look_for(ces84, "employed")
 ces84$occupation<-Recode(ces84$VAR525, "1=1; 2=2; 3:4=3; 5=4; 6:7=5; else=NA")
-val_labels(ces84$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+ces84$occupation<-ifelse(ces84$VAR533==1, 6, ces84$occupation)
+val_labels(ces84$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
 val_labels(ces84$occupation)
 table(ces84$occupation)

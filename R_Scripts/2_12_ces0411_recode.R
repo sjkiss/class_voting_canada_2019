@@ -203,9 +203,10 @@ val_labels(ces0411$vote04)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4,
 val_labels(ces0411$vote04)
 table(ces0411$vote04)
 
-#recode Occupation (ces04_PINPORR)
+#recode Occupation (ces04_PINPORR, ces04_CPS_S4)
 look_for(ces0411, "occupation")
 look_for(ces0411, "pinporr")
+look_for(ces0411, "employ")
 #ces0411$occupation04<-Recode(ces0411$ces04_PINPORR, "1:2:=1; 4:5=1; 3=2; 6:7=2; 9=3; 12=3; 14=3; 8=4; 10=4; 13=4; 15:16=5; else=NA")
 #ces0411$occupation08<-Recode(ces0411$ces08_PES_S3_NOCS, "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6300=1; 1200:1500=3; 6400:6700=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
 
@@ -248,7 +249,8 @@ ces0411 %>%
     # ces08_PES_S3_NOCS >9599 & ces08_PES_S3_NOCS <9701 & ces04_rtype1==1~ 5,
   ))->ces0411
 
-val_labels(ces0411$occupation04)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+ces0411$occupation04<-ifelse(ces0411$ces04_CPS_S4==1, 6, ces0411$occupation04)
+val_labels(ces0411$occupation04)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
 val_labels(ces0411$occupation04)
 table(ces0411$occupation04)
@@ -512,8 +514,9 @@ val_labels(ces0411$vote06)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4,
 val_labels(ces0411$vote06)
 table(ces0411$vote06)
 
-#recode Occupation (ces06_PES_SD3)
+#recode Occupation (ces06_PES_SD3, ces06_CPS_S4)
 look_for(ces0411, "occupation")
+look_for(ces0411, "employ")
 #ces0411$occupation06<-Recode(ces0411$ces06_PES_SD3, "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6300=1; 1200:1500=3; 6400:6700=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
 #ces0411$occupation04<-Recode(ces0411$ces04_PINPORR, "1:2:=1; 4:5=1; 3=2; 6:7=2; 9=3; 12=3; 14=3; 8=4; 10=4; 13=4; 15:16=5; else=NA")
 
@@ -572,7 +575,9 @@ ces0411 %>%
     # ces08_PES_S3_NOCS >9599 & ces08_PES_S3_NOCS <9701 & ces06_RECALL==1~ 5,
   ))->ces0411
 
-val_labels(ces0411$occupation06)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+ces0411$occupation06<-ifelse(ces0411$ces06_CPS_S4==1, 6, ces0411$occupation06)
+#ces0411$occupation06<-ifelse((ces0411$ces04_CPS_S4==1 & ces0411$ces06_RECALL==1), 6, ces0411$occupation06)
+val_labels(ces0411$occupation06)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
 val_labels(ces0411$occupation06)
 table(ces0411$occupation06)
@@ -865,8 +870,9 @@ val_labels(ces0411$vote08)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4,
 val_labels(ces0411$vote08)
 table(ces0411$vote08)
 
-#recode Occupation (ces08_PES_S3_NOCS)
+#recode Occupation (ces08_PES_S3_NOCS, ces08_CPS_S4)
 look_for(ces0411, "occupation")
+look_for(ces0411, "employ")
 #ces0411$occupation08<-Recode(ces0411$ces08_PES_S3_NOCS, "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6300=1; 1200:1500=3; 6400:6700=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
 #ces0411$occupation06<-Recode(ces0411$ces06_PES_SD3, "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6300=1; 1200:1500=3; 6400:6700=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
 #ces0411$occupation04<-Recode(ces0411$ces04_PINPORR, "1:2:=1; 4:5=1; 3=2; 6:7=2; 9=3; 12=3; 14=3; 8=4; 10=4; 13=4; 15:16=5; else=NA")
@@ -926,7 +932,8 @@ ces0411 %>%
     # ces04_PINPORR==16 & ces08_CPS_REPLICATE==9999~ 5,
   ))->ces0411
 
-val_labels(ces0411$occupation08)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+ces0411$occupation08<-ifelse(ces0411$ces08_CPS_S4==1, 6, ces0411$occupation08)
+val_labels(ces0411$occupation08)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
 val_labels(ces0411$occupation08)
 table(ces0411$occupation08)
@@ -1109,8 +1116,9 @@ val_labels(ces0411$vote11)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4,
 val_labels(ces0411$vote11)
 table(ces0411$vote11)
 
-#recode Occupation (NOC_PES11)
+#recode Occupation (NOC_PES11, CPS11_91)
 look_for(ces0411, "occupation")
+look_for(ces0411, "employ")
 class(ces0411$NOC_PES11)
 ces0411$occupation11<-Recode(as.numeric(ces0411$NOC_PES11), "1:1099=2; 1100:1199=1;
 2100:2199=1; 
@@ -1127,7 +1135,8 @@ ces0411$occupation11<-Recode(as.numeric(ces0411$NOC_PES11), "1:1099=2; 1100:1199
  6200:6399=3;
  6400:6799=3; 
  7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9399=4; 9400:9700=5; else=NA")
-val_labels(ces0411$occupation11)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+ces0411$occupation11<-ifelse(ces0411$CPS11_91==1, 6, ces0411$occupation11)
+val_labels(ces0411$occupation11)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
 val_labels(ces0411$occupation11)
 table(ces0411$occupation11)

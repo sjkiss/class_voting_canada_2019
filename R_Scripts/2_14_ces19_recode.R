@@ -118,14 +118,15 @@ table(ces19phone$party_id)
 
 #recode Vote (p3)
 look_for(ces19phone, "party did you vote")
-ces19phone$vote<-Recode(ces19phone$p3, "1=1; 2=2; 3=3; 4=4; 5=5; 6:7=0; else=NA")
+ces19phone$vote<-Recode(ces19phone$p3, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
 val_labels(ces19phone$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
 val_labels(ces19phone$vote)
 table(ces19phone$vote)
 
-#recode Occupation (p52) ***To be recoded later***
+#recode Occupation (p52)
 look_for(ces19phone, "occupation")
+look_for(ces19phone, "employ")
 ces19phone %>% 
   filter(as.numeric(NOC)<1100)
 ces19phone$occupation<-Recode(as.numeric(ces19phone$NOC), "0:1099=2; 
@@ -143,14 +144,16 @@ ces19phone$occupation<-Recode(as.numeric(ces19phone$NOC), "0:1099=2;
  5200:5299=3;
  6200:6399=3;
  6400:6799=3; 7200:7399=4; 
-                              7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
-val_labels(ces19phone$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+ 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
+ces19phone$occupation<-ifelse(ces19phone$q68==3, 6, ces19phone$occupation)
+val_labels(ces19phone$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
 val_labels(ces19phone$occupation)
 table(ces19phone$occupation)
 ces19phone %>% 
   filter(is.na(NOC)==F&is.na(occupation)==T) %>% 
   select(NOC, occupation)
+
 #recode Income (q70r)
 look_for(ces19phone, "income")
 ces19phone$income<-Recode(ces19phone$q70r, "1:2=1; 3=2; 4=3; 5:6=4; 7:8=5; else=NA")

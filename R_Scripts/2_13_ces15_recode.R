@@ -136,9 +136,9 @@ val_labels(ces15phone$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4
 val_labels(ces15phone$vote)
 table(ces15phone$vote)
 
-#recode Occupation (PES15_NOC)
+#recode Occupation (PES15_NOC, CPS15_91)
 look_for(ces15phone, "occupation")
-
+look_for(ces15phone, "employ")
 ces15phone$occupation<-Recode(as.numeric(ces15phone$PES15_NOC), "0:1099=2; 
 1100:1199=1;
 2100:2199=1; 
@@ -154,8 +154,9 @@ ces15phone$occupation<-Recode(as.numeric(ces15phone$PES15_NOC), "0:1099=2;
  5200:5299=3;
  6200:6399=3;
  6400:6799=3; 7200:7399=4; 
-                              7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
-val_labels(ces15phone$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+ 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
+ces15phone$occupation<-ifelse(ces15phone$CPS15_91==1, 6, ces15phone$occupation)
+val_labels(ces15phone$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
 val_labels(ces15phone$occupation)
 table(ces15phone$occupation)
