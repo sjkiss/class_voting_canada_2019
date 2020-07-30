@@ -131,16 +131,22 @@ val_labels(ces97$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Gre
 val_labels(ces97$vote)
 table(ces97$vote)
 
-#recode Occupation (pinporr, cpsm4)
+#recode Occupation (pinporr)
 look_for(ces97, "occupation")
 look_for(ces97, "pinporr")
-look_for(ces97, "employ")
 ces97$occupation<-Recode(ces97$pinporr, "1:2:=1; 4:5=1; 3=2; 6:7=2; 9=3; 12=3; 14=3; 8=4; 10=4; 13=4; 15:16=5; else=NA")
-ces97$occupation<-ifelse(ces97$cpsm4==8, 6, ces97$occupation)
-val_labels(ces97$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+val_labels(ces97$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
 #checks
 val_labels(ces97$occupation)
 table(ces97$occupation)
+
+#recode Occupation3 as 6 class schema with self-employed (cpsm4)
+look_for(ces97, "employ")
+ces97$occupation3<-ifelse(ces97$cpsm4==8, 6, ces97$occupation)
+val_labels(ces97$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+#checks
+val_labels(ces97$occupation3)
+table(ces97$occupation3)
 
 #recode Income (cpsm16 and cpsm16a)
 look_for(ces97, "income")

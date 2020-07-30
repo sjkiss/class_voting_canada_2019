@@ -151,6 +151,7 @@ table(ces7980$vote)
 
 #recode Occupation (V410)
 look_for(ces7980, "occupation")
+
 ces7980$occupation<-Recode(ces7980$V410, "11:12=1; 21:22=2; 30=3; 41:42=4; 43:50=5; else=NA")
 val_labels(ces7980$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
 #checks
