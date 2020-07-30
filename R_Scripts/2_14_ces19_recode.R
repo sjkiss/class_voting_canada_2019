@@ -127,8 +127,7 @@ table(ces19phone$vote)
 #recode Occupation (p52)
 look_for(ces19phone, "occupation")
 look_for(ces19phone, "employ")
-ces19phone %>% 
-  filter(as.numeric(NOC)<1100)
+
 ces19phone$occupation<-Recode(as.numeric(ces19phone$NOC), "0:1099=2; 
 1100:1199=1;
 2100:2199=1; 
@@ -145,8 +144,10 @@ ces19phone$occupation<-Recode(as.numeric(ces19phone$NOC), "0:1099=2;
  6200:6399=3;
  6400:6799=3; 7200:7399=4; 
  7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
-ces19phone$occupation<-ifelse(ces19phone$q68==3, 6, ces19phone$occupation)
-val_labels(ces19phone$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+
+##Here is a problem: 
+ces19phone$occupation3<-ifelse(ces19phone$q68==3, 6, ces19phone$occupation)
+val_labels(ces19phone$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
 val_labels(ces19phone$occupation)
 table(ces19phone$occupation)

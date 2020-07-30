@@ -495,7 +495,5 @@ val_labels(ces$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Hi
 #This command calls the file 2_diagnostics.R
 #source("R_scripts/3_recode_diagnostics.R", echo=T)
 #source("R_scripts/4_make_models.R", echo=T)
+source("R_scripts/5_ces19_models.R", echo=T)
 
-library(tidyverse)
-ces0411 %>%
-  

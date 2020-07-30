@@ -55,4 +55,4 @@ ces19web %>%
 table(is.na(ces19web$occupation))
 table(is.na(ces19web$occupation2))
 table(is.na(ces19web$NOC))
-summary(as.numeric(ces19web$NOC))
+

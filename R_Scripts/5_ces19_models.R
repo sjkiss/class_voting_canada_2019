@@ -9,11 +9,20 @@ library(nnet)
 summary(ces)
 
 #Recodes
-ces19phone$working_class<-Recode(ces19phone$occupation, "4:5=1; else=0")
+#CREATE WORKING CLASS DICHOTOMOUS VARIABLE; NOTE HERE ONLY EMPLOYED AND SELF-EMPLOYED PEOPLE ARE SET TO 0 OR 1; ELSE = NA
+ces19phone$working_class<-Recode(ces19phone$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
+#This collapses the two labour categories into one working class
 ces19phone$occupation2<-Recode(as.factor(ces19phone$occupation), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual'))
+#This collapses the two labour categories into one working class; maintaining self-employed as a unique distinction
+ces19phone$occupation4<-Recode(as.factor(ces19phone$occupation3), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'; 6='Self-Employed'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual', 'Self-Employed'))
+#this is the NDP vote variable
 ces19phone$ndp<-car::Recode(ces19phone$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
 table(ces19phone$working_class)
 table(ces19phone$ndp)
+#Let's put the working class variables in order
+ces19phone$occupation2<-fct_relevel(ces19phone$occupation2, "Managers", "Professionals", "Routine_Nonmanual", 'Working_Class')
+
+ces19phone$occupation4<-fct_relevel(ces19phone$occupation4, "Managers", "Self-Employed", "Professionals", "Routine_Nonmanual", 'Working_Class')
 
 #Turn region into factor with East as reference case
 ces19phone$region3<-Recode(as.factor(ces19phone$region), "1='East' ; 2='Ontario' ; 3='West'", levels=c('East', 'Ontario', 'West'))
@@ -195,17 +204,46 @@ stargazer(modelQC, model6QC, model8QC, model10QC, model12QC, model14QC, model16Q
 #--------------------------------------------------------------------------------------------------------
 
 #### Summarizing ####
-
 #Redistribution by Class
-ces19phone %>%
-  filter(!is.na(redistribution)) %>%
-  group_by(occupation) %>%
-  summarize(mean_redistribution = mean(redistribution))
+ces19phone$immigration
 
 ces19phone %>%
-  filter(!is.na(redistribution)) %>%
-  group_by(occupation2) %>%
-  summarize(mean_redistribution = mean(redistribution))
+  #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
+#  filter(!is.na(occupation4)) %>%
+  select(occupation4, Jagmeet_Singh, immigration, redistribution) %>% 
+  group_by(occupation4) %>%
+  summarise_at(vars(Jagmeet_Singh, immigration, redistribution), mean, na.rm=T)
+
+
+ces19phone %>%
+  #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
+#  filter(!is.na(occupation4)) %>%
+  select(occupation4, Jagmeet_Singh, immigration, redistribution) %>% 
+  group_by(occupation4) %>%
+  summarise_at(vars(Jagmeet_Singh, immigration, redistribution), mean, na.rm=T) %>% 
+  knitr::kable(., "html") %>% 
+  cat(., file=here('Tables', 'class_attitudes_2019.html'))
+## This is maybe useful, but ideally, I find it more useful to always graph this stuff. 
+
+ces19phone %>%
+  #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
+#  filter(!is.na(occupation4)) %>%
+  select(occupation4, Jagmeet_Singh, immigration, redistribution) %>%
+  gather(Variable, Value, -occupation4) %>% 
+  group_by(occupation4, Variable) %>% 
+  summarize(Average=mean(Value, na.rm=T), n=n(), sd=sd(Value, na.rm=T), se=sqrt(sd)) %>% 
+  ggplot(., aes(x=Variable, y=Average, col=occupation4))+geom_point()+geom_jitter()
+
+
+ces19phone %>%
+  filter(!is.na(occupation4)) %>%
+  group_by(occupation4) %>%
+  summarize(mean_redistribution = mean(redistribution, na.rm=T))
+# 
+# ces19phone %>%
+#   filter(!is.na(redistribution)) %>%
+#   group_by(occupation2) %>%
+#   summarize(mean_redistribution = mean(redistribution))
 
 #Redistribution by Class and Union
 ces19phone %>%
