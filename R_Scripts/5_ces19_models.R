@@ -204,25 +204,25 @@ stargazer(modelQC, model6QC, model8QC, model10QC, model12QC, model14QC, model16Q
 #--------------------------------------------------------------------------------------------------------
 
 #### Summarizing ####
-#Redistribution by Class
+
 ces19phone$immigration
 
-ces19phone %>%
-  #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
-#  filter(!is.na(occupation4)) %>%
-  select(occupation4, Jagmeet_Singh, immigration, redistribution) %>% 
-  group_by(occupation4) %>%
-  summarise_at(vars(Jagmeet_Singh, immigration, redistribution), mean, na.rm=T)
-
+#Attitudes by Class
 
 ces19phone %>%
   #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
 #  filter(!is.na(occupation4)) %>%
-  select(occupation4, Jagmeet_Singh, immigration, redistribution) %>% 
+  select(occupation4, Jagmeet_Singh, immigration, redistribution, environment) %>% 
   group_by(occupation4) %>%
-  summarise_at(vars(Jagmeet_Singh, immigration, redistribution), mean, na.rm=T) %>% 
+  summarise_at(vars(Jagmeet_Singh, immigration, redistribution, environment), mean, na.rm=T)
+
+ces19phone %>%
+  #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
+#  filter(!is.na(occupation4)) %>%
+  select(occupation4, Jagmeet_Singh, immigration, redistribution, environment) %>% 
+  group_by(occupation4) %>%
+  summarise_at(vars(Jagmeet_Singh, immigration, redistribution, environment), mean, na.rm=T) %>% 
   stargazer(., out=here('Tables', 'class_attitudes_2019.html'), type="html")
-
 
 ## This is maybe useful, but ideally, I find it more useful to always graph this stuff. 
 ces19phone %>%
@@ -252,7 +252,7 @@ ces19phone %>%
 #Redistribution by Class and Union
 ces19phone %>%
   filter(!is.na(redistribution)) %>%
-  group_by(occupation, union_both) %>%
+  group_by(occupation4, union_both) %>%
   summarize(mean_redistribution = mean(redistribution))
 
 ces19phone %>%
@@ -263,7 +263,7 @@ ces19phone %>%
 #Immigration by Class
 ces19phone %>%
   filter(!is.na(immigration)) %>%
-  group_by(occupation) %>%
+  group_by(occupation4) %>%
   summarize(mean_immigration = mean(immigration))
 
 ces19phone %>%
@@ -274,7 +274,7 @@ ces19phone %>%
 #Immigration by Class and Union
 ces19phone %>%
   filter(!is.na(immigration)) %>%
-  group_by(occupation, union_both) %>%
+  group_by(occupation4, union_both) %>%
   summarize(mean_immigration = mean(immigration))
 
 ces19phone %>%
@@ -285,7 +285,7 @@ ces19phone %>%
 ####Leadership by Class
 ces19phone %>%
   filter(!is.na(Jagmeet_Singh)) %>%
-  group_by(occupation) %>%
+  group_by(occupation4) %>%
   summarize(mean_leadership = mean(Jagmeet_Singh))
 
 ces19phone %>%
@@ -296,7 +296,7 @@ ces19phone %>%
 #Leadership by Class and Union
 ces19phone %>%
   filter(!is.na(Jagmeet_Singh)) %>%
-  group_by(occupation, union_both) %>%
+  group_by(occupation4, union_both) %>%
   summarize(mean_leadership = mean(Jagmeet_Singh))
 
 ces19phone %>%

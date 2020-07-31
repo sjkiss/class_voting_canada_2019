@@ -149,14 +149,21 @@ val_labels(ces7980$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, G
 val_labels(ces7980$vote)
 table(ces7980$vote)
 
-#recode Occupation (V410)
+#recode Occupation (V1471)
 look_for(ces7980, "occupation")
-
-ces7980$occupation<-Recode(ces7980$V410, "11:12=1; 21:22=2; 30=3; 41:42=4; 43:50=5; else=NA")
+ces7980$occupation<-Recode(ces7980$V1471, "11:12=1; 21:22=2; 30=3; 41:42=4; 43:50=5; else=NA")
 val_labels(ces7980$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
 #checks
 val_labels(ces7980$occupation)
 table(ces7980$occupation)
+
+#recode Occupation3 as 6 class schema with self-employed (V1477)
+look_for(ces7980, "employed")
+ces7980$occupation3<-ifelse(ces7980$V1477==1, 6, ces7980$occupation)
+val_labels(ces7980$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+#checks
+val_labels(ces7980$occupation3)
+table(ces7980$occupation3)
 
 #recode Income (V1516)
 look_for(ces7980, "income")

@@ -146,16 +146,16 @@ ces15phone$occupation<-Recode(as.numeric(ces15phone$PES15_NOC), "0:1099=2;
  4100:4199=1;
  5100:5199=1;
  1200:1599=3; 
- 2200:2299=3;
+ 2200:2999=3;
  3200:3299=3;
  3400:3500=3; 
  4200:4499=3;
- 5200:5299=3;
+ 5200:5999=3;
  6200:6399=3;
  6400:6799=3; 
  7200:7399=4; 
  7400:7700=5; 
-                              8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
+ 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
 val_labels(ces15phone$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
 #checks
 val_labels(ces15phone$occupation)
@@ -177,6 +177,7 @@ ces15phone %>%
   select(PES15_NOC, occupation) %>% 
   group_by(occupation) %>% 
   summarise(n=n())
+
 #recode Occupation3 as 6 class schema with self-employed (CPS15_91)
 look_for(ces15phone, "employ")
 ces15phone$occupation3<-ifelse(ces15phone$CPS15_91==1, 6, ces15phone$occupation)
@@ -186,6 +187,7 @@ val_labels(ces15phone$occupation3)
 table(ces15phone$occupation3)
 table(is.na(ces15phone$occupation3))
 table(is.na(ces15phone$occupation))
+
 #recode Income (cpsm16 and cpsm16a)
 look_for(ces15phone, "income")
 ces15phone %>% 

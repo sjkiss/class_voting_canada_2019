@@ -21,7 +21,8 @@ ces15phone %>%
 ces19web %>% 
   filter(is.na(NOC)==F&is.na(occupation)==T) %>% 
   select(NOC, occupation)
-##### SPLITTING THE 1979-1980 FILE
+
+#### SPLITTING THE 1979-1980 FILE ####
 table(ces7980$male80)
 names(ces7980)
 names(ces93)
@@ -111,7 +112,7 @@ table(ces80$region, ces80$region80)
 table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
 ces80 %>% 
-  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, religion, non_charter_language, size)->ces80
+  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size)->ces80
 names(ces80)
 
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
@@ -253,7 +254,6 @@ ces04 %>%
 table(ces04$survey, ces04$non_charter_language)
 
 #### Rename CES06 ####
-
 ces06 %>% 
   rename(union_both=union_both06)->ces06
 ces06 %>% 
@@ -287,8 +287,8 @@ ces06 %>%
 ces06 %>% 
   rename(occupation3=occupation06_3)->ces06
 table(ces06$survey, ces06$non_charter_language)
-#### REname CES08 ####
 
+#### Rename CES08 ####
 ces08 %>% 
   rename(union_both=union_both08)->ces08
 ces08 %>% 
@@ -322,8 +322,8 @@ ces08 %>%
 ces08 %>% 
   rename(occupation3=occupation08_3)->ces08
 table(ces08$survey, ces08$non_charter_language)
-#### Rename CES11 ####
 
+#### Rename CES11 ####
 ces11 %>% 
   rename(union_both=union_both11)->ces11
 ces11 %>% 

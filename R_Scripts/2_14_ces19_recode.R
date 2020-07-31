@@ -270,8 +270,8 @@ table(ces19phone$age2)
 
 #recode Redistribution (p44)
 look_for(ces19phone, "rich")
-ces19phone$redistribution<-Recode(ces19phone$p44, "1=5; 2=4; 3=3; 4=2; 5=1; else=NA")
-val_labels(ces19phone$redistribution)<-c(Much_less=1, Somewhat_less=2, Same_amount=3, Somewhat_more=4, Much_more=5)
+ces19phone$redistribution<-Recode(ces19phone$p44, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA", as.numeric=T)
+#val_labels(ces19phone$redistribution)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
 #checks
 val_labels(ces19phone$redistribution)
 table(ces19phone$redistribution)

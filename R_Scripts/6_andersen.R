@@ -9,11 +9,11 @@ library(car)
 
 #ces$working_class<-Recode(ces$occupation, "4:5=1; else=0")
 table(ces$occupation)
+table(ces$occupation3)
 #This was your old code 
 #ces$occupation2<-Recode(ces$occupation, "4:5=1; 3=2; 2=3; 1=4; NA=NA")
 #But I think I'd rather do it this way; just to keep the numbers as close as possible;
 #also this turns it into a factor with working class as the reference category.
-table(ces$occupation)
 
 #ces$occupation2<-Recode(ces$occupation, "4:5='Working_Class'; 3='Routine_Nonmanual' ;2='Managers' ; 1='Professionals'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual'),as.factor=T)
 #The above didn't work for me so I am using this recode -Matt
@@ -21,13 +21,19 @@ ces$occupation2<-Recode(as.factor(ces$occupation), "4:5='Working_Class' ; 3='Rou
 levels(ces$occupation2)
 table(ces$occupation2)
 
-table(ces$occupation, ces$occupation2)
+#This collapses the two labour categories into one working class; maintaining self-employed as a unique distinction
+ces$occupation4<-Recode(as.factor(ces$occupation3), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'; 6='Self-Employed'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual', 'Self-Employed'))
+levels(ces$occupation4)
+table(ces$occupation4)
+table(ces$occupation, ces$occupation2, ces$occupation4)
+
 #I think Andersen has the Conservatives set as the reference category. 
 ces$vote
 table(as_factor(ces$vote))
 ces$vote2<-Recode(as.factor(ces$vote), "0=NA; ;1='Liberal' ; 2='Conservative' ; 3:4='Left' ; 5='Green'", levels=c('Conservative', 'Liberal', 'Left', 'Green'))
 table(ces$vote2)
 levels(ces$vote2)
+
 #new variable checks
 #check for case counts 
 table(ces$election, ces$ndp, useNA = "ifany")
@@ -50,6 +56,7 @@ table(ces$region3)
 #Occupation 2000 and 2019
 table(ces$election, ces$sector)
 table(ces$election, ces$occupation2)
+table(ces$election, ces$occupation4)
 
 #By election
 head(ces)
@@ -73,7 +80,7 @@ ces %>%
            election==1993|
            election==1997|
            election==2004) %>% 
-  select(male, age, religion, degree, occupation2, region, quebec) %>% 
+  select(male, age, religion, degree, occupation2, occupation4, region, quebec) %>% 
   summary()
 
 ##Count missing values
@@ -147,7 +154,6 @@ qc_models %>%
   filter(response.level!="Green") %>% 
   #PLot as line plot 
   ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In QC\nLeft Vote")
-
 
 #Now ROC
 ces %>% 
@@ -223,7 +229,7 @@ andersen2roc<-multinom(vote2 ~ as.factor(occupation2)+age+male+as.factor(religio
 library(stargazer)
 #The command add.lines adds output into the stargazer table
 #The number of observations is stored in the number of fitted values in the model
-nrow(andersen1qc$fitted.values)
+nrow(andersen2qc$fitted.values)
 #nobs vector
 nobs_andersen2qc<-c("N", rep(nrow(andersen2qc$fitted.values), 2))
 nobs_andersen2roc<-c("N", rep(nrow(andersen2roc$fitted.values), 2))
@@ -249,14 +255,41 @@ andersen3roc<-multinom(vote2 ~ as.factor(occupation2)+age+male+as.factor(religio
 library(stargazer)
 #The command add.lines adds output into the stargazer table
 #The number of observations is stored in the number of fitted values in the model
-nrow(andersen1qc$fitted.values)
+nrow(andersen3qc$fitted.values)
 #nobs vector
 nobs_andersen3qc<-c("N", rep(nrow(andersen3qc$fitted.values), 2))
 nobs_andersen3roc<-c("N", rep(nrow(andersen3roc$fitted.values), 2))
 
 #Check
-nobs_andersen2qc
+nobs_andersen3qc
 #add in 
 
 stargazer(andersen3qc, type="html", out=here("Tables", "andersen3qc.html"), title="Multinomial Logistic Regression of Left Vote, 1965-2019, QC", add.lines=list(nobs_andersen3qc))
 stargazer(andersen3roc, type="html", out=here("Tables", "andersen3roc.html"), title="Multinomial Logistic Regression of NDP Vote, 1965-2019, ROC", add.lines=list(nobs_andersen3roc))
+
+----------------------------------------------------------------------------------------------------
+  ####Model 4 - Extension of Table 7.3 in Andersen including Self-Employed (by Region) 1979-2019 ####
+
+#we need to filter out years 2000 and before 1979
+ces %>% 
+  filter(election!=2000 & election>1979 & vote2!="Green")->ces.out
+table(ces$vote2)
+#QC
+andersen4qc<-multinom(vote2 ~ as.factor(occupation4)+age+male+as.factor(religion2)+degree+as.factor(election), data = subset(ces.out, quebec==1))
+#ROC
+andersen4roc<-multinom(vote2 ~ as.factor(occupation4)+age+male+as.factor(religion2)+degree+as.factor(election)+as.factor(region3), data = subset(ces.out, quebec!=1))
+
+library(stargazer)
+#The command add.lines adds output into the stargazer table
+#The number of observations is stored in the number of fitted values in the model
+nrow(andersen4qc$fitted.values)
+#nobs vector
+nobs_andersen4qc<-c("N", rep(nrow(andersen4qc$fitted.values), 2))
+nobs_andersen4roc<-c("N", rep(nrow(andersen4roc$fitted.values), 2))
+
+#Check
+nobs_andersen4qc
+#add in 
+
+stargazer(andersen4qc, type="html", out=here("Tables", "andersen4qc.html"), title="Multinomial Logistic Regression of Left Vote, 1979-2019, QC", add.lines=list(nobs_andersen4qc))
+stargazer(andersen4roc, type="html", out=here("Tables", "andersen4roc.html"), title="Multinomial Logistic Regression of NDP Vote, 1979-2019, ROC", add.lines=list(nobs_andersen4roc))
