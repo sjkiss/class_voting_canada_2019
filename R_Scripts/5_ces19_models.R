@@ -93,6 +93,7 @@ summary(model18QC)
 
 #Combine 5 models into one table
 stargazer(modelROC, model1ROC, model2ROC, model3ROC, model4ROC, model17ROC, model18ROC, type="html", out=here("Tables", "ROC_ces19_attitudinal_variables.html"))
+
 stargazer(modelQC, model1QC, model2QC, model3QC, model4QC, model17QC, model18QC, type="html", out=here("Tables", "QC_ces19_attitudinal_variables.html"))
 
 #### Leadership interactions ####
@@ -215,14 +216,18 @@ ces19phone %>%
   select(occupation4, Jagmeet_Singh, immigration, redistribution, environment) %>% 
   group_by(occupation4) %>%
   summarise_at(vars(Jagmeet_Singh, immigration, redistribution, environment), mean, na.rm=T)
-
+library(knitr)
+library(kableExtra)
 ces19phone %>%
   #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
 #  filter(!is.na(occupation4)) %>%
   select(occupation4, Jagmeet_Singh, immigration, redistribution, environment) %>% 
   group_by(occupation4) %>%
   summarise_at(vars(Jagmeet_Singh, immigration, redistribution, environment), mean, na.rm=T) %>% 
-  stargazer(., out=here('Tables', 'class_attitudes_2019.html'), type="html")
+  #Convert this to a data frame for printing
+  as.data.frame() %>% 
+  #summary=F tells stargazer to print the raw data, not summary statistics, digits=2 tells it to round to 2 digits
+stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Class attitudes ROC 2019.html"))
 
 ## This is maybe useful, but ideally, I find it more useful to always graph this stuff. 
 ces19phone %>%

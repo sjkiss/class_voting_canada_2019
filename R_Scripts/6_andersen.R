@@ -215,11 +215,13 @@ qc_models_2019 %>%
   ggplot(., aes(x=election, y=predicted, group=x, col=x))+geom_line()+facet_grid(~response.level)+labs(title="Class Voting In QCC")+theme(axis.text.x=element_text(angle=90))
 ggsave(here("Plots", "class_voting_qc_2019.png"), width=8, height=3)
 
-----------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 ####Model 2 - Replication of Table 7.3 in Andersen (by Region) ####
 #we need to filter out years 2000
+
 ces %>% 
   filter(election!=2000 & election<2006 &vote2!="Green")->ces.out
+
 table(ces$vote2)
 #QC
 andersen2qc<-multinom(vote2 ~ as.factor(occupation2)+age+male+as.factor(religion2)+degree+as.factor(election), data = subset(ces.out, quebec==1))
@@ -241,7 +243,7 @@ nobs_andersen2qc
 stargazer(andersen2qc, type="html", out=here("Tables", "andersen2qc.html"), title="Multinomial Logistic Regression of Left Vote, 1965-2004, QC", add.lines=list(nobs_andersen2qc))
 stargazer(andersen2roc, type="html", out=here("Tables", "andersen2roc.html"), title="Multinomial Logistic Regression of NDP Vote, 1965-2004, ROC", add.lines=list(nobs_andersen2roc))
 
-----------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 ####Model 3 - Replication of Table 7.3 in Andersen (by Region) expanded to 2019 ####
 #we need to filter out years 2000
 ces %>% 
@@ -267,12 +269,12 @@ nobs_andersen3qc
 stargazer(andersen3qc, type="html", out=here("Tables", "andersen3qc.html"), title="Multinomial Logistic Regression of Left Vote, 1965-2019, QC", add.lines=list(nobs_andersen3qc))
 stargazer(andersen3roc, type="html", out=here("Tables", "andersen3roc.html"), title="Multinomial Logistic Regression of NDP Vote, 1965-2019, ROC", add.lines=list(nobs_andersen3roc))
 
-----------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
   ####Model 4 - Extension of Table 7.3 in Andersen including Self-Employed (by Region) 1979-2019 ####
 
 #we need to filter out years 2000 and before 1979
 ces %>% 
-  filter(election!=2000 & election>1979 & vote2!="Green")->ces.out
+  filter(election!=2000 & election>1974 & vote2!="Green")->ces.out
 table(ces$vote2)
 #QC
 andersen4qc<-multinom(vote2 ~ as.factor(occupation4)+age+male+as.factor(religion2)+degree+as.factor(election), data = subset(ces.out, quebec==1))
