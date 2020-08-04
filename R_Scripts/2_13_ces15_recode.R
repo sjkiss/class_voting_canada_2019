@@ -203,3 +203,107 @@ val_labels(ces15phone$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middl
 #checks
 val_labels(ces15phone$income)
 table(ces15phone$income)
+
+
+#recode Immigration sentiment (PES15_51, PES15_19, PES15_28) into an index 0-1
+#1 = pro-immigration sentiment 0 = anti-immigration sentiment
+look_for(ces15phone, "immigr")
+ces15phone$immigration_jobs<-Recode(ces15phone$PES15_51, "7=1; 5=0.66; 3=0.33; 1=0; else=NA", as.numeric=T)
+#val_labels(ces15phone$immigration_jobs)<-c(Strongly_agree=0, Somewhat_agree=0.33, Somewhat_disagree=0.66, Strongly_disagree=1)
+#checks
+#val_labels(ces15phone$immigration_jobs)
+table(ces15phone$immigration_jobs)
+
+ces15phone$immigration_feel1<-Recode(ces15phone$PES15_19, "998:999=NA")
+table(ces15phone$immigration_feel1)
+ces15phone$immigration_feel<-(ces15phone$immigration_feel1 /100)
+#checks
+#val_labels(ces15phone$immigrations_feel)
+table(ces15phone$immigration_feel)
+
+ces15phone$immigration_rate<-Recode(ces15phone$PES15_28, "1=1; 3=0; 5=0.5; else=NA", as.numeric=T)
+#val_labels(ces15phone$immigration_rate)<-c(Less=0, Same=0.5, More=1)
+#checks
+#val_labels(ces15phone$immigration_rate)
+table(ces15phone$immigration_rate)
+
+#Combine the 3 immigration variables and divide by 3
+ces15phone$immigration3<-(ces15phone$immigration_jobs + ces15phone$immigration_feel + ces15phone$immigration_rate)
+table(ces15phone$immigration3)
+ces15phone$immigration<-(ces15phone$immigration3 /3)
+#Check distribution of immigration
+qplot(ces15phone$immigration, geom="histogram")
+
+#recode Racial Minorities sentiment (PES15_18, PES15_42) into an index 0-1 
+#1 = pro-racial minority sentiment 0 = anti-racial minority sentiment
+look_for(ces15phone, "minor")
+ces15phone$r_minorities_feel<-Recode(ces15phone$PES15_18, "998:999=NA")
+table(ces15phone$r_minorities_feel)
+ces15phone$minorities_feel<-(ces15phone$r_minorities_feel /100)
+#checks
+#val_labels(ces15phone$minorities_feel)
+table(ces15phone$minorities_feel)
+
+ces15phone$minorities_help<-Recode(ces15phone$PES15_42, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA", as.numeric=T)
+#val_labels(ces15phone$minorities_help)<-c(Much_less=0, Somewhat_less=0.25, Same=0.5, Somewhat_more=0.75, Much_more=1)
+#checks
+#val_labels(ces15phone$minorities_help)
+table(ces15phone$minorities_help)
+
+#Combine the 2 racial minority variables and divide by 2
+ces15phone$minorities<-(ces15phone$minorities_feel + ces15phone$minorities_help)
+table(ces15phone$minorities)
+ces15phone$minorities<-(ces15phone$minorities /2)
+#Check distribution of immigration
+qplot(ces15phone$minorities, geom="histogram")
+
+#Calculate Cronbach's alpha
+library(psych)
+
+ces15phone %>% 
+  select(immigration_jobs, immigration_feel, immigration_rate) %>% 
+  alpha(.)
+
+ces15phone %>% 
+  select(minorities_feel, minorities_help) %>% 
+  alpha(.)
+
+## Or Create a 5 variable immigration/racial minority sentiment index by dividing by 5
+ces15phone$immigration5<-(ces15phone$immigration_jobs + ces15phone$immigration_feel + ces15phone$immigration_rate + ces15phone$minorities_feel + ces15phone$minorities_help)
+table(ces15phone$immigration5)
+ces15phone$immigration2<-(ces15phone$immigration5 /5)
+qplot(ces15phone$immigration2, geom="histogram")
+
+#Calculate Cronbach's alpha
+ces15phone %>% 
+  select(immigration_jobs, immigration_feel, immigration_rate, minorities_feel, minorities_help) %>% 
+  alpha(.)
+
+#recode Tom Mulclair (CPS15_25)
+look_for(ces15phone, "Mulcair")
+ces15phone$Mulcair<-Recode(ces15phone$CPS15_25, "996:999=NA")
+#checks
+table(ces15phone$Mulcair)
+ces15phone$Tom_Mulcair<-(ces15phone$Mulcair /100)
+table(ces15phone$Tom_Mulcair)
+
+#recode Environment (CPS15_35)
+look_for(ces15phone, "enviro")
+ces15phone$environment<-Recode(ces15phone$CPS15_35, "5=0.5; 1=1; 3=0; else=NA")
+#val_labels(ces15phone$environment)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
+#checks
+val_labels(ces15phone$environment)
+table(ces15phone$environment)
+
+#recode Age2 (0-1 variable)
+ces15phone$age2<-(ces15phone$age /100)
+#checks
+table(ces15phone$age2)
+
+#recode Redistribution (PES15_41)
+look_for(ces15phone, "rich")
+ces15phone$redistribution<-Recode(ces15phone$PES15_41, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA", as.numeric=T)
+#val_labels(ces19phone$redistribution)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
+#checks
+#val_labels(ces15phone$redistribution)
+table(ces15phone$redistribution)

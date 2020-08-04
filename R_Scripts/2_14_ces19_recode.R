@@ -169,6 +169,22 @@ val_labels(ces19phone$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middl
 val_labels(ces19phone$income)
 table(ces19phone$income)
 
+#recode Community Size (p57)
+look_for(ces19phone, "live")
+ces19phone$size<-Recode(ces19phone$p57, "1=1; 2=2; 3=3; 4=4; 5=5; else=NA")
+val_labels(ces19phone$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, City=5)
+#checks
+val_labels(ces19phone$size)
+table(ces19phone$size)
+
+#recode Native-born (q64)
+look_for(ces19phone, "born")
+ces19phone$native<-Recode(ces19phone$q64, "1:2=1; 3:13=0; else=NA")
+val_labels(ces19phone$native)<-c(Foreign=0, Native=1)
+#checks
+val_labels(ces19phone$native)
+table(ces19phone$native)
+
 #recode Immigration sentiment (p22_a, p22_b, p22_c, q39) into an index 0-1
 #1 = pro-immigration sentiment 0 = anti-immigration sentiment
 look_for(ces19phone, "immigr")
@@ -196,8 +212,7 @@ ces19phone$immigration_rate<-Recode(ces19phone$q39, "1=1; 2=0; 3=0.5; else=NA", 
 #val_labels(ces19phone$immigration_rate)
 table(ces19phone$immigration_rate)
 
-#recode Minorities sentiment (p21_a, p35_a) into an index 0-1 
-#Realize now that the first one is any minority whereas the second one is racial minorities so just using 2nd one
+#recode Racial Minorities sentiment (p21_a)
 #1 = pro-racial minority sentiment 0 = anti-racial minority sentiment
 look_for(ces19phone, "minor")
 ces19phone$minorities_culture<-Recode(ces19phone$p21_a, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
