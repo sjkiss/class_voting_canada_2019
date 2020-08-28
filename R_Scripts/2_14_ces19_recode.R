@@ -270,6 +270,22 @@ table(ces19phone$Singh)
 ces19phone$Jagmeet_Singh<-(ces19phone$Singh /100)
 table(ces19phone$Jagmeet_Singh)
 
+#recode Justin Trudeau (q20)
+look_for(ces19phone, "Trudeau")
+ces19phone$Trudeau<-Recode(ces19phone$q20, "-6=NA; -8=NA; -9=NA")
+#checks
+table(ces19phone$Trudeau)
+ces19phone$Justin_Trudeau<-(ces19phone$Trudeau /100)
+table(ces19phone$Justin_Trudeau)
+
+#recode Andrew Scheer (q21)
+look_for(ces19phone, "Scheer")
+ces19phone$Scheer<-Recode(ces19phone$q21, "-6=NA; -8=NA; -9=NA")
+#checks
+table(ces19phone$Scheer)
+ces19phone$Andrew_Scheer<-(ces19phone$Scheer /100)
+table(ces19phone$Andrew_Scheer)
+
 #recode Environment (q27_b)
 look_for(ces19phone, "enviro")
 ces19phone$environment<-Recode(ces19phone$q27_b, "3=0.5; 1=1; 2=0; else=NA")
@@ -290,3 +306,35 @@ ces19phone$redistribution<-Recode(ces19phone$p44, "1=1; 2=0.75; 3=0.5; 4=0.25; 5
 #checks
 val_labels(ces19phone$redistribution)
 table(ces19phone$redistribution)
+
+#recode NDP_rating (q16)
+look_for(ces19phone, "NDP")
+ces19phone$NDP_therm<-Recode(ces19phone$q16, "-6=NA; -8=NA; -9=NA")
+#checks
+table(ces19phone$NDP_therm)
+ces19phone$NDP_rating<-(ces19phone$NDP_therm /100)
+table(ces19phone$NDP_rating)
+
+#recode Manage economy (q33)
+look_for(ces19phone, "economy")
+ces19phone$manage_economy<-Recode(ces19phone$q33, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
+val_labels(ces19phone$manage_economy)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19phone$manage_economy)
+table(ces19phone$manage_economy)
+
+#recode Manage environment (q34)
+look_for(ces19phone, "economy")
+ces19phone$manage_environment<-Recode(ces19phone$q34, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
+val_labels(ces19phone$manage_environment)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19phone$manage_environment)
+table(ces19phone$manage_environment)
+
+#recode Addressing Main Issue (q8)
+look_for(ces19phone, "issue")
+ces19phone$address_issue<-Recode(ces19phone$q8, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
+val_labels(ces19phone$address_issue)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19phone$address_issue)
+table(ces19phone$address_issue)
