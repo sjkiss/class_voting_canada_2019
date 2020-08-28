@@ -1169,9 +1169,10 @@ ces0411 %>%
 look_for(ces0411, "employ")
 table(ces0411$occupation11, useNA = "ifany")
 ces0411$CPS11_91
-table(ces0411$occupation11, ces0411$occupation11_3)
+
 ces0411$occupation11_3<-ifelse(ces0411$CPS11_91==1, 6, ces0411$occupation11)
 val_labels(ces0411$occupation11_3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+table(ces0411$occupation11, ces0411$occupation11_3)
 #checks
 val_labels(ces0411$occupation11_3)
 table(ces0411$occupation11_3)
