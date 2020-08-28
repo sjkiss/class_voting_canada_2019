@@ -287,6 +287,22 @@ table(ces15phone$Mulcair)
 ces15phone$Tom_Mulcair<-(ces15phone$Mulcair /100)
 table(ces15phone$Tom_Mulcair)
 
+#recode Justin Trudeau (CPS15_24)
+look_for(ces15phone, "Trudeau")
+ces15phone$Trudeau<-Recode(ces15phone$CPS15_24, "996:999=NA")
+#checks
+table(ces15phone$Trudeau)
+ces15phone$Justin_Trudeau<-(ces15phone$Trudeau /100)
+table(ces15phone$Justin_Trudeau)
+
+#recode Stephen Harper (CPS15_23)
+look_for(ces15phone, "Harper")
+ces15phone$Harper<-Recode(ces15phone$CPS15_23, "996:999=NA")
+#checks
+table(ces15phone$Harper)
+ces15phone$Stephen_Harper<-(ces15phone$Harper /100)
+table(ces15phone$Stephen_Harper)
+
 #recode Environment (CPS15_35)
 look_for(ces15phone, "enviro")
 ces15phone$environment<-Recode(ces15phone$CPS15_35, "5=0.5; 1=1; 3=0; else=NA")
@@ -307,3 +323,27 @@ ces15phone$redistribution<-Recode(ces15phone$PES15_41, "1=1; 2=0.75; 3=0.5; 4=0.
 #checks
 #val_labels(ces15phone$redistribution)
 table(ces15phone$redistribution)
+
+#recode NDP_rating (CPS15_20)
+look_for(ces15phone, "NDP")
+ces15phone$NDP_therm<-Recode(ces15phone$CPS15_20, "996=NA; 998=NA; 999=NA")
+#checks
+table(ces15phone$NDP_therm)
+ces15phone$NDP_rating<-(ces15phone$NDP_therm /100)
+table(ces15phone$NDP_rating)
+
+#recode Manage economy (CPS15_40b)
+look_for(ces15phone, "economy")
+ces15phone$manage_economy<-Recode(ces15phone$CPS15_40b, "1=1; 2=2; 3=3; 4=4; 0=5; else=NA")
+val_labels(ces15phone$manage_economy)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces15phone$manage_economy)
+table(ces15phone$manage_economy)
+
+#recode Addressing Main Issue (q8)
+look_for(ces19phone, "issue")
+ces19phone$address_issue<-Recode(ces19phone$q8, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
+val_labels(ces19phone$address_issue)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19phone$address_issue)
+table(ces19phone$address_issue)

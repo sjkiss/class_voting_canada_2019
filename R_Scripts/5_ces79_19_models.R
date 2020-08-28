@@ -330,7 +330,7 @@ ndp_models_complete4 %>%
   facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
   
 #save 
-ggsave(here("Plots", "M4_blais_degree_income_4_parties.png"))
+ggsave(here("Plots", "M4_blais_1979_2019_4_parties.png"))
 
 #------------------------------------------------------------------------------------------------
 
@@ -417,3 +417,89 @@ ndp_models_complete5 %>%
 
 #save 
 ggsave(here("Plots", "M5_blais_workingclass_subsample_4_parties.png"))
+
+#------------------------------------------------------------------------------------------------
+
+#### M6 Blais Replication Extension 1979-2019 with Greens & Occupation4 as factor####
+table(ces$election, ces$sector)
+
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(ndp~as.factor(region2)+catholic+no_religion+non_charter_language+as.factor(occupation4)+union_both+age+female+sector+degree+income, data=x)),
+         tidied=map(model, tidy), 
+         vote=rep('NDP', nrow(.)))->ndp_models_complete6
+
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(conservative~as.factor(region2)+catholic+no_religion+non_charter_language+as.factor(occupation4)+union_both+age+female+sector+degree+income, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Conservative', nrow(.))  
+  )->conservative_models_complete6
+
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(liberal~as.factor(region2)+catholic+no_religion+non_charter_language+as.factor(occupation4)+union_both+age+female+sector+degree+income, data=x)),
+         tidied=map(model, tidy),
+         vote=rep('Liberal', nrow(.))  
+  )->liberal_models_complete6
+
+ces %>% 
+  filter(election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) lm(green~as.factor(region2)+catholic+no_religion+non_charter_language+as.factor(occupation4)+union_both+age+female+sector+degree+income, data=x)),
+         tidied=map(model, tidy), 
+         vote=rep('Green', nrow(.)))->green_models_complete6
+
+stargazer(ndp_models_complete6$model, 
+          type="html", 
+          out=here("Tables", "NDP_Models_1979_2019_6.html"),
+          column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), 
+          title="NDP Models 1979-2019", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(liberal_models_complete6$model, 
+          type="html", 
+          out=here("Tables", "liberal_Models_1979_2019_6.html"),
+          column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), 
+          title="Liberal Models 1979-2019", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(conservative_models_complete6$model, 
+          type="html", 
+          out=here("Tables", "conservative_Models_1979_2019_6.html"),
+          column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), 
+          title="Conservative Models 1979-2019", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+stargazer(green_models_complete6$model, 
+          type="html", 
+          out=here("Tables", "Green_Models_1979_2019_6.html"),
+          column.labels=c("1979", "1980", "1984", "1988", "1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), 
+          star.cutoffs=c(0.05), 
+          title="Green Models 1979-2019", 
+          notes=paste("Printed on", as.character(Sys.time()), "by", Sys.getenv("USERNAME")))
+
+#Join all parties and plot sector coefficients
+ndp_models_complete6 %>% 
+  bind_rows(., liberal_models_complete6) %>% 
+  bind_rows(., conservative_models_complete6) %>%
+  bind_rows(., green_models_complete6) %>%
+  unnest(tidied) %>% 
+  filter(term=="union_both"| term=="working_class3") %>% 
+  mutate(term=Recode(term, "'union_both'='Union'; 'working_class3'='Working Class'")) %>% 
+  ggplot(., aes(x=election, y=estimate, col=vote, alpha=fct_relevel(term, "Working Class")))+
+  geom_point()+
+  labs(title="OLS Coefficients of Working Class on Party Vote", alpha="Variable", color="Vote", x="Election", y="Estimate")+
+  geom_errorbar(aes(ymin=estimate-(1.96*std.error), ymax=estimate+(1.96*std.error)), width=0)+
+  ylim(c(-0.2,0.2))+
+  scale_color_manual(values=c("blue", "green", "red", "orange"))+
+  facet_grid(rows=vars(vote), switch="y")+geom_hline(yintercept=0, alpha=0.5)+theme(axis.text.x=element_text(angle=90))
+
+#save 
+ggsave(here("Plots", "M6_blais_occupation_1979_2019_4_parties.png"))

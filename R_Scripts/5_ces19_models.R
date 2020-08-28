@@ -148,7 +148,7 @@ model25QC<-glm(ndp~working_class+union_both+age+male+sector+size, data=ces.out, 
 summary(model25ROC)
 summary(model25QC)
 
-#M26 basic model with community size
+#M26 basic model with native born
 model26ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+native, data=ces19phone, family="binomial")
 ces19phone %>% 
   filter(quebec==1)->ces.out
@@ -180,6 +180,14 @@ model29QC<-glm(ndp~working_class+union_both+age+male+sector+degree+income+size+n
 summary(model29ROC)
 summary(model29QC)
 
+#M30 Demographic and attitudinal model
+model30ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree+income+no_religion+immigration2+environment+redistribution+Justin_Trudeau+Andrew_Scheer+Jagmeet_Singh, data=ces19phone, family="binomial")
+ces19phone %>% 
+  filter(quebec==1)->ces.out
+model30QC<-glm(ndp~working_class+union_both+age+male+sector+degree+income+no_religion+immigration2+environment+redistribution+Justin_Trudeau+Andrew_Scheer+Jagmeet_Singh, data=ces.out, family="binomial")
+summary(model30ROC)
+summary(model30QC)
+
 #Combine models into one table by region
 #stargazer(modelROC, model23ROC, model24ROC, model1ROC, model2ROC, model3ROC, model4ROC, model17ROC, model18ROC, type="html", out=here("Tables", "ROC_ces19_attitudinal_variables.html"))
 #stargazer(modelQC, model23QC, model24QC, model1QC, model2QC, model3QC, model4QC, model17QC, model18QC, type="html", out=here("Tables", "QC_ces19_attitudinal_variables.html"))
@@ -193,6 +201,8 @@ stargazer(modelROC, modelQC, model4ROC, model4QC, model17ROC, model17QC, model18
 #Extra variable comparisons
 stargazer(modelROC, modelQC, model25ROC, model25QC, model26ROC, model26QC, model27ROC, model27QC, model28ROC, model28QC, model29ROC, model29QC,type="html", out=here("Tables", "ces19_different_controls.html"))
 
+#Combine best 2019/2015 model
+stargazer(model30ROC, model30QC, type="html", out=here("Tables", "ces15_19_3_party.html"))
 
 #### Leadership interactions ####
 #M5 leadership:working class interaction
@@ -313,9 +323,9 @@ ces19phone$immigration
 ces19phone %>%
   #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
 #  filter(!is.na(occupation4)) %>%
-  select(occupation4, Jagmeet_Singh, immigration, redistribution, environment) %>% 
+  select(occupation4, Jagmeet_Singh, immigration, redistribution, environment, minorities_help) %>% 
   group_by(occupation4) %>%
-  summarise_at(vars(Jagmeet_Singh, immigration, redistribution, environment), mean, na.rm=T)
+  summarise_at(vars(Jagmeet_Singh, immigration, redistribution, environment, minorities_help), mean, na.rm=T)
 library(knitr)
 library(kableExtra)
 
@@ -343,6 +353,30 @@ ces19phone %>%
   #Now summarize those groups, creating the average score, the count of cases n(), the standard deviation, the standard error
   summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sqrt(sd)/n) %>% 
   ggplot(., aes(x=Variable, y=Average, col=occupation4))+geom_jitter()
+
+#By income
+ces19phone %>%
+  #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
+  #  filter(!is.na(income)) %>%
+  select(income, Jagmeet_Singh, immigration, redistribution, environment, minorities_help) %>% 
+  group_by(income) %>%
+  summarise_at(vars(Jagmeet_Singh, immigration, redistribution, environment, minorities_help), mean, na.rm=T) %>% 
+  #Convert this to a data frame for printing
+  as.data.frame() %>% 
+  #summary=F tells stargazer to print the raw data, not summary statistics, digits=2 tells it to round to 2 digits
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Income attitudes 2019.html"))
+
+#By income
+ces19phone %>%
+  #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
+  #  filter(!is.na(income)) %>%
+  select(degree, Jagmeet_Singh, immigration, redistribution, environment, minorities_help) %>% 
+  group_by(degree) %>%
+  summarise_at(vars(Jagmeet_Singh, immigration, redistribution, environment, minorities_help), mean, na.rm=T) %>% 
+  #Convert this to a data frame for printing
+  as.data.frame() %>% 
+  #summary=F tells stargazer to print the raw data, not summary statistics, digits=2 tells it to round to 2 digits
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Degree attitudes 2019.html"))
 
 #By Union status
 ces19phone %>%
@@ -470,12 +504,22 @@ ces19phone %>%
 #### Past NDP Vote ####
 
 ces19phone$ndp_past<-Recode(ces19phone$past_vote, "3=1; 0:2=0; 4:5=0; else=NA")
+ces19phone$liberal_past<-Recode(ces19phone$past_vote, "1=1; 0=0; 2:5=0; else=NA")
+ces19phone$conservative+past<-Recode(ces19phone$past_vote, "2=1; 0:1=0; 3:5=0; else=NA")
+ces19phone$ndp_past<-Recode(ces19phone$past_vote, "3=1; 0:2=0; 4:5=0; else=NA")
+ces19phone$bloc_past<-Recode(ces19phone$past_vote, "4=1; 0:3=0; 5=0; else=NA")
+ces19phone$green_past<-Recode(ces19phone$past_vote, "5=1; 0:4=0; else=NA")
 ces19phone$liberal<-Recode(ces19phone$vote, "1=1; 0=0; 2:5=0; else=NA")
 ces19phone$conservative<-Recode(ces19phone$vote, "2=1; 0:1=0; 3:5=0; else=NA")
 ces19phone$ndp<-Recode(ces19phone$vote, "3=1; 0:2=0; 4:5=0; else=NA")
 ces19phone$bloc<-Recode(ces19phone$vote, "4=1; 0:3=0; 5=0; else=NA")
 ces19phone$green<-Recode(ces19phone$vote, "5=1; 0:4=0; else=NA")
 table(ces19phone$ndp_past)
+table(ces19phone$liberal_past)
+table(ces19phone$conservative_past)
+table(ces19phone$ndp_past)
+table(ces19phone$bloc_past)
+table(ces19phone$green_past)
 table(ces19phone$liberal)
 table(ces19phone$conservative)
 table(ces19phone$ndp)
@@ -640,4 +684,46 @@ ces19phone %>%
   summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
   as.data.frame() %>% 
   stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Past NDP Working Class Vote 2019.html"))
+
+#--------------------------------------------------------------------------------------------------------
   
+#### Leader/party ratings overall ####
+ces19phone%>% 
+  select(Jagmeet_Singh) %>% 
+  summary()
+
+ces15phone%>% 
+  select(Tom_Mulcair) %>% 
+  summary()
+
+ces19phone%>% 
+  select(NDP_rating) %>% 
+  summary()
+
+ces15phone%>% 
+  select(NDP_rating) %>% 
+  summary()
+
+#-------------------------------------------------------------------------------------------------
+
+#### Performance models#### (TBC)
+
+#create party_id and region2 variables
+ces19phone$ndp_party_id<-Recode(ces19phone$party_id, "3=1; 0:2=0; else=NA")
+table(ces19phone$ndp_party_id)
+
+ces19phone %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces19phone
+table(ces19phone$region2)
+
+#Model 1
+pmodel1<-glm(ndp~as.factor(region2)+age+male+degree+income+language+ndp_party_id+Jagmeet_Singh, data=ces19phone, family="binomial")
+summary(pmodel1)
+
+stargazer(pmodel1, pmodel1QC, type="html", out=here("Tables", "ces19_ndp_performance_1.html"))
+
