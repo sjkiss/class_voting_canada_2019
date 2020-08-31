@@ -338,3 +338,19 @@ val_labels(ces19phone$address_issue)<-c(Other=0, Liberal=1, Conservative=2, NDP=
 #checks
 val_labels(ces19phone$address_issue)
 table(ces19phone$address_issue)
+
+#Most Important Problem Recode
+library(tidyverse)
+look_for(ces19phone, "important")
+
+ces19phone$mip19<-tolower(ces19phone$q7)
+ces19phone %>% 
+  mutate(mip19_environment=case_when(
+    str_detect(mip19, "climat[a-z]") ~ 1,
+        str_detect(mip19, "environ[a-z]") ~ 1,
+                                           str_detect(mip19, "pipeline") ~ 1,
+                                               str_detect(mip19, "[eé]colog[a-z]") ~ 1,
+                                                   str_detect(mip19, "pollut[a-z]") ~ 1,
+  is.na(mip19)==F ~ 0,
+    TRUE ~ NA_real_
+  )) ->ces19phone
