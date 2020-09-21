@@ -110,8 +110,8 @@ table(ces19phone$sector)
 
 #recode Party ID (p47)
 look_for(ces19phone, "closest")
-ces19phone$party_id<-Recode(ces19phone$p47, "1=1; 2=2; 3=3; 4:7=0; else=NA")
-val_labels(ces19phone$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+ces19phone$party_id<-Recode(ces19phone$p47, "1=1; 2=2; 3=3; 4=4; 5=0; 7=0; 6=2; else=NA")
+val_labels(ces19phone$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4)
 #checks
 val_labels(ces19phone$party_id)
 table(ces19phone$party_id)
@@ -185,28 +185,36 @@ val_labels(ces19phone$native)<-c(Foreign=0, Native=1)
 val_labels(ces19phone$native)
 table(ces19phone$native)
 
+#recode Ideology (p42)
+look_for(ces19phone, "scale")
+ces19phone$ideology<-Recode(ces19phone$p42, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
+val_labels(ces19phone$ideology)<-c(Left=0, Right=1)
+#checks
+val_labels(ces19phone$ideology)
+table(ces19phone$ideology)
+
 #recode Immigration sentiment (p22_a, p22_b, p22_c, q39) into an index 0-1
 #1 = pro-immigration sentiment 0 = anti-immigration sentiment
 look_for(ces19phone, "immigr")
-ces19phone$immigration_economy<-Recode(ces19phone$p22_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA", as.numeric=T)
+ces19phone$immigration_economy<-Recode(ces19phone$p22_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
 #val_labels(ces19phone$immigration_economy)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
 #checks
 #val_labels(ces19phone$immigration_economy)
 table(ces19phone$immigration_economy)
 
-ces19phone$immigration_culture<-Recode(ces19phone$p22_b, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+ces19phone$immigration_culture<-Recode(ces19phone$p22_b, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
 #val_labels(ces19phone$immigration_culture)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
 #checks
 #val_labels(ces19phone$immigration_culture)
-#table(ces19phone$immigration_culture)
+table(ces19phone$immigration_culture)
 
-ces19phone$immigration_crime<-Recode(ces19phone$p22_c, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+ces19phone$immigration_crime<-Recode(ces19phone$p22_c, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
 #val_labels(ces19phone$immigration_crime)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
 #checks
 #val_labels(ces19phone$immigration_crime)
 table(ces19phone$immigration_crime)
 
-ces19phone$immigration_rate<-Recode(ces19phone$q39, "1=1; 2=0; 3=0.5; else=NA", as.numeric=T)
+ces19phone$immigration_rate<-Recode(ces19phone$q39, "1=1; 2=0; 3=0.5; -9=0.5; else=NA", as.numeric=T)
 #val_labels(ces19phone$immigration_rate)<-c(Less=0, Same=0.5, More=1)
 #checks
 #val_labels(ces19phone$immigration_rate)
@@ -215,13 +223,13 @@ table(ces19phone$immigration_rate)
 #recode Racial Minorities sentiment (p21_a)
 #1 = pro-racial minority sentiment 0 = anti-racial minority sentiment
 look_for(ces19phone, "minor")
-ces19phone$minorities_culture<-Recode(ces19phone$p21_a, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+ces19phone$minorities_culture<-Recode(ces19phone$p21_a, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
 #val_labels(ces19phone$minorities_culture)<-c(Negative=0, Somewhat_negative=0.25, Neither=0.5, Somewhat_positive=0.75, Positive=1)
 #checks
 #val_labels(ces19phone$minorities_culture)
 #table(ces19phone$minorities_culture)
 
-ces19phone$minorities_help<-Recode(ces19phone$p35_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA", as.numeric=T)
+ces19phone$minorities_help<-Recode(ces19phone$p35_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
 
 #checks
 #val_labels(ces19phone$minorities_help)
@@ -251,7 +259,7 @@ table(ces19phone$immigration2)
 library(psych)
 
 ces19phone %>% 
-  select(immigration_economy, immigration_economy, immigration_culture, immigration_crime, immigration_rate, minorities_help) %>% 
+  select(immigration_economy, immigration_culture, immigration_crime, immigration_rate, minorities_help) %>% 
   alpha(.)
 
 #recode Previous Vote (q60)
@@ -270,9 +278,62 @@ table(ces19phone$Singh)
 ces19phone$Jagmeet_Singh<-(ces19phone$Singh /100)
 table(ces19phone$Jagmeet_Singh)
 
+#recode Justin Trudeau (q20)
+look_for(ces19phone, "Trudeau")
+ces19phone$Trudeau<-Recode(ces19phone$q20, "-6=NA; -8=NA; -9=NA")
+#checks
+table(ces19phone$Trudeau)
+ces19phone$Justin_Trudeau<-(ces19phone$Trudeau /100)
+table(ces19phone$Justin_Trudeau)
+
+#recode Andrew Scheer (q21)
+look_for(ces19phone, "Scheer")
+ces19phone$Scheer<-Recode(ces19phone$q21, "-6=NA; -8=NA; -9=NA")
+#checks
+table(ces19phone$Scheer)
+ces19phone$Andrew_Scheer<-(ces19phone$Scheer /100)
+table(ces19phone$Andrew_Scheer)
+
+#recode Francois Blanchet (q23)
+look_for(ces19phone, "Blanchet")
+ces19phone$Blanchet<-Recode(ces19phone$q23, "-6=NA; -8=NA; -9=NA")
+#checks
+table(ces19phone$Blanchet)
+ces19phone$Francois_Blanchet<-(ces19phone$Blanchet /100)
+table(ces19phone$Francois_Blanchet)
+
+#recode leaders including don't knows
+#recode Jagmeet Singh (q22)
+ces19phone$Singh19<-Recode(ces19phone$q22, "-6=50; -8=NA; -9=50")
+#checks
+table(ces19phone$Singh19)
+ces19phone$Jagmeet_Singh19<-(ces19phone$Singh19 /100)
+table(ces19phone$Jagmeet_Singh19)
+
+#recode Justin Trudeau (q20)
+ces19phone$Trudeau19<-Recode(ces19phone$q20, "-6=50; -8=NA; -9=50")
+#checks
+table(ces19phone$Trudeau19)
+ces19phone$Justin_Trudeau19<-(ces19phone$Trudeau19 /100)
+table(ces19phone$Justin_Trudeau19)
+
+#recode Andrew Scheer (q21)
+ces19phone$Scheer19<-Recode(ces19phone$q21, "-6=50; -8=NA; -9=50")
+#checks
+table(ces19phone$Scheer19)
+ces19phone$Andrew_Scheer19<-(ces19phone$Scheer19 /100)
+table(ces19phone$Andrew_Scheer19)
+
+#recode Francois Blanchet (q23)
+ces19phone$Blanchet19<-Recode(ces19phone$q23, "-6=50; -8=NA; -9=50")
+#checks
+table(ces19phone$Blanchet19)
+ces19phone$Francois_Blanchet19<-(ces19phone$Blanchet19 /100)
+table(ces19phone$Francois_Blanchet19)
+
 #recode Environment (q27_b)
 look_for(ces19phone, "enviro")
-ces19phone$environment<-Recode(ces19phone$q27_b, "3=0.5; 1=1; 2=0; else=NA")
+ces19phone$environment<-Recode(ces19phone$q27_b, "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
 val_labels(ces19phone$environment)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 val_labels(ces19phone$environment)
@@ -285,8 +346,163 @@ table(ces19phone$age2)
 
 #recode Redistribution (p44)
 look_for(ces19phone, "rich")
-ces19phone$redistribution<-Recode(ces19phone$p44, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA", as.numeric=T)
+ces19phone$redistribution<-Recode(ces19phone$p44, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
 #val_labels(ces19phone$redistribution)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
 #checks
 val_labels(ces19phone$redistribution)
 table(ces19phone$redistribution)
+
+#recode NDP_rating (q16)
+look_for(ces19phone, "NDP")
+ces19phone$NDP_therm<-Recode(ces19phone$q16, "-6=NA; -8=NA; -9=NA")
+#checks
+table(ces19phone$NDP_therm)
+ces19phone$NDP_rating<-(ces19phone$NDP_therm /100)
+table(ces19phone$NDP_rating)
+
+#recode Manage economy (q33)
+look_for(ces19phone, "economy")
+ces19phone$manage_economy<-Recode(ces19phone$q33, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
+val_labels(ces19phone$manage_economy)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19phone$manage_economy)
+table(ces19phone$manage_economy)
+
+#recode Manage environment (q34)
+look_for(ces19phone, "economy")
+ces19phone$manage_environment<-Recode(ces19phone$q34, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
+val_labels(ces19phone$manage_environment)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19phone$manage_environment)
+table(ces19phone$manage_environment)
+
+#recode Addressing Main Issue (q8)
+look_for(ces19phone, "issue")
+ces19phone$address_issue<-Recode(ces19phone$q8, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
+val_labels(ces19phone$address_issue)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19phone$address_issue)
+table(ces19phone$address_issue)
+
+#recode Market Liberalism (p20_a and p20_f)
+look_for(ces19phone, "leave")
+look_for(ces19phone, "blame")
+ces19phone$market1<-Recode(ces19phone$p20_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$market2<-Recode(ces19phone$p20_f, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
+#val_labels(ces19phone$market1)<-c(Strongly_disagree=0, Somewhat_disagree=0.25, Neither=0.5, Somewhat_agree=0.75, Strongly_agree=1)
+#checks
+table(ces19phone$market1)
+table(ces19phone$market2)
+
+#Combine and divide by 2
+ces19phone$market_liberalism<-(ces19phone$market1 + ces19phone$market2)
+ces19phone$market_liberalism<-(ces19phone$market_liberalism /2)
+#Check distribution of market_liberalism
+qplot(ces19phone$market_liberalism, geom="histogram")
+table(ces19phone$market_liberalism)
+
+#Calculate Cronbach's alpha
+ces19phone %>% 
+  select(market1, market2) %>% 
+  alpha(.)
+
+#recode Moral Traditionalism (p35_b, p20_e,  p35_c)
+look_for(ces19phone, "women")
+look_for(ces19phone, "gays")
+ces19phone$moral1<-Recode(ces19phone$p20_e, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$moral2<-Recode(ces19phone$p35_b, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
+ces19phone$moral3<-Recode(ces19phone$p35_c, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
+#val_labels(ces19phone$moral1)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
+#checks
+table(ces19phone$moral1)
+table(ces19phone$moral2)
+table(ces19phone$moral3)
+
+#Combine and divide by 3
+ces19phone$moral_traditionalism3<-(ces19phone$moral1 + ces19phone$moral2 + ces19phone$moral3)
+ces19phone$moral_traditionalism<-(ces19phone$moral_traditionalism3 /3)
+#Check distribution of moral_traditionalism
+qplot(ces19phone$moral_traditionalism, geom="histogram")
+table(ces19phone$moral_traditionalism)
+
+#Calculate Cronbach's alpha
+ces19phone %>% 
+  select(moral1, moral2, moral3) %>% 
+  alpha(.)
+
+#recode Political Disaffection (p20_i and p20_n)
+look_for(ces19phone, "politicians")
+ces19phone$disaffection1<-Recode(ces19phone$p20_i, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$disaffection2<-Recode(ces19phone$p20_n, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
+#val_labels(ces19phone$disaffection1)<-c(Strongly_disagree=0, Somewhat_disagree=0.25, Neither=0.5, Somewhat_agree=0.75, Strongly_agree=1)
+#checks
+table(ces19phone$disaffection1)
+table(ces19phone$disaffection2)
+
+#Combine and divide by 2
+ces19phone$political_disaffection<-(ces19phone$disaffection1 + ces19phone$disaffection2)
+ces19phone$political_disaffection<-(ces19phone$political_disaffection /2)
+#Check distribution of market_liberalism
+qplot(ces19phone$political_disaffection, geom="histogram")
+table(ces19phone$political_disaffection)
+
+#Calculate Cronbach's alpha
+ces19phone %>% 
+  select(disaffection1, disaffection2) %>% 
+  alpha(.)
+
+#recode Continentalism (p43)
+look_for(ces19phone, "united states")
+ces19phone$continentalism<-Recode(ces19phone$p43, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; 6=0.5; else=NA", as.numeric=T)
+#val_labels(ces19phone$continentalism)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
+#checks
+val_labels(ces19phone$continentalism)
+table(ces19phone$continentalism)
+
+#recode Quebec Sovereignty (q43)
+look_for(ces19phone, "quebec")
+ces19phone$quebec_sovereignty<-Recode(ces19phone$q43, "1=1; 2=0.75; -9=0.5; 3=0.25; 4=0; else=NA", as.numeric=T)
+#val_labels(ces19phone$quebec_sovereignty)<-c(Much_less=0, Somewhat_less=0.25, Dont_know=0.5, Somewhat_more=0.75, Much_more=1)
+#checks
+val_labels(ces19phone$quebec_sovereignty)
+table(ces19phone$quebec_sovereignty)
+
+#recode Personal Retrospective (q47)
+look_for(ces19phone, "situation")
+ces19phone$personal_retrospective<-Recode(ces19phone$q47, "1=1; 2=0; 3=0.5; -9=0.5; else=NA", as.numeric=T)
+val_labels(ces19phone$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces19phone$personal_retrospective)
+table(ces19phone$personal_retrospective)
+
+#recode National Retrospective (q31)
+look_for(ces19phone, "economy")
+ces19phone$national_retrospective<-Recode(ces19phone$q31, "1=1; 2=0; 3=0.5; -9=0.5; else=NA", as.numeric=T)
+val_labels(ces19phone$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces19phone$national_retrospective)
+table(ces19phone$national_retrospective)
+
+#recode Defence (q27_d)
+look_for(ces19phone, "defence")
+ces19phone$defence<-Recode(ces19phone$q27_d, "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
+val_labels(ces19phone$defence)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
+#checks
+val_labels(ces19phone$defence)
+table(ces19phone$defence)
+
+#recode Crime and Justice (q27_c)
+look_for(ces19phone, "justice")
+ces19phone$justice<-Recode(ces19phone$q27_c, "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
+val_labels(ces19phone$justice)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
+#checks
+val_labels(ces19phone$justice)
+table(ces19phone$justice)
+
+#recode Education (q27_a)
+look_for(ces19phone, "education")
+ces19phone$education<-Recode(ces19phone$q27_a, "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
+val_labels(ces19phone$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
+#checks
+val_labels(ces19phone$education)
+table(ces19phone$education)
