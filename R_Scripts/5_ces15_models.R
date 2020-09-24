@@ -4,9 +4,7 @@
 library(stargazer)
 library(broom)
 library(nnet)
-
-#By election
-summary(ces)
+summary(ces15phone)
 
 #Recodes
 #CREATE WORKING CLASS DICHOTOMOUS VARIABLE; NOTE HERE ONLY EMPLOYED AND SELF-EMPLOYED PEOPLE ARE SET TO 0 OR 1; ELSE = NA
@@ -23,11 +21,65 @@ table(ces15phone$ndp)
 ces15phone$occupation2<-fct_relevel(ces15phone$occupation2, "Managers", "Professionals", "Routine_Nonmanual", 'Working_Class')
 
 ces15phone$occupation4<-fct_relevel(ces15phone$occupation4, "Managers", "Self-Employed", "Professionals", "Routine_Nonmanual", 'Working_Class')
+table(ces19phone$occupation4)
+ces15phone$working_class2<-Recode(ces15phone$occupation3, "4:5=1; 3=0; 2=0; 1=0; 6=0; else=NA")
+table(ces15phone$working_class2)
 
 #Turn region into factor with East as reference case
 ces15phone$region3<-Recode(as.factor(ces15phone$region), "1='East' ; 2='Ontario' ; 3='West'", levels=c('East', 'Ontario', 'West'))
 levels(ces15phone$region3)
 table(ces15phone$region3)
+
+#Turn income into factor with Middle as reference
+ces15phone$income3<-Recode(as.factor(ces15phone$income), "1='Low_Income' ; 2:4='Middle_Income' ; 5='High_Income'", levels=c('Low_Income', 'Middle_Income', 'High_Income'))
+#levels(ces15phone$income3)
+#table(ces15phone$income3)
+
+#Other dummies
+ces15phone$low_income<-Recode(ces15phone$income, "2:5=0; 1=1")
+ces15phone$high_income<-Recode(ces15phone$income, "1:4=0; 5=1")
+ces15phone$no_religion<-Recode(ces15phone$religion, "0=1; 1:3=0; NA=NA")
+ces15phone$catholic<-Recode(ces15phone$religion, "1=1; 2:3=0; 0=0; NA=NA")
+ces15phone$young<-Recode(ces15phone$age, "35:100=0; 18:34=1")
+ces15phone$old<-Recode(ces15phone$age, "55:100=1; 18:54=0")
+ces15phone$foreign<-Recode(ces15phone$native, "1=0; 0=1")
+table(ces15phone$low_income)
+table(ces15phone$high_income)
+table(ces15phone$no_religion)
+table(ces15phone$catholic)
+table(ces15phone$young)
+table(ces15phone$old)
+table(ces15phone$foreign)
+
+# Party Id
+ces15phone$liberal_id<-Recode(ces15phone$party_id, "1=1; 0=0; 2:4=0; else=NA")
+ces15phone$conservative_id<-Recode(ces15phone$party_id, "2=1; 0:1=0; 3:4=0; else=NA")
+ces15phone$ndp_id<-Recode(ces15phone$party_id, "3=1; 0:2=0; 4=0; else=NA")
+ces15phone$bloc_id<-Recode(ces15phone$party_id, "4=1; 0:3=0; else=NA")
+#ces15phone$liberal_id<-Recode(ces15phone$party_id, "1=1; else=0")
+#ces15phone$conservative_id<-Recode(ces15phone$party_id, "2=1; else=0")
+#ces15phone$ndp_id<-Recode(ces15phone$party_id, "3=1; else=0")
+#ces15phone$bloc_id<-Recode(ces15phone$party_id, "4=1; else=0")
+table(ces15phone$liberal_id)
+table(ces15phone$conservative_id)
+table(ces15phone$ndp_id)
+table(ces15phone$bloc_id)
+
+# Party vote
+ces15phone$liberal<-Recode(ces15phone$vote, "1=1; 0=0; 2:5=0; else=NA")
+ces15phone$conservative<-Recode(ces15phone$vote, "2=1; 0:1=0; 3:5=0; else=NA")
+ces15phone$ndp<-Recode(ces15phone$vote, "3=1; 0:2=0; 4:5=0; else=NA")
+ces15phone$bloc<-Recode(ces15phone$vote, "4=1; 0:3=0; 5=0; else=NA")
+ces15phone$green<-Recode(ces15phone$vote, "5=1; 0:4=0; else=NA")
+table(ces15phone$liberal)
+table(ces15phone$conservative)
+table(ces15phone$ndp)
+table(ces15phone$bloc)
+table(ces15phone$green)
+
+#Code working class variables missing as 0
+#ces15phone$working_class<-Recode(ces19phone$working_class, "1=1; else=0")
+#table(ces15phone$working_class)
 
 
 #### 2015 Models ####
@@ -297,7 +349,7 @@ ces15phone %>%
   #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
   #  filter(!is.na(occupation4)) %>%
   #Select the variables for graphing
-  select(occupation4, Tom_Mulcair, immigration, redistribution, environment, minorities) %>%
+  select(occupation4, Tom_Mulcair, Justin_Trudeau, Stephen_Harper, immigration, redistribution, environment) %>%
   #they are currently in a wide format, reduce it to long format with pivot_longer
   pivot_longer(-occupation4,values_to=c("Score"), names_to=c("Variable")) %>% 
   #Now form groups for each class category and each variable
@@ -324,11 +376,14 @@ ces15phone %>%
 
 ces15phone %>%
   #  filter(!is.na(union_both)) %>%
-  select(union_both, Tom_Mulcair, immigration, redistribution, environment, minorities) %>%
+#  select(union_both, Tom_Mulcair, immigration, redistribution, environment, minorities) %>%
+   select(union_both, redistribution, immigration, Tom_Mulcair) %>% 
+  zap_labels() %>% 
   pivot_longer(-union_both,values_to=c("Score"), names_to=c("Variable")) %>% 
   group_by(union_both, Variable) %>% 
   summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sqrt(sd)/n) %>% 
-  ggplot(., aes(x=Variable, y=Average, col=union_both))+geom_jitter()
+  filter(!is.na(union_both)) %>% 
+  ggplot(., aes(x=Variable, y=Average, col=as.factor(union_both)))+geom_jitter()
 
 # By Regions
 ces15phone %>%
@@ -358,6 +413,50 @@ ces15phone %>%
   select(male, Tom_Mulcair, immigration, redistribution, environment, minorities) %>% 
   group_by(male) %>%
   summarise_at(vars(Tom_Mulcair, immigration, redistribution, environment, minorities), mean, na.rm=T)
+
+# Block recursion variables
+# By Class
+ces15phone %>%
+  #  filter(!is.na(union_both)) %>%
+  select(occupation4, market_liberalism, moral_traditionalism, political_disaffection, continentalism, personal_retrospective, national_retrospective, defence, justice, education) %>% 
+  group_by(occupation4) %>%
+  summarise_at(vars(market_liberalism, moral_traditionalism, political_disaffection, continentalism, personal_retrospective, national_retrospective, defence, justice, education), mean, na.rm=T)
+
+#Graph it
+ces15phone %>%
+  #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
+  #  filter(!is.na(occupation4)) %>%
+  #Select the variables for graphing
+  select(occupation4, market_liberalism, moral_traditionalism, political_disaffection, continentalism, personal_retrospective, national_retrospective, defence, justice, education) %>%
+  #they are currently in a wide format, reduce it to long format with pivot_longer
+  pivot_longer(-occupation4,values_to=c("Score"), names_to=c("Variable")) %>% 
+  #Now form groups for each class category and each variable
+  group_by(occupation4, Variable) %>% 
+  #Now summarize those groups, creating the average score, the count of cases n(), the standard deviation, the standard error
+  summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sqrt(sd)/n) %>% 
+  ggplot(., aes(x=Variable, y=Average, col=occupation4))+geom_jitter()
+
+#By Income
+ces15phone %>%
+  #  filter(!is.na(union_both)) %>%
+  select(income, market_liberalism, moral_traditionalism, political_disaffection, continentalism, personal_retrospective, national_retrospective, defence, justice, education) %>% 
+  group_by(income) %>%
+  summarise_at(vars(market_liberalism, moral_traditionalism, political_disaffection, continentalism, personal_retrospective, national_retrospective, defence, justice, education), mean, na.rm=T)
+
+#By Union
+ces15phone %>%
+  #  filter(!is.na(union_both)) %>%
+  select(union_both, market_liberalism, moral_traditionalism, political_disaffection, continentalism, personal_retrospective, national_retrospective, defence, justice, education) %>% 
+  group_by(union_both) %>%
+  summarise_at(vars(market_liberalism, moral_traditionalism, political_disaffection, continentalism, personal_retrospective, national_retrospective, defence, justice, education), mean, na.rm=T)
+
+#By Degree
+ces15phone %>%
+  #  filter(!is.na(union_both)) %>%
+  select(degree, market_liberalism, moral_traditionalism, political_disaffection, continentalism, personal_retrospective, national_retrospective, defence, justice, education) %>% 
+  group_by(degree) %>%
+  summarise_at(vars(market_liberalism, moral_traditionalism, political_disaffection, continentalism, personal_retrospective, national_retrospective, defence, justice, education), mean, na.rm=T)
+
 
 ## This is your code and it's great; I just showed some ways to aggregate it and present more information
 ces15phone %>%
