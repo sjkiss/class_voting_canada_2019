@@ -31,7 +31,7 @@ levels(ces19phone$region3)
 table(ces19phone$region3)
 
 #Turn income into factor with Middle as reference
-#ces19phone$income3<-Recode(as.factor(ces19phone$income), "1='Low_Income' ; 2:4='Middle_Income' ; 5='High_Income'", levels=c('Low_Income', 'Middle_Income', 'High_Income'))
+ces19phone$income3<-Recode(as.factor(ces19phone$income), "1='Low_Income' ; 2:4='Middle_Income' ; 5='High_Income'", levels=c('Low_Income', 'Middle_Income', 'High_Income'))
 #levels(ces19phone$income3)
 #table(ces19phone$income3)
 

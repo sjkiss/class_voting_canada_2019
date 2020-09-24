@@ -31,7 +31,7 @@ levels(ces15phone$region3)
 table(ces15phone$region3)
 
 #Turn income into factor with Middle as reference
-#ces15phone$income3<-Recode(as.factor(ces15phone$income), "1='Low_Income' ; 2:4='Middle_Income' ; 5='High_Income'", levels=c('Low_Income', 'Middle_Income', 'High_Income'))
+ces15phone$income3<-Recode(as.factor(ces15phone$income), "1='Low_Income' ; 2:4='Middle_Income' ; 5='High_Income'", levels=c('Low_Income', 'Middle_Income', 'High_Income'))
 #levels(ces15phone$income3)
 #table(ces15phone$income3)
 
@@ -376,11 +376,14 @@ ces15phone %>%
 
 ces15phone %>%
   #  filter(!is.na(union_both)) %>%
-  select(union_both, Tom_Mulcair, immigration, redistribution, environment, minorities) %>%
+#  select(union_both, Tom_Mulcair, immigration, redistribution, environment, minorities) %>%
+   select(union_both, redistribution, immigration, Tom_Mulcair) %>% 
+  zap_labels() %>% 
   pivot_longer(-union_both,values_to=c("Score"), names_to=c("Variable")) %>% 
   group_by(union_both, Variable) %>% 
   summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sqrt(sd)/n) %>% 
-  ggplot(., aes(x=Variable, y=Average, col=union_both))+geom_jitter()
+  filter(!is.na(union_both)) %>% 
+  ggplot(., aes(x=Variable, y=Average, col=as.factor(union_both)))+geom_jitter()
 
 # By Regions
 ces15phone %>%

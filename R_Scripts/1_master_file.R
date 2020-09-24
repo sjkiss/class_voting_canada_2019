@@ -512,4 +512,9 @@ group_by(election) %>%
 #This command calls the file 2_diagnostics.R
 #source("R_scripts/3_recode_diagnostics.R", echo=T)
 #source("R_scripts/4_make_models.R", echo=T)
+source("R_scripts/5_ces15_models.R", echo=T)
+source("R_scripts/5_ces15_block_models.R", echo=T)
+
 source("R_scripts/5_ces19_models.R", echo=T)
+source("R_scripts/5_ces19_block_models.R", echo=T)
+

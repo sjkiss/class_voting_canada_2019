@@ -275,7 +275,7 @@ stargazer(modelROC, modelQC, model4ROC, model4QC, model17ROC, model17QC, model18
 stargazer(modelROC, modelQC, model25ROC, model25QC, model26ROC, model26QC, model27ROC, model27QC, model28ROC, model28QC, model29ROC, model29QC,type="html", out=here("Tables", "ces19_different_controls.html"))
 
 #Combine best 2019/2015 model
-stargazer(model330ROC, model330QC, type="html", out=here("Tables", "ces15_19_3_party.html"))
+stargazer(model33ROC, model33QC, type="html", out=here("Tables", "ces15_19_3_party.html"))
 
 #### Leadership interactions ####
 #M5 leadership:working class interaction
