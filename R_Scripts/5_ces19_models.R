@@ -30,6 +30,19 @@ ces19phone$region3<-Recode(as.factor(ces19phone$region), "1='East' ; 2='Ontario'
 levels(ces19phone$region3)
 table(ces19phone$region3)
 
+#Turn region into all of Canada (4 regions)
+ces19phone %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces19phone
+table(ces19phone$region2)
+ces19phone$region4<-factor(ces19phone$region2, levels=c("Atlantic", "Quebec", "Ontario", "West"))
+levels(ces19phone$region4)
+table(ces19phone$region4)
+
 #Turn income into factor with Middle as reference
 #ces19phone$income3<-Recode(as.factor(ces19phone$income), "1='Low_Income' ; 2:4='Middle_Income' ; 5='High_Income'", levels=c('Low_Income', 'Middle_Income', 'High_Income'))
 #levels(ces19phone$income3)
@@ -50,6 +63,8 @@ ces19phone$old<-Recode(ces19phone$age, "55:100=1; 18:54=0")
 table(ces19phone$old)
 ces19phone$foreign<-Recode(ces19phone$native, "1=0; 0=1")
 table(ces19phone$foreign)
+ces19phone$working_class3<-Recode(ces19phone$working_class2, "1=1; else=0")
+table(ces19phone$working_class3)
 
 # Party Id
 ces19phone$liberal_id<-Recode(ces19phone$party_id, "1=1; 0=0; 2:4=0; else=NA")
@@ -76,10 +91,14 @@ table(ces19phone$conservative)
 table(ces19phone$ndp)
 table(ces19phone$bloc)
 table(ces19phone$green)
+ces19phone$ndp_vs_right<-Recode(ces19phone$vote, "3=1; 2=0; else=NA")
+ces19phone$ndp_vs_liberal<-Recode(ces19phone$vote, "3=1; 1=0; else=NA")
+table(ces19phone$ndp_vs_right)
+table(ces19phone$ndp_vs_liberal)
 
 #Code working class missing as 0
-#ces19phone$working_class<-Recode(ces19phone$working_class, "1=1; else=0")
-#table(ces19phone$working_class)
+ces19phone$working_class4<-Recode(ces19phone$working_class, "1=1; else=0")
+table(ces19phone$working_class4)
 
 #### 2019 Models ####
 #Model basic with controls
@@ -260,6 +279,76 @@ ces19phone %>%
 model33QC<-glm(ndp~working_class+union_both+age+male+sector+degree+income+no_religion+immigration2+environment+redistribution+Justin_Trudeau+Andrew_Scheer+Jagmeet_Singh, data=ces.out, family="binomial")
 summary(model33ROC)
 summary(model33QC)
+
+#M34-M36 Basic class models
+#M34 NDP vs Right
+ces19phone %>% 
+  filter(quebec!=1)->ces.out
+  model34ROC<-glm(ndp_vs_right~working_class3+union_both+income+degree+sector, data=ces.out, family="binomial")
+
+ces19phone %>% 
+  filter(quebec==1)->ces.out
+  model34QC<-glm(ndp_vs_right~working_class3+union_both+income+degree+sector, data=ces.out, family="binomial")
+summary(model34ROC)
+summary(model34QC)
+
+#M35 NDP vs Liberal
+ces19phone %>% 
+  filter(quebec!=1)->ces.out
+  model35ROC<-glm(ndp_vs_liberal~working_class3+union_both+income+degree+sector, data=ces.out, family="binomial")
+
+ces19phone %>% 
+  filter(quebec==1)->ces.out
+  model35QC<-glm(ndp_vs_liberal~working_class3+union_both+income+degree+sector, data=ces.out, family="binomial")
+summary(model35ROC)
+summary(model35QC)
+
+#M36 Basic Class Model w self-employed
+model36ALL<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces19phone, family="binomial")
+
+ces19phone %>% 
+  filter(quebec!=1)->ces.out
+  model36ROC<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces.out, family="binomial")
+
+ces19phone %>% 
+  filter(quebec==1)->ces.out
+  model36QC<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces.out, family="binomial")
+summary(model36ALL)
+summary(model36ROC)
+summary(model36QC)
+
+#### M37 Basic Class Model without self-employed ####
+model37ALL<-glm(ndp~working_class4+union_both+income+degree+sector, data=ces19phone, family="binomial")
+
+ces19phone %>% 
+  filter(quebec!=1)->ces.out
+model37ROC<-glm(ndp~working_class4+union_both+income+degree+sector, data=ces.out, family="binomial")
+
+ces19phone %>% 
+  filter(quebec==1)->ces.out
+model37QC<-glm(ndp~working_class4+union_both+income+degree+sector, data=ces.out, family="binomial")
+summary(model37ALL)
+summary(model37ROC)
+summary(model37QC)
+
+#M38 Basic Class Model without self-employed (including age, gender, region)
+model38ALL<-glm(ndp~working_class4+union_both+income+degree+sector+age+male+as.factor(region4), data=ces19phone, family="binomial")
+
+ces19phone %>% 
+  filter(quebec!=1)->ces.out
+model38ROC<-glm(ndp~working_class4+union_both+income+degree+sector+age+male+region3, data=ces.out, family="binomial")
+
+ces19phone %>% 
+  filter(quebec==1)->ces.out
+model38QC<-glm(ndp~working_class4+union_both+income+degree+sector+age+male, data=ces.out, family="binomial")
+summary(model38ALL)
+summary(model38ROC)
+summary(model38QC)
+
+stargazer(model34ROC, model34QC, type="html", out=here("Tables", "ndp_vs_right_models.html"))
+stargazer(model35ROC, model35QC, type="html", out=here("Tables", "ndp_vs_liberal_models.html"))
+stargazer(model36ALL, model36ROC, model36QC, model37ALL, model37ROC, model37QC, type="html", out=here("Tables", "basic_class_models1.html"))
+stargazer(model37ALL, model37ROC, model37QC, model38ALL, model38ROC, model38QC, column.labels=c("ALL", "ROC", "QC", "ALL", "ROC", "QC"), type="html", out=here("Tables", "basic_class_models2.html")) 
 
 #Combine models into one table by region
 #stargazer(modelROC, model23ROC, model24ROC, model1ROC, model2ROC, model3ROC, model4ROC, model17ROC, model18ROC, type="html", out=here("Tables", "ROC_ces19_attitudinal_variables.html"))
