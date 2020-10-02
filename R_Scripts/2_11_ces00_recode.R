@@ -169,3 +169,19 @@ look_for(ces00, "noc")
 look_for(ces00, "employment")
 look_for(ces00, "career")
 ces00$bycat_15
+
+#recode Redistribution (cpsc13)
+look_for(ces00, "rich")
+val_labels(ces00$cpsc13)
+ces00$redistribution<-Recode(ces00$cpsc13, "; 1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces00$redistribution)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
+#checks
+#val_labels(ces00$redistribution)
+table(ces00$redistribution)
+
+#recode Pro-Redistribution (cpsc13)
+ces00$pro_redistribution<-Recode(ces00$cpsc13, "1:2=1; 3:5=0; else=NA", as.numeric=T)
+val_labels(ces00$pro_redistribution)<-c(Non_Pro=0, Pro=1)
+#checks
+val_labels(ces00$pro_redistribution)
+table(ces00$pro_redistribution)

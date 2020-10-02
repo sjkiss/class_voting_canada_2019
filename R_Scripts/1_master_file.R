@@ -4,6 +4,7 @@ load("Data/recoded_cesdata.Rdata")
 library(tidyverse)
 library(labelled)
 library(here)
+library(car)
 
 ### Checks
 nrow(ces74)==2562 #TRUE
@@ -112,7 +113,7 @@ table(ces80$region, ces80$region80)
 table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
 ces80 %>% 
-  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size)->ces80
+  select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size, redistribution, pro_redistribution)->ces80
 names(ces80)
 
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
@@ -251,6 +252,10 @@ ces04 %>%
   rename(non_charter_language=non_charter_language04)->ces04
 ces04 %>% 
   rename(occupation3=occupation04_3)->ces04
+ces04 %>% 
+  rename(redistribution=redistribution04)->ces04
+ces04 %>% 
+  rename(pro_redistribution=pro_redistribution04)->ces04
 table(ces04$survey, ces04$non_charter_language)
 
 #### Rename CES06 ####
@@ -286,6 +291,10 @@ ces06 %>%
   rename(non_charter_language=non_charter_language06)->ces06
 ces06 %>% 
   rename(occupation3=occupation06_3)->ces06
+ces06 %>% 
+  rename(redistribution=redistribution06)->ces06
+ces06 %>% 
+  rename(pro_redistribution=pro_redistribution06)->ces06
 table(ces06$survey, ces06$non_charter_language)
 
 #### Rename CES08 ####
@@ -321,6 +330,10 @@ ces08 %>%
   rename(non_charter_language=non_charter_language08)->ces08
 ces08 %>% 
   rename(occupation3=occupation08_3)->ces08
+ces08 %>% 
+  rename(redistribution=redistribution08)->ces08
+ces08 %>% 
+  rename(pro_redistribution=pro_redistribution08)->ces08
 table(ces08$survey, ces08$non_charter_language)
 
 #### Rename CES11 ####
@@ -356,6 +369,10 @@ ces11 %>%
   rename(non_charter_language=non_charter_language11)->ces11
 ces11 %>% 
   rename(occupation3=occupation11_3)->ces11
+ces11 %>% 
+  rename(redistribution=redistribution11)->ces11
+ces11 %>% 
+  rename(pro_redistribution=pro_redistribution11)->ces11
 
 #### Rejoin the Files To Make CES ####
 
@@ -440,7 +457,7 @@ ces %>%
           "income", 
           "non_charter_language", 
           "occupation3",
-          "election", "size") )-> ces
+          "election", "size", "redistribution", "pro_redistribution") )-> ces
 ##
 
 library(stringr)
@@ -497,6 +514,8 @@ val_labels(ces$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
 val_labels(ces$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
 val_labels(ces$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+val_labels(ces$redistribution)<-c(Less=0, More=1)
+
 
 ####
 names(ces)

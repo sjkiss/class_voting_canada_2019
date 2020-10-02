@@ -13,6 +13,7 @@ table(ces$ndp_vs_liberal)
 
 #CREATE WORKING CLASS DICHOTOMOUS VARIABLE; NOTE HERE ONLY EMPLOYED AND SELF-EMPLOYED PEOPLE ARE SET TO 0 OR 1; ELSE = NA
 ces$working_class<-Recode(ces$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
+ces$working_class2<-Recode(ces$occupation, "4:5=1; else=0")
 #This collapses the two labour categories into one working class
 ces$occupation2<-Recode(as.factor(ces$occupation), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual'))
 #This collapses the two labour categories into one working class; maintaining self-employed as a unique distinction
@@ -22,8 +23,9 @@ ces$working_class4<-Recode(ces$occupation3, "4:5=1; else=0")
 
 #this is the NDP vote variable
 ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
-table(ces$working_class, ces$election)
 table(ces$ndp)
+table(ces$working_class, ces$election)
+table(ces$working_class2, ces$election)
 table(ces$working_class3, ces$election)
 table(ces$working_class4)
 
@@ -37,6 +39,11 @@ table(ces$occupation4, ces$election)
 ces$region3<-Recode(as.factor(ces$region), "1='East' ; 2='Ontario' ; 3='West'", levels=c('East', 'Ontario', 'West'))
 levels(ces$region3)
 table(ces$region3)
+
+#Party voting
+ces19phone$bloc<-Recode(ces19phone$vote, "4=1; 0:3=0; 5=0; else=NA")
+ces19phone$green<-Recode(ces19phone$vote, "5=1; 0:4=0; else=NA")
+ces$other<-Recode(ces$vote, "4:5=1; 0=1; 1:3=0; else=NA")
 
 #By election
 summary(ces)
@@ -112,4 +119,324 @@ ndp_vs_liberal_QC_models_1 %>%
   ggplot(., aes(x=as.numeric(election),y=estimate ))+geom_point()+labs(title="Logit Coefficients of voting NDP vote by degree")+geom_smooth(method="loess", se=F)
 ggsave(here("Plots", "QC_degree_ndp_vs_liberal_coefficients.png"))
 
+#------------------------------------------------------------------------------------------------
+#### Redistribution models ####
 
+table(ces$pro_redistribution, ces$election)
+table(ces$redistribution, ces$election)
+table(ces$working_class, ces$election)
+table(ces$working_class4, ces$election)
+library(knitr)
+library(kableExtra)
+
+ces93$working_class<-Recode(ces93$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
+ces97$working_class<-Recode(ces97$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
+ces0411$working_class04<-Recode(ces0411$occupation04, "4:5=1; 3=0; 2=0; 1=0; else=NA")
+ces0411$working_class06<-Recode(ces0411$occupation06, "4:5=1; 3=0; 2=0; 1=0; else=NA")
+ces0411$working_class08<-Recode(ces0411$occupation08, "4:5=1; 3=0; 2=0; 1=0; else=NA")
+ces0411$working_class11<-Recode(ces0411$occupation11, "4:5=1; 3=0; 2=0; 1=0; else=NA")
+ces15phone$working_class<-Recode(ces15phone$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
+ces19phone$working_class<-Recode(ces19phone$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
+table(ces93$working_class)
+table(ces97$working_class)
+table(ces0411$working_class04)
+table(ces0411$working_class06)
+table(ces0411$working_class08)
+table(ces0411$working_class11)
+table(ces15phone$working_class)
+table(ces19phone$working_class)
+
+#M1 NDP ROC
+ces %>% 
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(ndp~income+degree+sector+union_both+working_class2+redistribution, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('NDP', nrow(.)))->ndp_ROC_redistribution_models_1
+
+#M1 NDP QC
+ces %>% 
+  filter(quebec==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(ndp~income+degree+sector+union_both+working_class2+redistribution, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('NDP', nrow(.)))->ndp_QC_redistribution_models_1
+
+#M1 Con ROC
+ces %>% 
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(conservative~income+degree+sector+union_both+working_class2+redistribution, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Conservative', nrow(.)))->conservative_ROC_redistribution_models_1
+
+#M1 Con QC
+ces %>% 
+  filter(quebec==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(conservative~income+degree+sector+union_both+working_class2+redistribution, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Conservative', nrow(.)))->conservative_QC_redistribution_models_1
+
+#M2 NDP ROC WC interaction
+ces %>% 
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(ndp~income+degree+sector+union_both+working_class2+redistribution+working_class2:redistribution, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('NDP', nrow(.)))->ndp_ROC_redistribution_models_2
+
+#M2 NDP QC WC interaction
+ces %>% 
+  filter(quebec==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(ndp~income+degree+sector+union_both+working_class2+redistribution+working_class2:redistribution, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('NDP', nrow(.)))->ndp_QC_redistribution_models_2
+
+#M2 Con ROC WC interaction
+ces %>% 
+  filter(quebec!=1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(conservative~income+degree+sector+union_both+working_class2+redistribution+working_class2:redistribution, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Conservative', nrow(.)))->conservative_ROC_redistribution_models_2
+
+#M2 Con QC WC interaction
+ces %>% 
+  filter(quebec==1 & election!=1965 & election!=1968 & election!=1972 & election!=1974 & election!=1979 & election!=1980 & election!=1984 & election!=1988 & election!=2000) %>%
+  nest(variables=-election) %>% 
+  mutate(model=map(variables, function(x) glm(conservative~income+degree+sector+union_both+working_class2+redistribution+working_class2:redistribution, data=x, family="binomial")),
+         tidied=map(model, tidy), 
+         vote=rep('Conservative', nrow(.)))->conservative_QC_redistribution_models_2
+
+stargazer(ndp_ROC_redistribution_models_1$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "NDP_ROC_redistribution_models_1.html"))
+stargazer(ndp_QC_redistribution_models_1$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "NDP_QC_redistribution_models_1.html"))
+stargazer(conservative_ROC_redistribution_models_1$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_ROC_redistribution_models_1.html"))
+stargazer(conservative_QC_redistribution_models_1$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_QC_redistribution_models_1.html"))
+stargazer(ndp_ROC_redistribution_models_2$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "NDP_ROC_redistribution_inter_models_2.html"))
+stargazer(ndp_QC_redistribution_models_2$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "NDP_QC_redistribution_inter_models_2.html"))
+stargazer(conservative_ROC_redistribution_models_2$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_ROC_redistribution_inter_models_2.html"))
+stargazer(conservative_QC_redistribution_models_2$model, column.labels=c("1993", "1997", "2004", "2006", "2008", "2011", "2015", "2019"), type="html", out=here("Tables", "Con_QC_redistribution_inter_models_2.html"))
+
+#------------------------------------------------------------------------------------------------
+#### Redistribution descriptives ####
+
+ces %>% 
+  group_by(election) %>% 
+  summarize(avg_age=mean(redistribution, na.rm=T)) %>% 
+  ggplot(., aes(x=election, y=avg_age))+geom_point()+labs(title="Average redistribution of respondents in ces studies")
+
+ces %>% 
+  group_by(election, working_class) %>% 
+  filter(!is.na(working_class)) %>%
+  summarize(avg_age=mean(redistribution, na.rm=T)) %>% 
+  ggplot(., aes(x=election, y=avg_age))+geom_point()+labs(title="Average redistribution of WC respondents in ces studies")
+
+ces %>% 
+  group_by(election) %>% 
+  summarize(avg_age=mean(pro_redistribution, na.rm=T)) %>% 
+  ggplot(., aes(x=election, y=avg_age))+geom_point()+labs(title="Average pro-redistribution of respondents in ces studies")
+
+ces %>% 
+  group_by(election, working_class) %>% 
+  filter(!is.na(working_class)) %>%
+  summarize(avg_age=mean(pro_redistribution, na.rm=T)) %>% 
+  ggplot(., aes(x=election, y=avg_age))+geom_point()+labs(title="Average pro-redistribution of WC respondents in ces studies")
+
+ces %>%
+  filter(!is.na(redistribution)) %>%
+  group_by(working_class, election) %>%
+  summarize(mean_redistribution = mean(redistribution))
+
+ces %>%
+  filter(!is.na(pro_redistribution)) %>%
+  group_by(working_class, election) %>%
+  summarize(mean_pro_redistribution = mean(pro_redistribution))
+
+## Share of Pro-redistribution Working Class members voting NDP
+ces %>% 
+  group_by(election, pro_redistribution, working_class, ndp) %>% 
+  summarize(n=n()) %>% 
+  filter(is.na(pro_redistribution)==F) %>% 
+  filter(is.na(working_class)==F) %>% 
+  filter(is.na(ndp)==F) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  filter(working_class==1) %>% 
+  filter(ndp==1) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(pro_redistribution)))+geom_col(position="dodge")+labs(title="Share of Pro-redistribution Working Class members voting NDP")
+ggsave(here("Plots", "Pro_redistribution_working_class_vote_NDP.png"))
+
+## Share of Pro-redistribution Working Class members voting Conservative
+ces %>% 
+  group_by(election, pro_redistribution, working_class, conservative) %>% 
+  summarize(n=n()) %>% 
+  filter(is.na(pro_redistribution)==F) %>% 
+  filter(is.na(working_class)==F) %>% 
+  filter(is.na(conservative)==F) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  filter(working_class==1) %>% 
+  filter(conservative==1) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(pro_redistribution)))+geom_col(position="dodge")+labs(title="Share of Pro-redistribution Working Class members voting Conservative")
+ggsave(here("Plots", "Pro_redistribution_working_class_vote_Conservative.png"))
+
+## Share of Pro-redistribution Working Class members voting Liberal
+ces %>% 
+  group_by(election, pro_redistribution, working_class, liberal) %>% 
+  summarize(n=n()) %>% 
+  filter(is.na(pro_redistribution)==F) %>% 
+  filter(is.na(working_class)==F) %>% 
+  filter(is.na(liberal)==F) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  filter(working_class==1) %>% 
+  filter(liberal==1) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(pro_redistribution)))+geom_col(position="dodge")+labs(title="Share of Pro-redistribution Working Class members voting Liberal")
+ggsave(here("Plots", "Pro_redistribution_working_class_vote_Liberal.png"))
+
+# Working Class redistribution by year
+ces93 %>%
+  select(working_class, redistribution, pro_redistribution) %>% 
+  group_by(working_class) %>%
+  summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
+
+ces97 %>%
+  select(working_class, redistribution, pro_redistribution) %>% 
+  group_by(working_class) %>%
+  summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
+
+ces0411 %>%
+  select(working_class04, redistribution04, pro_redistribution04) %>% 
+  group_by(working_class04) %>%
+  summarise_at(vars(redistribution04, pro_redistribution04), mean, na.rm=T)
+
+ces0411 %>%
+  select(working_class06, redistribution06, pro_redistribution06) %>% 
+  group_by(working_class06) %>%
+  summarise_at(vars(redistribution06, pro_redistribution06), mean, na.rm=T)
+
+ces0411 %>%
+  select(working_class08, redistribution08, pro_redistribution08) %>% 
+  group_by(working_class08) %>%
+  summarise_at(vars(redistribution08, pro_redistribution08), mean, na.rm=T)
+
+ces0411 %>%
+  select(working_class11, redistribution11, pro_redistribution11) %>% 
+  group_by(working_class11) %>%
+  summarise_at(vars(redistribution11, pro_redistribution11), mean, na.rm=T)
+
+ces15phone %>%
+  select(working_class, redistribution, pro_redistribution) %>% 
+  group_by(working_class) %>%
+  summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
+
+ces19phone %>%
+  select(working_class, redistribution, pro_redistribution) %>% 
+  group_by(working_class) %>%
+  summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
+
+# Working Class voting by pro-redistribution
+ces19phone %>%
+  select(working_class, pro_redistribution, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(working_class, pro_redistribution) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro-redistribution Working Class Vote 2019.html"))
+
+# Working Class voting pro-redistribution by election
+ces %>%
+  select(election, working_class, pro_redistribution, liberal, conservative, ndp) %>% 
+  group_by(election, working_class, pro_redistribution) %>%
+  summarise_at(vars(liberal, conservative, ndp), mean, na.rm=T) %>% 
+  as.data.frame() %>%
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_Working_Class_Vote_by_election.html"))
+
+#------------------------------------------------------------------------------------------------
+#### Working Class descriptives ####
+
+#Share of Working class voting NDP
+ces %>% 
+  group_by(election, working_class, ndp) %>% 
+  summarize(n=n()) %>% 
+  filter(is.na(working_class)==F) %>% 
+  filter(is.na(ndp)==F) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  filter(working_class==1) %>% 
+  filter(ndp==1) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(working_class)))+geom_col(position="dodge")+labs(title="Share of Working Class respondents voting NDP")
+ggsave(here("Plots", "NDP_working_class_vote.png"))
+
+#Share of Working class voting Liberal
+ces %>% 
+  group_by(election, working_class, liberal) %>% 
+  summarize(n=n()) %>% 
+  filter(is.na(working_class)==F) %>% 
+  filter(is.na(liberal)==F) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  filter(working_class==1) %>% 
+  filter(liberal==1) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(working_class)))+geom_col(position="dodge")+labs(title="Share of Working Class respondents voting Liberal")
+ggsave(here("Plots", "Liberal_working_class_vote.png"))
+
+#Share of Working class voting Conservative
+ces %>% 
+  group_by(election, working_class, conservative) %>% 
+  summarize(n=n()) %>% 
+  filter(is.na(working_class)==F) %>% 
+  filter(is.na(conservative)==F) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  filter(working_class==1) %>% 
+  filter(conservative==1) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(working_class)))+geom_col(position="dodge")+labs(title="Share of Working Class respondents voting Conservative")
+ggsave(here("Plots", "Conservative_working_class_vote.png"))
+
+#Share of Working class voting Other
+ces %>% 
+  group_by(election, working_class, other) %>% 
+  summarize(n=n()) %>% 
+  filter(is.na(working_class)==F) %>% 
+  filter(is.na(other)==F) %>% 
+  mutate(percent=n/sum(n)) %>% 
+  filter(working_class==1) %>% 
+  filter(other==1) %>% 
+  ggplot(., aes(x=election, y=percent, fill=as_factor(working_class)))+geom_col(position="dodge")+labs(title="Share of Working Class respondents voting Other")
+ggsave(here("Plots", "Other_working_class_vote.png"))
+
+#Party Vote Shares of Working Class
+ces %>% 
+  group_by(election, working_class, vote) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)) %>%
+  filter(working_class==1 & (vote<4 & vote>0)) %>% 
+  ggplot(.,aes(x=as.numeric(election), y=pct))+
+  geom_point()+
+  geom_smooth(method="lm", se=F)+
+  facet_grid(~as_factor(vote))+
+  labs(title="Share of Working Class voting for political parties over time")
+ggsave(here("Plots", "Party_shares_working_class_vote.png"))
+
+#Percent of NDP Voters Working Class
+ces %>% 
+  group_by(election, vote, working_class) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)) %>%
+  filter(working_class==1 & vote==3) %>% 
+  ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="NDP Voter % that are Working Class")
+ggsave(here("Plots", "NDP_Voters_Working_Class_Percent.png"))
+
+#Percent of Liberal Voters Working Class
+ces %>% 
+  group_by(election, vote, working_class) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)) %>%
+  filter(working_class==1 & vote==1) %>% 
+  ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Liberal Voter % that are Working Class")
+ggsave(here("Plots", "Lib_Voters_Working_Class_Percent.png"))
+
+#Percent of Conservative Voters Working Class
+ces %>% 
+  group_by(election, vote, working_class) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n)) %>%
+  filter(working_class==1 & vote==2) %>% 
+  ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Conservative Voter % that are Working Class")
+ggsave(here("Plots", "Con_Voters_Working_Class_Percent.png"))

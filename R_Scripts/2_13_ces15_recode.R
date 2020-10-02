@@ -376,6 +376,13 @@ ces15phone$redistribution<-Recode(ces15phone$PES15_41, "1=1; 2=0.75; 3=0.5; 4=0.
 #val_labels(ces15phone$redistribution)
 table(ces15phone$redistribution)
 
+#recode Pro-Redistribution (PES15_41)
+ces15phone$pro_redistribution<-Recode(ces15phone$PES15_41, "1:2=1; 3:5=0; else=NA", as.numeric=T)
+val_labels(ces15phone$pro_redistribution)<-c(Non_Pro=0, Pro=1)
+#checks
+val_labels(ces15phone$pro_redistribution)
+table(ces15phone$pro_redistribution)
+
 #recode NDP_rating (CPS15_20)
 look_for(ces15phone, "NDP")
 ces15phone$NDP_therm<-Recode(ces15phone$CPS15_20, "996=NA; 998=NA; 999=NA")

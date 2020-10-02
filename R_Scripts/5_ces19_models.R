@@ -845,6 +845,14 @@ ces19phone %>%
   summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
   as.data.frame() %>% 
   stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Past NDP Working Class Vote 2019.html"))
+
+#Working Class voting by pro-redistribution
+ces19phone %>%
+  select(working_class, pro_redistribution, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(working_class, pro_redistribution) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro-redistribution Working Class Vote 2019.html"))
   
 #-------------------------------------------------------------------------------------------------
 

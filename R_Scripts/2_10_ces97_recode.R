@@ -168,3 +168,19 @@ val_labels(ces97$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, 
 #checks
 val_labels(ces97$income)
 table(ces97$income)
+
+#recode Redistribution (mbsa4)
+look_for(ces97, "rich")
+val_labels(ces97$mbsa4)
+ces97$redistribution<-Recode(ces97$mbsa4, "; 1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces97$redistribution)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
+#checks
+#val_labels(ces97$redistribution)
+table(ces97$redistribution)
+
+#recode Pro-Redistribution (mbsa4)
+ces97$pro_redistribution<-Recode(ces97$mbsa4, "1:2=1; 3:4=0; else=NA", as.numeric=T)
+val_labels(ces97$pro_redistribution)<-c(Non_Pro=0, Pro=1)
+#checks
+val_labels(ces97$pro_redistribution)
+table(ces97$pro_redistribution)

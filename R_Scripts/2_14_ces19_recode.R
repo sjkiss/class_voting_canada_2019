@@ -352,6 +352,13 @@ ces19phone$redistribution<-Recode(ces19phone$p44, "1=1; 2=0.75; 3=0.5; 4=0.25; 5
 val_labels(ces19phone$redistribution)
 table(ces19phone$redistribution)
 
+#recode Pro-Redistribution (p44)
+ces19phone$pro_redistribution<-Recode(ces19phone$p44, "1:2=1; 3:5=0; else=NA", as.numeric=T)
+val_labels(ces19phone$pro_redistribution)<-c(Non_Pro=0, Pro=1)
+#checks
+val_labels(ces19phone$pro_redistribution)
+table(ces19phone$pro_redistribution)
+
 #recode NDP_rating (q16)
 look_for(ces19phone, "NDP")
 ces19phone$NDP_therm<-Recode(ces19phone$q16, "-6=NA; -8=NA; -9=NA")

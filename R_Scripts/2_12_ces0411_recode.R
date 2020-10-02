@@ -293,8 +293,24 @@ val_labels(ces0411$income04)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle
 val_labels(ces0411$income04)
 table(ces0411$income04)
 
+#recode Redistribution (ces04_CPS_F6)
+look_for(ces0411, "rich")
+val_labels(ces0411$ces04_CPS_F6)
+ces0411$redistribution04<-Recode(ces0411$ces04_CPS_F6, "; 1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces0411$redistribution04)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
+#checks
+#val_labels(ces0411$redistribution04)
+table(ces0411$redistribution04)
+
+#recode Pro-Redistribution (ces04_CPS_F6)
+ces0411$pro_redistribution04<-Recode(ces0411$ces04_CPS_F6, "1:2=1; 3:5=0; else=NA", as.numeric=T)
+val_labels(ces0411$pro_redistribution04)<-c(Non_Pro=0, Pro=1)
+#checks
+val_labels(ces0411$pro_redistribution04)
+table(ces0411$pro_redistribution04)
+
 #----------------------------------------------------------------------------
-###Recode 2006 2nd
+###Recode 2006 2nd ####
 
 # Gender done at top
 
@@ -636,8 +652,24 @@ val_labels(ces0411$income06)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle
 val_labels(ces0411$income06)
 table(ces0411$income06)
 
+#recode Redistribution (ces06_CPS_F6)
+look_for(ces0411, "rich")
+val_labels(ces0411$ces06_CPS_F6)
+ces0411$redistribution06<-Recode(ces0411$ces06_CPS_F6, "; 1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces0411$redistribution06)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
+#checks
+#val_labels(ces0411$redistribution06)
+table(ces0411$redistribution06)
+
+#recode Pro-Redistribution (ces06_CPS_F6)
+ces0411$pro_redistribution06<-Recode(ces0411$ces06_CPS_F6, "1:2=1; 3:5=0; else=NA", as.numeric=T)
+val_labels(ces0411$pro_redistribution06)<-c(Non_Pro=0, Pro=1)
+#checks
+val_labels(ces0411$pro_redistribution06)
+table(ces0411$pro_redistribution06)
+
 #----------------------------------------------------------------------------
-###Recode 2008 3rd
+####Recode 2008 3rd ####
 
 # Gender done at top
 
@@ -1001,8 +1033,24 @@ val_labels(ces0411$income08)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle
 val_labels(ces0411$income08)
 table(ces0411$income08)
 
+#recode Redistribution (ces08_PES_F6)
+look_for(ces0411, "rich")
+val_labels(ces0411$ces08_PES_F6)
+ces0411$redistribution08<-Recode(ces0411$ces08_PES_F6, "; 1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces0411$redistribution08)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
+#checks
+#val_labels(ces0411$redistribution08)
+table(ces0411$redistribution08)
+
+#recode Pro-Redistribution (ces08_PES_F6)
+ces0411$pro_redistribution08<-Recode(ces0411$ces08_PES_F6, "1:2=1; 3:5=0; else=NA", as.numeric=T)
+val_labels(ces0411$pro_redistribution08)<-c(Non_Pro=0, Pro=1)
+#checks
+val_labels(ces0411$pro_redistribution08)
+table(ces0411$pro_redistribution08)
+
 #----------------------------------------------------------------------------
-###Recode 2011 4th
+####Recode 2011 4th ####
 
 # Gender done at top
 
@@ -1193,3 +1241,18 @@ val_labels(ces0411$income11)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle
 val_labels(ces0411$income11)
 table(ces0411$income11)
 
+#recode Redistribution (PES11_41)
+look_for(ces0411, "rich")
+val_labels(ces0411$PES11_41)
+ces0411$redistribution11<-Recode(ces0411$PES11_41, "; 1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces0411$redistribution11)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
+#checks
+#val_labels(ces0411$redistribution11)
+table(ces0411$redistribution11)
+
+#recode Pro-Redistribution (PES11_41)
+ces0411$pro_redistribution11<-Recode(ces0411$PES11_41, "1:2=1; 3:5=0; else=NA", as.numeric=T)
+val_labels(ces0411$pro_redistribution11)<-c(Non_Pro=0, Pro=1)
+#checks
+val_labels(ces0411$pro_redistribution11)
+table(ces0411$pro_redistribution11)
