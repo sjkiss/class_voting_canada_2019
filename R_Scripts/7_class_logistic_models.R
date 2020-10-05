@@ -402,18 +402,32 @@ ces %>%
 ggsave(here("Plots", "Other_working_class_vote.png"))
 
 #Party Vote Shares of Working Class
+#This was your code
+
+# ces %>% 
+#   group_by(election, working_class, vote) %>% 
+#   summarize(n=n()) %>% 
+#   mutate(pct=n/sum(n)) %>%
+#   filter(working_class==1 & (vote<4 & vote>0)) %>% 
+#   ggplot(.,aes(x=as.numeric(election), y=pct))+
+#   geom_point()+
+#   geom_smooth(method="lm", se=F)+
+#   facet_grid(~as_factor(vote))+
+#   labs(title="Share of Working Class voting for political parties over time")
+# ggsave(here("Plots", "Party_shares_working_class_vote.png"))
+
+#My modifications
 ces %>% 
   group_by(election, working_class, vote) %>% 
   summarize(n=n()) %>% 
-  mutate(pct=n/sum(n)) %>%
+  mutate(pct=n/sum(n)*100) %>%
   filter(working_class==1 & (vote<4 & vote>0)) %>% 
-  ggplot(.,aes(x=as.numeric(election), y=pct))+
+  ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+  geom_line()+
   geom_point()+
-  geom_smooth(method="lm", se=F)+
-  facet_grid(~as_factor(vote))+
-  labs(title="Share of Working Class voting for political parties over time")
+  scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+  labs(title="Share of Working Class voting for political parties over time", x="Year", y="Percent")
 ggsave(here("Plots", "Party_shares_working_class_vote.png"))
-
 #Percent of NDP Voters Working Class
 ces %>% 
   group_by(election, vote, working_class) %>% 
@@ -440,3 +454,6 @@ ces %>%
   filter(working_class==1 & vote==2) %>% 
   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Conservative Voter % that are Working Class")
 ggsave(here("Plots", "Con_Voters_Working_Class_Percent.png"))
+
+
+

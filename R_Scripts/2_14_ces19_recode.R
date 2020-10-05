@@ -407,11 +407,18 @@ ces19phone$market_liberalism<-(ces19phone$market_liberalism /2)
 #Check distribution of market_liberalism
 qplot(ces19phone$market_liberalism, geom="histogram")
 table(ces19phone$market_liberalism)
+ces19phone$market2
 
 #Calculate Cronbach's alpha
 ces19phone %>% 
   select(market1, market2) %>% 
   alpha(.)
+#For some reason the cronbach's alpha doesn't work here. 
+#Check correlation
+ces19phone %>% 
+  select(market1, market2) %>% 
+  cor(., use="complete.obs")
+#Weakly correlated, but correlated
 
 #recode Moral Traditionalism (p35_b, p20_e,  p35_c)
 look_for(ces19phone, "women")
@@ -428,6 +435,10 @@ table(ces19phone$moral3)
 #Combine and divide by 3
 ces19phone$moral_traditionalism3<-(ces19phone$moral1 + ces19phone$moral2 + ces19phone$moral3)
 ces19phone$moral_traditionalism<-(ces19phone$moral_traditionalism3 /3)
+#Check missing values
+ces19phone %>% 
+  select(starts_with("moral")) %>% 
+  summary()
 #Check distribution of moral_traditionalism
 qplot(ces19phone$moral_traditionalism, geom="histogram")
 table(ces19phone$moral_traditionalism)

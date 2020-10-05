@@ -1,0 +1,86 @@
+---
+title: "CES19 Demographics"
+author: "Simon J. Kiss"
+date: "29/09/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE, echo=F, results='hide'}
+knitr::opts_chunk$set(echo = F,results='hide', warning=F, message=F)
+```
+
+```{r load-data}
+library(cesdata)
+library(tidyverse)
+library(labelled)
+data("ces19web")
+
+```
+
+### Province
+
+```{r tab, results='asis'}
+library(flextable)
+ces19web %>% 
+  count(as_factor(cps19_province)) %>% 
+  mutate(pct=round(n/sum(n), 2)) %>% 
+  arrange(desc(pct)) %>% 
+  rename(province=1) %>% 
+  flextable() 
+  
+```
+
+## Sex
+
+```{r gender, results="asis"}
+ces19web %>% 
+  count(as_factor(cps19_gender)) %>% 
+  mutate(pct=n/sum(n)) %>% 
+  rename(Gender=1) %>% 
+  flextable() %>% 
+  colformat_num(., j='pct',digits=2)
+
+
+```
+
+## Degree
+
+```{r degree}
+look_for(ces19web, 'education')
+table(ces19web$cps19_education)
+library(car)
+ces19web$degree<-Recode(ces19web$cps19_education, "9:11='degree'; 1:8='no degree'; else=NA" , as.factor=T, levels=c('no degree' , 'degree'))
+prop.table(table(ces19web$degree))
+val_labels(ces19web$cps19_education)
+
+```
+
+```{r results="asis"}
+ces19web %>% 
+  count(degree) %>% 
+  mutate(pct=n/sum(n)) %>% 
+  rename(degree=1) %>% 
+  flextable() %>% 
+  colformat_num(., j='pct', digits=2)
+```
+
+## Vote
+
+```{r vote}
+look_for(ces19web, "vote")
+ces19web$cps19_votechoice
+val_labels(ces19web$cps19_votechoice)
+table(as_factor(ces19web$cps19_votechoice))
+ces19web$vote<-Recode(ces19web$cps19_votechoice, "1='Liberals' ; 2='Conservatives' ; 3='NDP' ; 4='BQ' ; 5='Green'", as.factor=T, levels=c('Liberals', 'Conservatives' , 'NDP', 'BQ', 'Green'))
+
+```
+
+```{r vote-table, results="asis"}
+ces19web %>% 
+  count(vote) %>% 
+  filter(!is.na(vote)) %>% 
+  mutate(pct=n/sum(n)) %>% 
+  flextable() %>% 
+  colformat_num(., j='pct', digits=2)
+```
+
