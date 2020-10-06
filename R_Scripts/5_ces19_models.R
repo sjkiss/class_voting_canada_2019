@@ -22,6 +22,7 @@ ces19phone$occupation2<-fct_relevel(ces19phone$occupation2, "Managers", "Profess
 
 ces19phone$occupation4<-fct_relevel(ces19phone$occupation4, "Managers", "Self-Employed", "Professionals", "Routine_Nonmanual", 'Working_Class')
 table(ces19phone$occupation4)
+#Can we just turn working_class2 into a dichotomous variable here and make the elses 0? We do that ultimately with working_class3. Why not simplify the code?
 ces19phone$working_class2<-Recode(ces19phone$occupation3, "4:5=1; 3=0; 2=0; 1=0; 6=0; else=NA")
 table(ces19phone$working_class2)
 
@@ -65,7 +66,7 @@ ces19phone$foreign<-Recode(ces19phone$native, "1=0; 0=1")
 table(ces19phone$foreign)
 ces19phone$working_class3<-Recode(ces19phone$working_class2, "1=1; else=0")
 table(ces19phone$working_class3)
-
+table(ces19phone$working_class2)
 # Party Id
 ces19phone$liberal_id<-Recode(ces19phone$party_id, "1=1; 0=0; 2:4=0; else=NA")
 ces19phone$conservative_id<-Recode(ces19phone$party_id, "2=1; 0:1=0; 3:4=0; else=NA")
@@ -101,254 +102,200 @@ ces19phone$working_class4<-Recode(ces19phone$working_class, "1=1; else=0")
 table(ces19phone$working_class4)
 
 #### 2019 Models ####
-#Model basic with controls
-
-modelROC<-glm(ndp~region3+working_class+union_both+age+male+sector, data=ces19phone, family="binomial")
-
+#Split QC out into ces19.qc
 ces19phone %>% 
-  filter(quebec==1)->ces.out
+  filter(quebec==1)->ces19.qc
+ces19phone %>% 
+  filter(quebec!=1)->ces19.roc
 
-modelQC<-glm(ndp~working_class+union_both+age+male+sector, data=ces.out, family="binomial")
+#Model basic with controls
+modelCAN<-glm(ndp~region3+working_class+union_both+age+male+sector, data=ces19phone, family="binomial")
+modelROC<-glm(ndp~region3+working_class+union_both+age+male+sector, data=ces19.roc, family="binomial")
+modelQC<-glm(ndp~working_class+union_both+age+male+sector, data=ces19.qc, family="binomial")
+summary(modelCAN)
 summary(modelROC)
 summary(modelQC)
 
 #M1 with leadership (Jagmeet_Singh)
-model1ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+Jagmeet_Singh, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model1QC<-glm(ndp~working_class+union_both+age+male+sector+Jagmeet_Singh, data=ces.out, family="binomial")
+model1ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+Jagmeet_Singh, data=ces19.roc, family="binomial")
+model1QC<-glm(ndp~working_class+union_both+age+male+sector+Jagmeet_Singh, data=ces19.qc, family="binomial")
 summary(model1ROC)
 summary(model1QC)
 
 #M2 with redistribution
-model2ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+redistribution, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model2QC<-glm(ndp~working_class+union_both+age+male+sector+redistribution, data=ces.out, family="binomial")
+model2ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+redistribution, data=ces19.roc, family="binomial")
+model2QC<-glm(ndp~working_class+union_both+age+male+sector+redistribution, data=ces19.qc, family="binomial")
 summary(model2ROC)
 summary(model2QC)
 
 #M3 with environment
-model3ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+environment, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model3QC<-glm(ndp~working_class+union_both+age+male+sector+environment, data=ces.out, family="binomial")
+model3ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+environment, data=ces19.roc, family="binomial")
+model3QC<-glm(ndp~working_class+union_both+age+male+sector+environment, data=ces19.qc, family="binomial")
 summary(model3ROC)
 summary(model3QC)
 
 #M4 with immigration
-model4ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model4QC<-glm(ndp~working_class+union_both+age+male+sector+immigration, data=ces.out, family="binomial")
+model4ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration, data=ces19.roc, family="binomial")
+model4QC<-glm(ndp~working_class+union_both+age+male+sector+immigration, data=ces19.qc, family="binomial")
 summary(model4ROC)
 summary(model4QC)
 
 #M17 with minority
-model17ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+minorities_help, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model17QC<-glm(ndp~working_class+union_both+age+male+sector+minorities_help, data=ces.out, family="binomial")
+model17ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+minorities_help, data=ces19.roc, family="binomial")
+
+model17QC<-glm(ndp~working_class+union_both+age+male+sector+minorities_help, data=ces19.qc, family="binomial")
 summary(model17ROC)
 summary(model17QC)
 
 #M18 with immigration2
-model18ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration2, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model18QC<-glm(ndp~working_class+union_both+age+male+sector+immigration2, data=ces.out, family="binomial")
+model18ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration2, data=ces19.roc, family="binomial")
+model18QC<-glm(ndp~working_class+union_both+age+male+sector+immigration2, data=ces19.qc, family="binomial")
 summary(model18ROC)
 summary(model18QC)
 
 #M19 with immigration economy
-model19ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration_economy, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model19QC<-glm(ndp~working_class+union_both+age+male+sector+immigration_economy, data=ces.out, family="binomial")
+model19ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration_economy, data=ces19.roc, family="binomial") 
+model19QC<-glm(ndp~working_class+union_both+age+male+sector+immigration_economy, data=ces19.qc, family="binomial")
 summary(model19ROC)
 summary(model19QC)
 
 #M20 with immigration culture
-model20ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration_culture, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model20QC<-glm(ndp~working_class+union_both+age+male+sector+immigration_culture, data=ces.out, family="binomial")
+model20ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration_culture, data=ces19.roc, family="binomial")
+
+model20QC<-glm(ndp~working_class+union_both+age+male+sector+immigration_culture, data=ces19.qc, family="binomial")
 summary(model20ROC)
 summary(model20QC)
 
 #M21 with immigration crime
-model21ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration_crime, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model21QC<-glm(ndp~working_class+union_both+age+male+sector+immigration_crime, data=ces.out, family="binomial")
+model21ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration_crime, data=ces19.roc, family="binomial")
+
+model21QC<-glm(ndp~working_class+union_both+age+male+sector+immigration_crime, data=ces19.qc, family="binomial")
 summary(model21ROC)
 summary(model21QC)
 
 #M22 with immigration rate
 model22ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration_rate, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model22QC<-glm(ndp~working_class+union_both+age+male+sector+immigration_rate, data=ces.out, family="binomial")
+
+model22QC<-glm(ndp~working_class+union_both+age+male+sector+immigration_rate, data=ces19.qc, family="binomial")
 summary(model22ROC)
 summary(model22QC)
 
 #M23 basic model with degree
 model23ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model23QC<-glm(ndp~working_class+union_both+age+male+sector+degree, data=ces.out, family="binomial")
+
+model23QC<-glm(ndp~working_class+union_both+age+male+sector+degree, data=ces19.qc, family="binomial")
 summary(model23ROC)
 summary(model23QC)
 
 #M24 basic model with income
 model24ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+income, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model24QC<-glm(ndp~working_class+union_both+age+male+sector+income, data=ces.out, family="binomial")
+
+model24QC<-glm(ndp~working_class+union_both+age+male+sector+income, data=ces19.qc, family="binomial")
 summary(model24ROC)
 summary(model24QC)
 
 #M25 basic model with community size
 model25ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+size, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model25QC<-glm(ndp~working_class+union_both+age+male+sector+size, data=ces.out, family="binomial")
+
+model25QC<-glm(ndp~working_class+union_both+age+male+sector+size, data=ces19.qc, family="binomial")
 summary(model25ROC)
 summary(model25QC)
 
 #M26 basic model with foreign-born status
 model26ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+foreign, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model26QC<-glm(ndp~working_class+union_both+age+male+sector+foreign, data=ces.out, family="binomial")
+model26QC<-glm(ndp~working_class+union_both+age+male+sector+foreign, data=ces19.qc, family="binomial")
 summary(model26ROC)
 summary(model26QC)
 
 #M27 basic model with Age2 (coded as 0-1)
 model27ROC<-glm(ndp~region3+working_class+union_both+age2+male+sector, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model27QC<-glm(ndp~working_class+union_both+age2+male+sector, data=ces.out, family="binomial")
+model27QC<-glm(ndp~working_class+union_both+age2+male+sector, data=ces19.qc, family="binomial")
 summary(model27ROC)
 summary(model27QC)
 
 #M28 basic model with no_relgiion
 model28ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+no_religion, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model28QC<-glm(ndp~working_class+union_both+age+male+sector+no_religion, data=ces.out, family="binomial")
+
+model28QC<-glm(ndp~working_class+union_both+age+male+sector+no_religion, data=ces19.qc, family="binomial")
 summary(model28ROC)
 summary(model28QC)
 
 #M29 Full controls model
 model29ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree+income+size+foreign+no_religion, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model29QC<-glm(ndp~working_class+union_both+age+male+sector+degree+income+size+foreign+no_religion, data=ces.out, family="binomial")
+
+model29QC<-glm(ndp~working_class+union_both+age+male+sector+degree+income+size+foreign+no_religion, data=ces19.qc, family="binomial")
 summary(model29ROC)
 summary(model29QC)
 
 #M30 basic model with left-right ideology
 model30ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+ideology, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model30QC<-glm(ndp~working_class+union_both+age+male+sector+ideology, data=ces.out, family="binomial")
+
+model30QC<-glm(ndp~working_class+union_both+age+male+sector+ideology, data=ces19.qc, family="binomial")
 summary(model30ROC)
 summary(model30QC)
 
 #M31 Income as factor
 model31ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree+as.factor(income)+foreign+no_religion, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model31QC<-glm(ndp~working_class+union_both+age+male+sector+degree+as.factor(income)+foreign+no_religion, data=ces.out, family="binomial")
+
+model31QC<-glm(ndp~working_class+union_both+age+male+sector+degree+as.factor(income)+foreign+no_religion, data=ces19.qc, family="binomial")
 summary(model31ROC)
 summary(model31QC)
 
 #M32 Young/Old instead of Age
-model32ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+degree+income+foreign+no_religion, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model32QC<-glm(ndp~working_class+union_both+young+old+male+sector+degree+income+foreign+no_religion, data=ces.out, family="binomial")
+model32ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+degree+income+foreign+no_religion, data=ces19.roc, family="binomial")
+
+model32QC<-glm(ndp~working_class+union_both+young+old+male+sector+degree+income+foreign+no_religion, data=ces19.qc, family="binomial")
 summary(model32ROC)
 summary(model32QC)
 
 #M33 Demographic and attitudinal model
-model33ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree+income+no_religion+immigration2+environment+redistribution+Justin_Trudeau+Andrew_Scheer+Jagmeet_Singh, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model33QC<-glm(ndp~working_class+union_both+age+male+sector+degree+income+no_religion+immigration2+environment+redistribution+Justin_Trudeau+Andrew_Scheer+Jagmeet_Singh, data=ces.out, family="binomial")
+model33ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree+income+no_religion+immigration2+environment+redistribution+Justin_Trudeau+Andrew_Scheer+Jagmeet_Singh, data=ces19.roc, family="binomial")
+model33QC<-glm(ndp~working_class+union_both+age+male+sector+degree+income+no_religion+immigration2+environment+redistribution+Justin_Trudeau+Andrew_Scheer+Jagmeet_Singh, data=ces19.qc, family="binomial")
 summary(model33ROC)
 summary(model33QC)
 
 #M34-M36 Basic class models
 #M34 NDP vs Right
-ces19phone %>% 
-  filter(quebec!=1)->ces.out
-  model34ROC<-glm(ndp_vs_right~working_class3+union_both+income+degree+sector, data=ces.out, family="binomial")
-
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-  model34QC<-glm(ndp_vs_right~working_class3+union_both+income+degree+sector, data=ces.out, family="binomial")
+  model34ROC<-glm(ndp_vs_right~working_class3+union_both+income+degree+sector, data=ces19.roc, family="binomial")
+  model34QC<-glm(ndp_vs_right~working_class3+union_both+income+degree+sector, data=ces19.qc, family="binomial")
 summary(model34ROC)
 summary(model34QC)
 
 #M35 NDP vs Liberal
-ces19phone %>% 
-  filter(quebec!=1)->ces.out
-  model35ROC<-glm(ndp_vs_liberal~working_class3+union_both+income+degree+sector, data=ces.out, family="binomial")
-
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-  model35QC<-glm(ndp_vs_liberal~working_class3+union_both+income+degree+sector, data=ces.out, family="binomial")
+  model35ROC<-glm(ndp_vs_liberal~working_class3+union_both+income+degree+sector, data=ces19.roc, family="binomial")
+  model35QC<-glm(ndp_vs_liberal~working_class3+union_both+income+degree+sector, data=ces19.qc, family="binomial")
 summary(model35ROC)
 summary(model35QC)
 
-#M36 Basic Class Model w self-employed
+#M36 Basic Class Model with self-employed carved out
 model36ALL<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces19phone, family="binomial")
-
-ces19phone %>% 
-  filter(quebec!=1)->ces.out
-  model36ROC<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces.out, family="binomial")
-
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-  model36QC<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces.out, family="binomial")
+  model36ROC<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces19.roc, family="binomial")
+  model36QC<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces19.qc, family="binomial")
 summary(model36ALL)
 summary(model36ROC)
 summary(model36QC)
 
-#### M37 Basic Class Model without self-employed ####
-model37ALL<-glm(ndp~working_class4+union_both+income+degree+sector, data=ces19phone, family="binomial")
-
-ces19phone %>% 
-  filter(quebec!=1)->ces.out
-model37ROC<-glm(ndp~working_class4+union_both+income+degree+sector, data=ces.out, family="binomial")
-
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model37QC<-glm(ndp~working_class4+union_both+income+degree+sector, data=ces.out, family="binomial")
-summary(model37ALL)
-summary(model37ROC)
+#### M37 Basic Class Model with self-employed lumped in ####
+# #note: if we want to lump the self-employed with the working class we need to change this to working_class4
+# model37ALL<-glm(ndp~working_class4+union_both+income+degree+sector, data=ces19phone, family="binomial")
+# model37ROC<-glm(ndp~working_class4+union_both+income+degree+sector, data=ces19.roc, family="binomial")
+# model37QC<-glm(ndp~working_class4+union_both+income+degree+sector, data=ces19.qc, family="binomial")
+# summary(model37ALL)
+# summary(model37ROC)
 summary(model37QC)
 
-#M38 Basic Class Model without self-employed (including age, gender, region)
-model38ALL<-glm(ndp~working_class4+union_both+income+degree+sector+age+male+as.factor(region4), data=ces19phone, family="binomial")
-
-ces19phone %>% 
-  filter(quebec!=1)->ces.out
-model38ROC<-glm(ndp~working_class4+union_both+income+degree+sector+age+male+region3, data=ces.out, family="binomial")
-
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model38QC<-glm(ndp~working_class4+union_both+income+degree+sector+age+male, data=ces.out, family="binomial")
+#M38 Basic Class Model with self-employed careved out into 0 (including age, gender, region)
+model38ALL<-glm(ndp~working_class3+union_both+income+degree+sector+age+male+as.factor(region4), data=ces19phone, family="binomial")
+model38ROC<-glm(ndp~working_class3+union_both+income+degree+sector+age+male+region3, data=ces19.roc, family="binomial")
+model38QC<-glm(ndp~working_class3+union_both+income+degree+sector+age+male, data=ces19.qc, family="binomial")
 summary(model38ALL)
 summary(model38ROC)
 summary(model38QC)
 
 stargazer(model34ROC, model34QC, type="html", out=here("Tables", "ndp_vs_right_models.html"))
 stargazer(model35ROC, model35QC, type="html", out=here("Tables", "ndp_vs_liberal_models.html"))
-stargazer(model36ALL, model36ROC, model36QC, model37ALL, model37ROC, model37QC, type="html", out=here("Tables", "basic_class_models1.html"))
-stargazer(model37ALL, model37ROC, model37QC, model38ALL, model38ROC, model38QC, column.labels=c("ALL", "ROC", "QC", "ALL", "ROC", "QC"), type="html", out=here("Tables", "basic_class_models2.html")) 
+stargazer(model36ALL, model36ROC, model36QC, model38ALL, model38ROC, model38QC, type="html", out=here("Tables", "basic_class_models1.html"), column.labels = rep(c("CAN", "ROC", "QC"),2))
+#stargazer(model37ALL, model37ROC, model37QC, model38ALL, model38ROC, model38QC, column.labels=c("ALL", "ROC", "QC", "ALL", "ROC", "QC"), type="html", out=here("Tables", "basic_class_models2.html")) 
 
 #Combine models into one table by region
 #stargazer(modelROC, model23ROC, model24ROC, model1ROC, model2ROC, model3ROC, model4ROC, model17ROC, model18ROC, type="html", out=here("Tables", "ROC_ces19_attitudinal_variables.html"))
@@ -368,101 +315,77 @@ stargazer(model33ROC, model33QC, type="html", out=here("Tables", "ces15_19_3_par
 
 #### Leadership interactions ####
 #M5 leadership:working class interaction
-model5ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+Jagmeet_Singh+working_class:Jagmeet_Singh, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model5QC<-glm(ndp~working_class+union_both+age+male+sector+Jagmeet_Singh+working_class:Jagmeet_Singh, data=ces.out, family="binomial")
+model5ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+Jagmeet_Singh+working_class:Jagmeet_Singh, data=ces19.roc, family="binomial")
+model5QC<-glm(ndp~working_class+union_both+age+male+sector+Jagmeet_Singh+working_class:Jagmeet_Singh, data=ces19.qc, family="binomial")
 summary(model5ROC)
 summary(model5QC)
 
 #M6 leadership:union interaction
-model6ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+Jagmeet_Singh+union_both:Jagmeet_Singh, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model6QC<-glm(ndp~working_class+union_both+age+male+sector+Jagmeet_Singh+union_both:Jagmeet_Singh, data=ces.out, family="binomial")
+model6ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+Jagmeet_Singh+union_both:Jagmeet_Singh, data=ces19.roc, family="binomial")
+model6QC<-glm(ndp~working_class+union_both+age+male+sector+Jagmeet_Singh+union_both:Jagmeet_Singh, data=ces19.qc, family="binomial")
 summary(model6ROC)
 summary(model6QC)
 
 #### Redistribution interactions ####
 #M7 redistribution:working class interaction
-model7ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+redistribution+working_class:redistribution, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model7QC<-glm(ndp~working_class+union_both+age+male+sector+redistribution+working_class:redistribution, data=ces.out, family="binomial")
+model7ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+redistribution+working_class:redistribution, data=ces19.roc, family="binomial")
+model7QC<-glm(ndp~working_class+union_both+age+male+sector+redistribution+working_class:redistribution, data=ces19.qc, family="binomial")
 summary(model7ROC)
 summary(model7QC)
 
 #M8 redistribution:union interaction
-model8ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+redistribution+union_both:redistribution, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model8QC<-glm(ndp~working_class+union_both+age+male+sector+redistribution+union_both:redistribution, data=ces.out, family="binomial")
+model8ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+redistribution+union_both:redistribution, data=ces19.roc, family="binomial")
+model8QC<-glm(ndp~working_class+union_both+age+male+sector+redistribution+union_both:redistribution, data=ces19.qc, family="binomial")
 summary(model8ROC)
 summary(model8QC)
 
 #### Environment interactions ####
 #M9 environment:working class interaction
-model9ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+environment+working_class:environment, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model9QC<-glm(ndp~working_class+union_both+age+male+sector+environment+working_class:environment, data=ces.out, family="binomial")
+model9ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+environment+working_class:environment, data=ces19.roc, family="binomial")
+model9QC<-glm(ndp~working_class+union_both+age+male+sector+environment+working_class:environment, data=ces19.qc, family="binomial")
 summary(model9ROC)
 summary(model9QC)
 
 #M10 environment:union interaction
-model10ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+environment+union_both:environment, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model10QC<-glm(ndp~working_class+union_both+age+male+sector+environment+union_both:environment, data=ces.out, family="binomial")
+model10ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+environment+union_both:environment, data=ces19.roc, family="binomial")
+model10QC<-glm(ndp~working_class+union_both+age+male+sector+environment+union_both:environment, data=ces19.qc, family="binomial")
 summary(model10ROC)
 summary(model10QC)
 
 #### Immigration interactions ####
 #M11 immigration:working class interaction
-model11ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration+working_class:immigration, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model11QC<-glm(ndp~working_class+union_both+age+male+sector+immigration+working_class:immigration, data=ces.out, family="binomial")
+model11ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration+working_class:immigration, data=ces19.roc, family="binomial")
+model11QC<-glm(ndp~working_class+union_both+age+male+sector+immigration+working_class:immigration, data=ces19.qc, family="binomial")
 summary(model11ROC)
 summary(model11QC)
 
 #M12 immigration:union interaction
-model12ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration+union_both:immigration, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model12QC<-glm(ndp~working_class+union_both+age+male+sector+immigration+union_both:immigration, data=ces.out, family="binomial")
+model12ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration+union_both:immigration, data=ces19.roc, family="binomial")
+model12QC<-glm(ndp~working_class+union_both+age+male+sector+immigration+union_both:immigration, data=ces19.qc, family="binomial")
 summary(model12ROC)
 summary(model12QC)
 
 #M13 minority:working class interaction
-model13ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+minorities_help+working_class:minorities_help, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model13QC<-glm(ndp~working_class+union_both+age+male+sector+minorities_help+working_class:minorities_help, data=ces.out, family="binomial")
+model13ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+minorities_help+working_class:minorities_help, data=ces19.roc, family="binomial")
+model13QC<-glm(ndp~working_class+union_both+age+male+sector+minorities_help+working_class:minorities_help, data=ces19.qc, family="binomial")
 summary(model13ROC)
 summary(model13QC)
 
 #M14 minority:union interaction
-model14ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+minorities_help+union_both:minorities_help, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model14QC<-glm(ndp~working_class+union_both+age+male+sector+minorities_help+union_both:minorities_help, data=ces.out, family="binomial")
+model14ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+minorities_help+union_both:minorities_help, data=ces19.roc, family="binomial")
+model14QC<-glm(ndp~working_class+union_both+age+male+sector+minorities_help+union_both:minorities_help, data=ces19.qc, family="binomial")
 summary(model14ROC)
 summary(model14QC)
 
 #M15 immigration2:working class interaction
-model15ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration2+working_class:immigration2, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model15QC<-glm(ndp~working_class+union_both+age+male+sector+immigration2+working_class:immigration2, data=ces.out, family="binomial")
+model15ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration2+working_class:immigration2, data=ces19.roc, family="binomial")
+model15QC<-glm(ndp~working_class+union_both+age+male+sector+immigration2+working_class:immigration2, data=ces19.qc, family="binomial")
 summary(model15ROC)
 summary(model15QC)
 
 #M16 immigration2:union interaction
-model16ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration2+union_both:immigration2, data=ces19phone, family="binomial")
-ces19phone %>% 
-  filter(quebec==1)->ces.out
-model16QC<-glm(ndp~working_class+union_both+age+male+sector+immigration2+union_both:immigration2, data=ces.out, family="binomial")
+model16ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration2+union_both:immigration2, data=ces19.roc, family="binomial")
+model16QC<-glm(ndp~working_class+union_both+age+male+sector+immigration2+union_both:immigration2, data=ces19.qc, family="binomial")
 summary(model16ROC)
 summary(model16QC)
 
@@ -690,48 +613,48 @@ table(ces19phone$ndp_past)
 #Past Model basic with controls
 past_modelROC<-glm(ndp_past~region3+working_class+union_both+age+male+sector, data=ces19phone, family="binomial")
 ces19phone %>% 
-  filter(quebec==1)->ces.out
-past_modelQC<-glm(ndp_past~working_class+union_both+age+male+sector, data=ces.out, family="binomial")
+  filter(quebec==1)->ces19.qc
+past_modelQC<-glm(ndp_past~working_class+union_both+age+male+sector, data=ces19.qc, family="binomial")
 summary(past_modelROC)
 summary(past_modelQC)
 
 #PM1 including past vote
 past_model1ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+ndp_past, data=ces19phone, family="binomial")
 ces19phone %>% 
-  filter(quebec==1)->ces.out
-past_model1QC<-glm(ndp~working_class+union_both+age+male+sector+ndp_past, data=ces.out, family="binomial")
+  filter(quebec==1)->ces19.qc
+past_model1QC<-glm(ndp~working_class+union_both+age+male+sector+ndp_past, data=ces19.qc, family="binomial")
 summary(past_model1ROC)
 summary(past_model1QC)
 
 #PM2 including past vote interaction with class
 past_model2ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+ndp_past+ndp_past:working_class, data=ces19phone, family="binomial")
 ces19phone %>% 
-  filter(quebec==1)->ces.out
-past_model2QC<-glm(ndp~working_class+union_both+age+male+sector+ndp_past+ndp_past:working_class, data=ces.out, family="binomial")
+  filter(quebec==1)->ces19.qc
+past_model2QC<-glm(ndp~working_class+union_both+age+male+sector+ndp_past+ndp_past:working_class, data=ces19.qc, family="binomial")
 summary(past_model2ROC)
 summary(past_model2QC)
 
 #PM3 including past vote interaction with union
 past_model3ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+ndp_past+ndp_past:union_both, data=ces19phone, family="binomial")
 ces19phone %>% 
-  filter(quebec==1)->ces.out
-past_model3QC<-glm(ndp~working_class+union_both+age+male+sector+ndp_past+ndp_past:union_both, data=ces.out, family="binomial")
+  filter(quebec==1)->ces19.qc
+past_model3QC<-glm(ndp~working_class+union_both+age+male+sector+ndp_past+ndp_past:union_both, data=ces19.qc, family="binomial")
 summary(past_model3ROC)
 summary(past_model3QC)
 
 #PM4 including past vote class interaction with income & degree
 past_model4ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+ndp_past+ndp_past:working_class+income+degree, data=ces19phone, family="binomial")
 ces19phone %>% 
-  filter(quebec==1)->ces.out
-past_model4QC<-glm(ndp~working_class+union_both+age+male+sector+ndp_past+ndp_past:working_class+income+degree, data=ces.out, family="binomial")
+  filter(quebec==1)->ces19.qc
+past_model4QC<-glm(ndp~working_class+union_both+age+male+sector+ndp_past+ndp_past:working_class+income+degree, data=ces19.qc, family="binomial")
 summary(past_model4ROC)
 summary(past_model4QC)
 
 #PM5 including past vote union interaction with income & degree
 past_model5ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+ndp_past+ndp_past:union_both+income+degree, data=ces19phone, family="binomial")
 ces19phone %>% 
-  filter(quebec==1)->ces.out
-past_model5QC<-glm(ndp~working_class+union_both+age+male+sector+ndp_past+ndp_past:union_both+income+degree, data=ces.out, family="binomial")
+  filter(quebec==1)->ces19.qc
+past_model5QC<-glm(ndp~working_class+union_both+age+male+sector+ndp_past+ndp_past:union_both+income+degree, data=ces19.qc, family="binomial")
 summary(past_model5ROC)
 summary(past_model5QC)
 

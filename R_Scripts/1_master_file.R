@@ -515,7 +515,7 @@ val_labels(ces$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, S
 val_labels(ces$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
 val_labels(ces$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 val_labels(ces$redistribution)<-c(Less=0, More=1)
-
+val_labels(ces$working_class)<-c(Other=0, Working_Class=1)
 
 ####
 names(ces)
