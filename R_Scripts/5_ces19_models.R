@@ -174,68 +174,68 @@ summary(model21ROC)
 summary(model21QC)
 
 #M22 with immigration rate
-model22ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration_rate, data=ces19phone, family="binomial")
+model22ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+immigration_rate, data=ces19.roc, family="binomial")
 
 model22QC<-glm(ndp~working_class+union_both+age+male+sector+immigration_rate, data=ces19.qc, family="binomial")
 summary(model22ROC)
 summary(model22QC)
 
 #M23 basic model with degree
-model23ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree, data=ces19phone, family="binomial")
+model23ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree, data=ces19.roc, family="binomial")
 
 model23QC<-glm(ndp~working_class+union_both+age+male+sector+degree, data=ces19.qc, family="binomial")
 summary(model23ROC)
 summary(model23QC)
 
 #M24 basic model with income
-model24ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+income, data=ces19phone, family="binomial")
+model24ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+income, data=ces19.roc, family="binomial")
 
 model24QC<-glm(ndp~working_class+union_both+age+male+sector+income, data=ces19.qc, family="binomial")
 summary(model24ROC)
 summary(model24QC)
 
 #M25 basic model with community size
-model25ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+size, data=ces19phone, family="binomial")
+model25ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+size, data=ces19.roc, family="binomial")
 
 model25QC<-glm(ndp~working_class+union_both+age+male+sector+size, data=ces19.qc, family="binomial")
 summary(model25ROC)
 summary(model25QC)
 
 #M26 basic model with foreign-born status
-model26ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+foreign, data=ces19phone, family="binomial")
+model26ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+foreign, data=ces19.roc, family="binomial")
 model26QC<-glm(ndp~working_class+union_both+age+male+sector+foreign, data=ces19.qc, family="binomial")
 summary(model26ROC)
 summary(model26QC)
 
 #M27 basic model with Age2 (coded as 0-1)
-model27ROC<-glm(ndp~region3+working_class+union_both+age2+male+sector, data=ces19phone, family="binomial")
+model27ROC<-glm(ndp~region3+working_class+union_both+age2+male+sector, data=ces19.roc, family="binomial")
 model27QC<-glm(ndp~working_class+union_both+age2+male+sector, data=ces19.qc, family="binomial")
 summary(model27ROC)
 summary(model27QC)
 
 #M28 basic model with no_relgiion
-model28ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+no_religion, data=ces19phone, family="binomial")
+model28ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+no_religion, data=ces19.roc, family="binomial")
 
 model28QC<-glm(ndp~working_class+union_both+age+male+sector+no_religion, data=ces19.qc, family="binomial")
 summary(model28ROC)
 summary(model28QC)
 
 #M29 Full controls model
-model29ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree+income+size+foreign+no_religion, data=ces19phone, family="binomial")
+model29ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree+income+size+foreign+no_religion, data=ces19.roc, family="binomial")
 
 model29QC<-glm(ndp~working_class+union_both+age+male+sector+degree+income+size+foreign+no_religion, data=ces19.qc, family="binomial")
 summary(model29ROC)
 summary(model29QC)
 
 #M30 basic model with left-right ideology
-model30ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+ideology, data=ces19phone, family="binomial")
+model30ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+ideology, data=ces19.roc, family="binomial")
 
 model30QC<-glm(ndp~working_class+union_both+age+male+sector+ideology, data=ces19.qc, family="binomial")
 summary(model30ROC)
 summary(model30QC)
 
 #M31 Income as factor
-model31ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree+as.factor(income)+foreign+no_religion, data=ces19phone, family="binomial")
+model31ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+degree+as.factor(income)+foreign+no_religion, data=ces19.roc, family="binomial")
 
 model31QC<-glm(ndp~working_class+union_both+age+male+sector+degree+as.factor(income)+foreign+no_religion, data=ces19.qc, family="binomial")
 summary(model31ROC)
