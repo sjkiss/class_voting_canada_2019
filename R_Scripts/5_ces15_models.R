@@ -21,7 +21,7 @@ table(ces15phone$ndp)
 ces15phone$occupation2<-fct_relevel(ces15phone$occupation2, "Managers", "Professionals", "Routine_Nonmanual", 'Working_Class')
 
 ces15phone$occupation4<-fct_relevel(ces15phone$occupation4, "Managers", "Self-Employed", "Professionals", "Routine_Nonmanual", 'Working_Class')
-table(ces19phone$occupation4)
+
 ces15phone$working_class2<-Recode(ces15phone$occupation3, "4:5=1; 3=0; 2=0; 1=0; 6=0; else=NA")
 table(ces15phone$working_class2)
 
@@ -89,7 +89,7 @@ ces15phone %>%
   filter(quebec!=1)->ces15.roc
 
 #Model basic with controls
-modelsCAN<-glm(ndp~region3+working_class+union_both+age+male+sector, data=ces19phone, family="binomial")
+modelsCAN<-glm(ndp~region3+working_class+union_both+age+male+sector, data=ces15phone, family="binomial")
 modelsROC<-glm(ndp~region3+working_class+union_both+age+male+sector, data=ces15.roc, family="binomial")
 modelsQC<-glm(ndp~working_class+union_both+age+male+sector, data=ces15.qc, family="binomial")
 summary(modelsCAN)
@@ -368,20 +368,23 @@ ces15phone %>%
 
 # Block recursion variables
 # By Class
+ces15phone$market_liberalism<-as.numeric(ces15phone$market_liberalism)
+ces15phone$moral_traditionalism<-as.numeric(ces15phone$moral_traditionalism)
 ces15phone %>%
   #  filter(!is.na(union_both)) %>%
   select(occupation4, market_liberalism, moral_traditionalism, political_disaffection, continentalism, personal_retrospective, national_retrospective, defence, justice, education) %>% 
   group_by(occupation4) %>%
   summarise_at(vars(market_liberalism, moral_traditionalism, political_disaffection, continentalism, personal_retrospective, national_retrospective, defence, justice, education), mean, na.rm=T)
-
+ces15phone$market_liberalism
 #Graph it
 ces15phone %>%
   #It's actually maybe useful to keep the mssing values in for a while; it tells us where those marginal to the labour market are. 
   #  filter(!is.na(occupation4)) %>%
   #Select the variables for graphing
-  select(occupation4, market_liberalism, moral_traditionalism, political_disaffection, continentalism, personal_retrospective, national_retrospective, defence, justice, education) %>%
+  select(occupation4, market_liberalism, moral_traditionalism, political_disaffection, continentalism, personal_retrospective, national_retrospective, defence, justice, education) %>% 
+  #gather(.,  Variable,Score, -occupation4) %>% 
   #they are currently in a wide format, reduce it to long format with pivot_longer
-  pivot_longer(-occupation4,values_to=c("Score"), names_to=c("Variable")) %>% 
+  pivot_longer(c(moral_traditionalism,market_liberalism,political_disaffection,national_retrospective, defence, justice, education),values_to=c("Score"), names_to=c("Variable")) %>% 
   #Now form groups for each class category and each variable
   group_by(occupation4, Variable) %>% 
   #Now summarize those groups, creating the average score, the count of cases n(), the standard deviation, the standard error

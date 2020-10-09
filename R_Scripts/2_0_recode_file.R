@@ -66,9 +66,10 @@ resave <- function(..., list = character(), file) {
 }
 #use resave to update the file
 
-#resave(ces15phone,  file="Data/recoded_cesdata.Rdata")
+resave(ces15phone,  file="Data/recoded_cesdata.Rdata")
 #now clear everything out
 rm(list=ls())
 
 ## Detach package "cesdata"
 detach("package:cesdata")
+rm(list=ls())
