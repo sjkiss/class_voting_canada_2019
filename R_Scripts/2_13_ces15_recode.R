@@ -464,7 +464,7 @@ ces15phone %>%
   select(starts_with('moral')) %>% 
   rowwise() %>% 
   mutate(avg=mean(., na.rm=T))
-?rowwise
+
 ces15phone$moral_traditionalism3<-(ces15phone$moral1 + ces15phone$moral2 + ces15phone$moral3)
 ces15phone$moral_traditionalism<-(ces15phone$moral_traditionalism3 /3)
 #Check distribution of moral_traditionalism
