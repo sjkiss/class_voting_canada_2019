@@ -399,14 +399,6 @@ val_labels(ces15phone$manage_economy)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=
 val_labels(ces15phone$manage_economy)
 table(ces15phone$manage_economy)
 
-#recode Addressing Main Issue (q8)
-look_for(ces15phone, "issue")
-ces15phone$address_issue<-Recode(ces15phone$q8, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
-val_labels(ces15phone$address_issue)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
-#checks
-val_labels(ces15phone$address_issue)
-table(ces15phone$address_issue)
-
 #recode Market Liberalism (PES15_22 and PES15_49)
 look_for(ces15phone, "leave")
 look_for(ces15phone, "blame")
@@ -417,10 +409,26 @@ ces15phone$market2<-Recode(ces15phone$PES15_49, "1=1; 3=0.75; 8=0.5; 5=0.25; 7=0
 table(ces15phone$market1, useNA="ifany")
 table(ces15phone$market2, useNA="ifany")
 
-#Combine and divide by 2
-ces15phone$market_liberalism<-(ces15phone$market1 + ces15phone$market2)
-ces15phone$market_liberalism<-(ces15phone$market_liberalism /2)
-ces15phone$market_liberalism<-as.numeric(ces15phone$market_liberalism)
+ces15phone %>% 
+  rowwise() %>% 
+  mutate(market_liberalism=mean(
+    c_across(market1:market2)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('market1', 'market2', 'market_liberalism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces15phone %>% 
+  rowwise() %>% 
+  mutate(market_liberalism=mean(
+    c_across(c('market1', 'market2')), na.rm=T  
+  )) %>% 
+  ungroup()->ces15phone
+ces15phone %>% 
+  select(starts_with("market")) %>% 
+  summary()
 #Check distribution of market_liberalism
 qplot(ces15phone$market_liberalism, geom="histogram")
 table(ces15phone$market_liberalism, useNA="ifany")
@@ -436,11 +444,10 @@ look_for(ces15phone, "gays")
 ces15phone$moral1<-Recode(ces15phone$PES15_26, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 ces15phone$moral2<-Recode(ces15phone$PES15_43, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA", as.numeric=T)
 
-#### moral traditionalism3#### 
+# moral traditionalism3
 # There is a way easier way to do this. 
 # I think you want to reverse them; high scores go to zero, low scores go to high
 # I noticed you set the DK to 50. That's neat. I had never thought about that. 
-#
 
 #First rescale this from 0 to 1
 ces15phone$moral3<-Recode(ces15phone$PES15_16, "998=50; 999=NA", as.numeric=T)
@@ -459,14 +466,26 @@ table(ces15phone$moral1, useNA="ifany")
 table(ces15phone$moral2, useNA="ifany")
 table(ces15phone$moral3, useNA="ifany")
 
-#Combine and divide by 3
 ces15phone %>% 
-  select(starts_with('moral')) %>% 
   rowwise() %>% 
-  mutate(avg=mean(., na.rm=T))
-
-ces15phone$moral_traditionalism3<-(ces15phone$moral1 + ces15phone$moral2 + ces15phone$moral3)
-ces15phone$moral_traditionalism<-(ces15phone$moral_traditionalism3 /3)
+  mutate(moral_traditionalism=mean(
+    c_across(moral1:moral2:moral3)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('moral1', 'moral2', 'moral3', 'moral_traditionalism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<4)
+#Scale Averaging 
+ces15phone %>% 
+  rowwise() %>% 
+  mutate(moral_traditionalism=mean(
+    c_across(c('moral1', 'moral2', 'moral3')), na.rm=T  
+  )) %>% 
+  ungroup()->ces15phone
+ces15phone %>% 
+  select(starts_with("moral")) %>% 
+  summary()
 #Check distribution of moral_traditionalism
 qplot(ces15phone$moral_traditionalism, geom="histogram")
 table(ces15phone$moral_traditionalism, useNA="ifany")
@@ -538,4 +557,3 @@ val_labels(ces15phone$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 val_labels(ces15phone$education)
 table(ces15phone$education)
-ces15phone$moral_traditionalism

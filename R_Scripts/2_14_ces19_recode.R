@@ -401,13 +401,29 @@ ces19phone$market2<-Recode(ces19phone$p20_f, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -
 table(ces19phone$market1)
 table(ces19phone$market2)
 
-#Combine and divide by 2
-ces19phone$market_liberalism<-(ces19phone$market1 + ces19phone$market2)
-ces19phone$market_liberalism<-(ces19phone$market_liberalism /2)
+ces19phone %>% 
+  rowwise() %>% 
+  mutate(market_liberalism=mean(
+    c_across(market1:market2)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('market1', 'market2', 'market_liberalism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces19phone %>% 
+  rowwise() %>% 
+  mutate(market_liberalism=mean(
+    c_across(c('market1', 'market2')), na.rm=T  
+  )) %>% 
+  ungroup()->ces15phone
+ces19phone %>% 
+  select(starts_with("market")) %>% 
+  summary()
 #Check distribution of market_liberalism
 qplot(ces19phone$market_liberalism, geom="histogram")
-table(ces19phone$market_liberalism)
-ces19phone$market2
+table(ces19phone$market_liberalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces19phone %>% 
@@ -432,16 +448,29 @@ table(ces19phone$moral1)
 table(ces19phone$moral2)
 table(ces19phone$moral3)
 
-#Combine and divide by 3
-ces19phone$moral_traditionalism3<-(ces19phone$moral1 + ces19phone$moral2 + ces19phone$moral3)
-ces19phone$moral_traditionalism<-(ces19phone$moral_traditionalism3 /3)
-#Check missing values
+ces19phone %>% 
+  rowwise() %>% 
+  mutate(moral_traditionalism=mean(
+    c_across(moral1:moral2:moral3)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('moral1', 'moral2', 'moral3', 'moral_traditionalism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<4)
+#Scale Averaging 
+ces19phone %>% 
+  rowwise() %>% 
+  mutate(moral_traditionalism=mean(
+    c_across(c('moral1', 'moral2', 'moral3')), na.rm=T  
+  )) %>% 
+  ungroup()->ces19phone
 ces19phone %>% 
   select(starts_with("moral")) %>% 
   summary()
 #Check distribution of moral_traditionalism
 qplot(ces19phone$moral_traditionalism, geom="histogram")
-table(ces19phone$moral_traditionalism)
+table(ces19phone$moral_traditionalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces19phone %>% 
@@ -457,12 +486,29 @@ ces19phone$disaffection2<-Recode(ces19phone$p20_n, "1=1; 2=0.75; 3=0.5; 4=0.25; 
 table(ces19phone$disaffection1)
 table(ces19phone$disaffection2)
 
-#Combine and divide by 2
-ces19phone$political_disaffection<-(ces19phone$disaffection1 + ces19phone$disaffection2)
-ces19phone$political_disaffection<-(ces19phone$political_disaffection /2)
-#Check distribution of market_liberalism
+ces19phone %>% 
+  rowwise() %>% 
+  mutate(political_disaffection=mean(
+    c_across(disaffection1:disaffection2)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('disaffection1', 'disaffection2', 'political_disaffection')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces19phone %>% 
+  rowwise() %>% 
+  mutate(political_disaffection=mean(
+    c_across(c('disaffection1', 'disaffection2')), na.rm=T  
+  )) %>% 
+  ungroup()->ces15phone
+ces19phone %>% 
+  select(starts_with("political_disaffection")) %>% 
+  summary()
+#Check distribution of disaffection
 qplot(ces19phone$political_disaffection, geom="histogram")
-table(ces19phone$political_disaffection)
+table(ces19phone$political_disaffection, useNA="ifany")
 
 #Calculate Cronbach's alpha
 ces19phone %>% 
