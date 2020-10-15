@@ -51,19 +51,19 @@ here("R_Scripts/2_ces65_recode.R")
 # source(here("R_Scripts/2_11_ces00_recode.R"))
 # source(here("R_Scripts/2_12_ces0411_recode.R"))
 source(here("R_Scripts/2_13_ces15_recode.R"), echo=T)
-source(here("R_Scripts/2_14_ces19_recode.R"), echo=T)
-source(here("R_Scripts/2_15_ces19_web_recode.R"), echo=T)
+# source(here("R_Scripts/2_14_ces19_recode.R"), echo=T)
+# source(here("R_Scripts/2_15_ces19_web_recode.R"), echo=T)
 #This saves the ojbects that we 
-save(ces65, ces68, ces72_nov, ces74, ces7980, ces84, ces88, ces93, ces97, ces00, ces0411, ces15phone, ces19web, ces19phone, file="Data/recoded_cesdata.Rdata")
+#save(ces65, ces68, ces72_nov, ces74, ces7980, ces84, ces88, ces93, ces97, ces00, ces0411, ces15phone, ces19web, ces19phone, file="Data/recoded_cesdata.Rdata")
 
 #### Update the file recoded_cesdata with any recodes ####
 #Define Resave function
-# resave <- function(..., list = character(), file) {
-#    previous  <- load(file)
-#    var.names <- c(list, as.character(substitute(list(...)))[-1L])
-#    for (var in var.names) assign(var, get(var, envir = parent.frame()))
-#    save(list = unique(c(previous, var.names)), file = file)
-# }
+resave <- function(..., list = character(), file) {
+   previous  <- load(file)
+   var.names <- c(list, as.character(substitute(list(...)))[-1L])
+   for (var in var.names) assign(var, get(var, envir = parent.frame()))
+   save(list = unique(c(previous, var.names)), file = file)
+}
 #use resave to update the file
 
 resave(ces15phone,  file="Data/recoded_cesdata.Rdata")
