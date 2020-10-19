@@ -331,29 +331,29 @@ table(ces15phone$Gilles_Duceppe)
 ces15phone$Mulcair15<-Recode(ces15phone$CPS15_25, "998=50; 996:997=NA; 999=NA")
 #checks
 table(ces15phone$Mulcair15)
-ces15phone$Tom_Mulcair15<-(ces15phone$Mulcair15 /100)
-table(ces15phone$Tom_Mulcair15)
+ces15phone$ndp_leader<-(ces15phone$Mulcair15 /100)
+table(ces15phone$ndp_leader)
 
 #recode Justin Trudeau (CPS15_24)
 ces15phone$Trudeau15<-Recode(ces15phone$CPS15_24, "998=50; 996:997=NA; 999=NA")
 #checks
 table(ces15phone$Trudeau15)
-ces15phone$Justin_Trudeau15<-(ces15phone$Trudeau15 /100)
-table(ces15phone$Justin_Trudeau15)
+ces15phone$liberal_leader<-(ces15phone$Trudeau15 /100)
+table(ces15phone$liberal_leader)
 
 #recode Stephen Harper (CPS15_23)
 ces15phone$Harper15<-Recode(ces15phone$CPS15_23, "998=50; 996:997=NA; 999=NA")
 #checks
 table(ces15phone$Harper15)
-ces15phone$Stephen_Harper15<-(ces15phone$Harper15 /100)
-table(ces15phone$Stephen_Harper15)
+ces15phone$conservative_leader<-(ces15phone$Harper15 /100)
+table(ces15phone$conservative_leader)
 
 #recode Gilles Duceppe (CPS15_26)
 ces15phone$Duceppe15<-Recode(ces15phone$CPS15_26, "998=50; 996:997=NA; 999=NA")
 #checks
 table(ces15phone$Duceppe15)
-ces15phone$Gilles_Duceppe15<-(ces15phone$Duceppe15 /100)
-table(ces15phone$Gilles_Duceppe15)
+ces15phone$bloc_leader<-(ces15phone$Duceppe15 /100)
+table(ces15phone$bloc_leader)
 
 #recode Environment (CPS15_35)
 look_for(ces15phone, "enviro")
