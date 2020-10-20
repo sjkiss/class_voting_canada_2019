@@ -332,6 +332,7 @@ table(ces19phone$Blanchet19)
 ces19phone$bloc_leader<-(ces19phone$Blanchet19 /100)
 table(ces19phone$bloc_leader)
 
+
 #recode Environment (q27_b)
 look_for(ces19phone, "enviro")
 ces19phone$environment<-Recode(ces19phone$q27_b, "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
