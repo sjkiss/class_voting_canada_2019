@@ -308,29 +308,29 @@ table(ces19phone$Francois_Blanchet)
 ces19phone$Singh19<-Recode(ces19phone$q22, "-6=50; -8=NA; -9=50")
 #checks
 table(ces19phone$Singh19)
-ces19phone$Jagmeet_Singh19<-(ces19phone$Singh19 /100)
-table(ces19phone$Jagmeet_Singh19)
+ces19phone$ndp_leader<-(ces19phone$Singh19 /100)
+table(ces19phone$ndp_leader)
 
 #recode Justin Trudeau (q20)
 ces19phone$Trudeau19<-Recode(ces19phone$q20, "-6=50; -8=NA; -9=50")
 #checks
 table(ces19phone$Trudeau19)
-ces19phone$Justin_Trudeau19<-(ces19phone$Trudeau19 /100)
-table(ces19phone$Justin_Trudeau19)
+ces19phone$liberal_leader<-(ces19phone$Trudeau19 /100)
+table(ces19phone$liberal_leader)
 
 #recode Andrew Scheer (q21)
 ces19phone$Scheer19<-Recode(ces19phone$q21, "-6=50; -8=NA; -9=50")
 #checks
 table(ces19phone$Scheer19)
-ces19phone$Andrew_Scheer19<-(ces19phone$Scheer19 /100)
-table(ces19phone$Andrew_Scheer19)
+ces19phone$conservative_leader<-(ces19phone$Scheer19 /100)
+table(ces19phone$conservative_leader)
 
 #recode Francois Blanchet (q23)
 ces19phone$Blanchet19<-Recode(ces19phone$q23, "-6=50; -8=NA; -9=50")
 #checks
 table(ces19phone$Blanchet19)
-ces19phone$Francois_Blanchet19<-(ces19phone$Blanchet19 /100)
-table(ces19phone$Francois_Blanchet19)
+ces19phone$bloc_leader<-(ces19phone$Blanchet19 /100)
+table(ces19phone$bloc_leader)
 
 #recode Environment (q27_b)
 look_for(ces19phone, "enviro")
