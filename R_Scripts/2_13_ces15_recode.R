@@ -1,3 +1,4 @@
+
 #File to Recode 2015 CES Data 
 #load data
 data("ces15phone")
@@ -469,7 +470,7 @@ table(ces15phone$moral3, useNA="ifany")
 ces15phone %>% 
   rowwise() %>% 
   mutate(moral_traditionalism=mean(
-    c_across(moral1:moral2:moral3)
+    c_across(moral1, moral2, moral3)
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
@@ -557,3 +558,4 @@ val_labels(ces15phone$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 val_labels(ces15phone$education)
 table(ces15phone$education)
+

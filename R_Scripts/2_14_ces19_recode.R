@@ -1,3 +1,4 @@
+
 #File to Recode 2019 CES Data 
 #Load Data
 data("ces19phone")
@@ -417,7 +418,8 @@ ces19phone %>%
   mutate(market_liberalism=mean(
     c_across(c('market1', 'market2')), na.rm=T  
   )) %>% 
-  ungroup()->ces15phone
+  ungroup()->ces19phone
+
 ces19phone %>% 
   select(starts_with("market")) %>% 
   summary()
@@ -502,7 +504,7 @@ ces19phone %>%
   mutate(political_disaffection=mean(
     c_across(c('disaffection1', 'disaffection2')), na.rm=T  
   )) %>% 
-  ungroup()->ces15phone
+  ungroup()->ces19phone
 ces19phone %>% 
   select(starts_with("political_disaffection")) %>% 
   summary()
