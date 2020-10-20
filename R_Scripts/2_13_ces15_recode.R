@@ -1,6 +1,5 @@
 #File to Recode 2015 CES Data 
 #load data
-
 data("ces15phone")
 
 #recode Gender (RGENDER)
@@ -400,14 +399,6 @@ val_labels(ces15phone$manage_economy)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=
 val_labels(ces15phone$manage_economy)
 table(ces15phone$manage_economy)
 
-#recode Addressing Main Issue (q8)
-# look_for(ces15phone, "issue")
-# ces15phone$address_issue<-Recode(ces15phone$q8, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
-# val_labels(ces15phone$address_issue)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
-# #checks
-# val_labels(ces15phone$address_issue)
-# table(ces15phone$address_issue)
-
 #recode Market Liberalism (PES15_22 and PES15_49)
 look_for(ces15phone, "leave")
 look_for(ces15phone, "blame")
@@ -418,10 +409,26 @@ ces15phone$market2<-Recode(ces15phone$PES15_49, "1=1; 3=0.75; 8=0.5; 5=0.25; 7=0
 table(ces15phone$market1, useNA="ifany")
 table(ces15phone$market2, useNA="ifany")
 
-#Combine and divide by 2
-ces15phone$market_liberalism<-(ces15phone$market1 + ces15phone$market2)
-ces15phone$market_liberalism<-(ces15phone$market_liberalism /2)
-ces15phone$market_liberalism<-as.numeric(ces15phone$market_liberalism)
+ces15phone %>% 
+  rowwise() %>% 
+  mutate(market_liberalism=mean(
+    c_across(market1:market2)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('market1', 'market2', 'market_liberalism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<3)
+#Scale Averaging 
+ces15phone %>% 
+  rowwise() %>% 
+  mutate(market_liberalism=mean(
+    c_across(c('market1', 'market2')), na.rm=T  
+  )) %>% 
+  ungroup()->ces15phone
+ces15phone %>% 
+  select(starts_with("market")) %>% 
+  summary()
 #Check distribution of market_liberalism
 qplot(ces15phone$market_liberalism, geom="histogram")
 table(ces15phone$market_liberalism, useNA="ifany")
@@ -437,42 +444,48 @@ look_for(ces15phone, "gays")
 ces15phone$moral1<-Recode(ces15phone$PES15_26, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 ces15phone$moral2<-Recode(ces15phone$PES15_43, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 8=0.5; else=NA", as.numeric=T)
 
-#### moral traditionalism3#### 
+# moral traditionalism3
 # There is a way easier way to do this. 
 # I think you want to reverse them; high scores go to zero, low scores go to high
 # I noticed you set the DK to 50. That's neat. I had never thought about that. 
-#
 
-#First Recode out the missing values
+#First rescale this from 0 to 1
 ces15phone$moral3<-Recode(ces15phone$PES15_16, "998=50; 999=NA", as.numeric=T)
 #table to check
 table(ces15phone$moral3)
 #Rescale to 0 and 1 by dividing by 100
 ces15phone$moral3<-ces15phone$moral3/100
-#Use this command to  in the psych package reverse code
-
-#-1 means to reverse the item
-#it's a tricky command, sometimes it only works on full data frames. But if you only want to feed it one variable you have to feed it in this way. 
-library(psych)
 ces15phone$moral3<-reverse.code(-1, ces15phone[,'moral3'])
-#Calculate the average of all three
 ces15phone %>% 
-  #perform the mutate calculation by row
   rowwise() %>% 
-  #mutate to define the new variable using the function mean
-  mutate(moral_traditionalism=mean(
-    #go across the columns that starts with moral followed by a 1, 2 or 3, and drop any missing values
-    c_across(num_range('moral',1:3)), na.rm=T)) ->ces15phone
-
-
-summary(ces15phone$moral_traditionalism)
+mutate(moral_traditionalism=mean(c_across(starts_with('moral'))))->ces15phone
+ces15phone$moral_traditionalism<-as.numeric(ces15phone$moral_traditionalism)
 #val_labels(ces15phone$moral1)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
 #checks
 table(ces15phone$moral1, useNA="ifany")
 table(ces15phone$moral2, useNA="ifany")
 table(ces15phone$moral3, useNA="ifany")
 
-
+ces15phone %>% 
+  rowwise() %>% 
+  mutate(moral_traditionalism=mean(
+    c_across(moral1:moral2:moral3)
+    , na.rm=T )) -> out
+out %>% 
+  ungroup() %>% 
+  select(c('moral1', 'moral2', 'moral3', 'moral_traditionalism')) %>% 
+  mutate(na=rowSums(is.na(.))) %>% 
+  filter(na>0, na<4)
+#Scale Averaging 
+ces15phone %>% 
+  rowwise() %>% 
+  mutate(moral_traditionalism=mean(
+    c_across(c('moral1', 'moral2', 'moral3')), na.rm=T  
+  )) %>% 
+  ungroup()->ces15phone
+ces15phone %>% 
+  select(starts_with("moral")) %>% 
+  summary()
 #Check distribution of moral_traditionalism
 qplot(ces15phone$moral_traditionalism, geom="histogram")
 table(ces15phone$moral_traditionalism, useNA="ifany")
@@ -499,7 +512,6 @@ table(ces15phone$continentalism)
 
 #recode Quebec Sovereignty (CPS15_75)
 look_for(ces15phone, "quebec")
-
 ces15phone$quebec_sovereignty<-Recode(ces15phone$CPS15_75, "1=1; 3=0.75; 8=0.5; 5=0.25; 7=0; else=NA", as.numeric=T)
 #val_labels(ces15phone$quebec_sovereignty)<-c(Much_less=0, Somewhat_less=0.25, Dont_know=0.5, Somewhat_more=0.75, Much_more=1)
 #checks
@@ -545,4 +557,3 @@ val_labels(ces15phone$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 val_labels(ces15phone$education)
 table(ces15phone$education)
-ces15phone$moral_traditionalism

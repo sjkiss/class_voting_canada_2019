@@ -118,6 +118,7 @@ ces19phone %>%
 #Model 1 - income as 3 level factor
 #NDP
 ndp_model1ROC<-glm(ndp~region3+working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces19.roc, family="binomial")
+
 ndp_model1QC<-glm(ndp~working_class+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+as.factor(income3), data=ces19.qc, family="binomial")
 summary(ndp_model1ROC)
 summary(ndp_model1QC)
