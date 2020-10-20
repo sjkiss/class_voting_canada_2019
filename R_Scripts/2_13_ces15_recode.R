@@ -456,27 +456,9 @@ ces15phone$moral3<-Recode(ces15phone$PES15_16, "998=50; 999=NA", as.numeric=T)
 table(ces15phone$moral3)
 #Rescale to 0 and 1 by dividing by 100
 ces15phone$moral3<-ces15phone$moral3/100
+#Redverse
 ces15phone$moral3<-reverse.code(-1, ces15phone[,'moral3'])
-ces15phone %>% 
-  rowwise() %>% 
-mutate(moral_traditionalism=mean(c_across(starts_with('moral'))))->ces15phone
-ces15phone$moral_traditionalism<-as.numeric(ces15phone$moral_traditionalism)
-#val_labels(ces15phone$moral1)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
-#checks
-table(ces15phone$moral1, useNA="ifany")
-table(ces15phone$moral2, useNA="ifany")
-table(ces15phone$moral3, useNA="ifany")
 
-ces15phone %>% 
-  rowwise() %>% 
-  mutate(moral_traditionalism=mean(
-    c_across(moral1, moral2, moral3)
-    , na.rm=T )) -> out
-out %>% 
-  ungroup() %>% 
-  select(c('moral1', 'moral2', 'moral3', 'moral_traditionalism')) %>% 
-  mutate(na=rowSums(is.na(.))) %>% 
-  filter(na>0, na<4)
 #Scale Averaging 
 ces15phone %>% 
   rowwise() %>% 
