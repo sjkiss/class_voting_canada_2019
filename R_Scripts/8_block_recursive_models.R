@@ -216,782 +216,838 @@ out15$survey<-rep(0, nrow(out15))
 out19$survey<-rep(1, nrow(out19))
 out15 %>% 
   bind_rows(., out19)->out
-
+roc<-out %>% 
+  filter(quebec!=1)
+qc<-out %>% 
+  filter(quebec==1)
 
 #Model 1
 #### NDP ROC ####
-out %>% 
-  #this is how we filter for quebec / roc
-  filter(quebec!=1) %>% 
-  group_by(survey) %>% 
-nest() %>% 
-  mutate(
-    block1=map(data, function(x) glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, family="binomial", data=x)), 
-    block2=map(data, function(x) glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, family="binomial", data=x)),
-    block3=map(data, function(x) glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id, family="binomial", data=x)),
-    block4=map(data, function(x) glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x)),
-    block5=map(data, function(x) glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x)),
-    block6=map(data, function(x) glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))
-    #Get the interaction models
-    #Note I found a quick way to do an interaction for all the terms. 
-    #Group all the main effects in parenthesess, then multiply by the interaction variable
-) ->ndp_models_ROC
 
-ndp_models_ROC
-    ndp_models_ROC %>% 
-  mutate(block1=map(block1, tidy),
-         block2=map(block2, tidy), 
-         block3=map(block3, tidy),
-         block4=map(block4, tidy),
-         block5=map(block5, tidy),
-         block6=map(block6, tidy)) ->ndp_models_ROC
+block1<-glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income)*survey, family="binomial", data=roc)
+block2<-glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism)*survey, family="binomial", data=roc)
+block3<-glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id)*survey, family="binomial", data=roc)
+block4<-glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective)*survey, family="binomial", data=roc)
+block5<-glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence)*survey, family="binomial", data=roc)
+block6<-glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader)*survey, family="binomial", data=roc)
+#Turn into a list
+roc_ndp<-list(block1, block2, block3, block4, block5, block6)
+names(roc_ndp)<-c("block1", "block2", "block3", "block4", "block5", "block6")
 
-#Get block 1
-ndp_models_ROC %>% 
-  unnest(block1) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  mutate(block=rep("block 1", nrow(.))) %>% 
-  select(term, difference, block)->block1
-
-#Get block 2
-ndp_models_ROC %>% 
-  #Be sure to get the right block here 
-  unnest(block2) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 2", nrow(.))) %>% 
-    select(term, difference, block)->block2
-
-#Get block 3
-ndp_models_ROC %>% 
-  unnest(block3) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-    #Name the correct block here 
-  mutate(block=rep("block 3", nrow(.))) %>% 
-  select(term, difference, block)->block3
-
-#Get block 4
-ndp_models_ROC %>% 
-  unnest(block4) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 4", nrow(.))) %>% 
-  select(term, difference, block)->block4
-
-#Get block 5
-ndp_models_ROC %>% 
-  unnest(block5) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 5", nrow(.))) %>% 
-  select(term, difference, block)->block5
-
-#Get block 6
-ndp_models_ROC %>% 
-  unnest(block6) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 6", nrow(.))) %>% 
-  select(term, difference, block)->block6
-
-#Bind them together
-library(knitr)
-block1 %>% 
-  #bind all the things together
-  #the dot here just means what came before it (e.g. block 1)
-  #then it binds all the following arguments to block 1 in successive order 
-  bind_rows(., block2, block3, block4, block5, block6) %>% 
-  #This next bit is to pick out the first occurrence of each term. 
-  #We want to do this only to get the first time a variable is entered
-  #Group by the term
-  #So this creates a grouped data frame where each group is made up of all the variables with the same name (e.g. all the variables with the name 'young' ) are in one gtroup
-  group_by(term)%>%
-  #pick out the first occurrence of each term
-  slice(1)%>%
-  #Then we need to arrange these by block. 
-  #I ran this without this and it seemed like the kable() caommand below was printing the table with the variables sorted alphabetically. We want them sorted by block
-  #wE dumpt it out here into an object, because I think that was what was tripping you up.
-  arrange(block)->NDP_ROC_block_difference_model #Name it whatever is most meanginful.
-
-#Check
-NDP_ROC_block_difference_model
-
-#Fit a pooled model for the interactions
-ndp_roc_interaction_model<-glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+survey)*survey, family="binomial", data=subset(out, quebec!=1))
-summary(ndp_roc_interaction_model)
-
-###Note: there are almost no interaction effects. 
-### Does this help our story? Note that market_liberalism is kind of significant, and positive. And union_both gets kind of close, which also helps our story. Is this a sample size issue? There are a lot of variables here. 
-
-#Tidy it
-ndp_roc_interaction_model<-tidy(ndp_roc_interaction_model)
-#We just need to merge the NDP with the significance terms from the block model 
-#Because the interaction model contains terms for the main effects (e.g. "young", "old", "sector", we need to drop those because we only want the significance of the of the interaction terms, they contain the word survey, so we can drop any row that does not have the word survey)
-ndp_roc_interaction_model %>% 
-  filter(str_detect(term, "survey")) %>% 
-  #Now we need to delete the :survey from the term to match what is in the block difference model 
-  mutate(term=str_replace_all(term, ":survey", "")) %>% 
-#Now keep on only the term and the p.value
-  select(term, p.value) %>% 
-  #join in the results from the block_difference_model with the interaction p-values
-  left_join(NDP_ROC_block_difference_model, .) %>% 
-  ungroup() %>% 
-slice(-1)->ndp_roc_full_results
-
-ndp_roc_full_results
-
-#You may have to install these packages
-library(readr)
 library(kableExtra)
 library(knitr)
-#Define a bolding condition, here we're going to bold any term that has a p.value less than 0.1
-col_bold<-ndp_roc_full_results$p.value<0.1
-ndp_roc_full_results %>% 
-  kable(format="html", digits=2) %>% 
-  column_spec(column=2, bold=col_bold) %>% 
-write_file(.,"Tables/NDP_Difference_Table.html" )
-
-
-
-#### NDP QC ####
-out %>% 
-      filter(quebec==1) %>% 
-  group_by(survey) %>% 
-  nest() %>% 
-  mutate(
-    block1=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign, family="binomial", data=x)), 
-    block2=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, family="binomial", data=x)),
-    block3=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x)),
-    block4=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective, family="binomial", data=x)),
-    block5=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x)),
-    block6=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))
-  )->ndp_models_QC
-ndp_models_QC %>% 
-  mutate(block1=map(block1, tidy),
-         block2=map(block2, tidy), 
-         block3=map(block3, tidy),
-         block4=map(block4, tidy),
-         block5=map(block5, tidy),
-         block6=map(block6, tidy)) ->ndp_models_QC
-
-#Get block 1
-ndp_models_QC %>% 
-  unnest(block1) %>% 
-  #Calculate the differences
+## This code  pulls it all nicely together. 
+roc_ndp %>% 
+  #Tidy each of the models 
+  map(., tidy) %>% 
+  #bind them; the argument .id="Block" makes a new variable called Block filling it with the names of the list items from line 235
+  bind_rows(., .id="Block") %>% 
+  #filter in only the interaction terms; they all contain :survey
+  filter(str_detect(term,":survey")) %>% 
+  #Keep only the first instance of each interaction term
+  #First group by term; this forms groups of the terms
   group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  mutate(block=rep("block 1", nrow(.))) %>% 
-  select(term, difference, block)->block1
+  #this picks only the first term
+  slice(1) %>% 
+  #get rid of the :survey
+  mutate(term=str_replace_all(term, ":survey", "")) %>% 
+  #arrange them by block so that block1 variables appear first
+  arrange(Block) %>% 
+  select(Block, term, estimate,p.value)->roc_ndp_table
 
-#Get block 2
-ndp_models_QC %>% 
-  #Be sure to get the right block here 
-  unnest(block2) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 2", nrow(.))) %>% 
-  select(term, difference, block)->block2
+#Save the values to be bolded here
+#This requires changing which object is used e.g. roc_ndp_table might become qc_ndp_table etc. 
+to_bold<-roc_ndp_table$p.value<0.05
+roc_ndp_table %>% 
+  kable(., digits=2) %>% 
+  #bold the third and fourth columns
+  column_spec(3:4, bold=to_bold) %>% 
+  save_kable(file="Tables/ndp_roc_interaction.html")
 
-#Get block 3
-ndp_models_QC %>% 
-  unnest(block3) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 3", nrow(.))) %>% 
-  select(term, difference, block)->block3
+#### NDP QC Interation ####
 
-#Get block 4
-ndp_models_QC %>% 
-  unnest(block4) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 4", nrow(.))) %>% 
-  select(term, difference, block)->block4
+#### Conservative ROC Interation ####
 
-#Get block 5
-ndp_models_QC %>% 
-  unnest(block5) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 5", nrow(.))) %>% 
-  select(term, difference, block)->block5
+#### Conservative QC Interation ####
 
-#Get block 6
-ndp_models_QC %>% 
-  unnest(block6) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 6", nrow(.))) %>% 
-  select(term, difference, block)->block6
+#### Liberal ROC Interation ####
 
-#Bind them together
-block1 %>% 
-  bind_rows(., block2, block3, block4, block5, block6) %>% 
-  group_by(term)%>%
-  slice(1)%>%
-  arrange(block)->NDP_QC_block_difference_model
+#### Liberal QC Interation ####
 
-NDP_QC_block_difference_model %>%
-  kable()
 
-#Model 2
-#### Liberal ROC ####
-out %>% 
-  filter(quebec!=1) %>% 
-  group_by(survey) %>% 
-  nest() %>% 
-  mutate(
-    block1=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, family="binomial", data=x)), 
-    block2=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, family="binomial", data=x)),
-    block3=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id, family="binomial", data=x)),
-    block4=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x)),
-    block5=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x)),
-    block6=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))
-  )->liberal_models_ROC
-liberal_models_ROC %>% 
-  mutate(block1=map(block1, tidy),
-         block2=map(block2, tidy), 
-         block3=map(block3, tidy),
-         block4=map(block4, tidy),
-         block5=map(block5, tidy),
-         block6=map(block6, tidy)) ->liberal_models_ROC
-
-#Get block 1
-liberal_models_ROC %>% 
-  unnest(block1) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  mutate(block=rep("block 1", nrow(.))) %>% 
-  select(term, difference, block)->block1
-
-#Get block 2
-liberal_models_ROC %>% 
-  #Be sure to get the right block here 
-  unnest(block2) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 2", nrow(.))) %>% 
-  select(term, difference, block)->block2
-
-#Get block 3
-liberal_models_ROC %>% 
-  unnest(block3) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 3", nrow(.))) %>% 
-  select(term, difference, block)->block3
-
-#Get block 4
-liberal_models_ROC %>% 
-  unnest(block4) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 4", nrow(.))) %>% 
-  select(term, difference, block)->block4
-
-#Get block 5
-liberal_models_ROC %>% 
-  unnest(block5) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 5", nrow(.))) %>% 
-  select(term, difference, block)->block5
-
-#Get block 6
-liberal_models_ROC %>% 
-  unnest(block6) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 6", nrow(.))) %>% 
-  select(term, difference, block)->block6
-
-#Bind them together
-block1 %>% 
-  bind_rows(., block2, block3, block4, block5, block6) %>% 
-  group_by(term)%>%
-  slice(1)%>%
-  arrange(block)->Liberal_ROC_block_difference_model
-
-Liberal_ROC_block_difference_model %>%
-  kable()
-
-#### Liberal QC ####
-out %>% 
-      filter(quebec==1) %>% 
-  group_by(survey) %>% 
-  nest() %>% 
-  mutate(
-    block1=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign, family="binomial", data=x)), 
-    block2=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, family="binomial", data=x)),
-    block3=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x)),
-    block4=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective, family="binomial", data=x)),
-    block5=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x)),
-    block6=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))
-  )->liberal_models_QC
-liberal_models_QC %>% 
-  mutate(block1=map(block1, tidy),
-         block2=map(block2, tidy), 
-         block3=map(block3, tidy),
-         block4=map(block4, tidy),
-         block5=map(block5, tidy),
-         block6=map(block6, tidy)) ->liberal_models_QC
-
-#Get block 1
-liberal_models_QC %>% 
-  unnest(block1) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  mutate(block=rep("block 1", nrow(.))) %>% 
-  select(term, difference, block)->block1
-
-#Get block 2
-liberal_models_QC %>% 
-  #Be sure to get the right block here 
-  unnest(block2) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 2", nrow(.))) %>% 
-  select(term, difference, block)->block2
-
-#Get block 3
-liberal_models_QC %>% 
-  unnest(block3) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 3", nrow(.))) %>% 
-  select(term, difference, block)->block3
-
-#Get block 4
-liberal_models_QC %>% 
-  unnest(block4) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 4", nrow(.))) %>% 
-  select(term, difference, block)->block4
-
-#Get block 5
-liberal_models_QC %>% 
-  unnest(block5) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 5", nrow(.))) %>% 
-  select(term, difference, block)->block5
-
-#Get block 6
-liberal_models_QC %>% 
-  unnest(block6) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 6", nrow(.))) %>% 
-  select(term, difference, block)->block6
-
-#Bind them together
-block1 %>% 
-  bind_rows(., block2, block3, block4, block5, block6) %>% 
-  group_by(term)%>%
-  slice(1)%>%
-  arrange(block)->Liberal_QC_block_difference_model
-
-Liberal_QC_block_difference_model %>%
-  kable()
-
-#Model 3
-#### Conservative ROC ####
-out %>% 
-    filter(quebec!=1) %>% 
-  group_by(survey) %>% 
-  nest() %>% 
-  mutate(
-    block1=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, family="binomial", data=x)), 
-    block2=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, family="binomial", data=x)),
-    block3=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id, family="binomial", data=x)),
-    block4=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x)),
-    block5=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x)),
-    block6=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))
-  )->conservative_models_ROC
-conservative_models_ROC %>% 
-  mutate(block1=map(block1, tidy),
-         block2=map(block2, tidy), 
-         block3=map(block3, tidy),
-         block4=map(block4, tidy),
-         block5=map(block5, tidy),
-         block6=map(block6, tidy)) ->conservative_models_ROC
-
-#Get block 1
-conservative_models_ROC %>% 
-  unnest(block1) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  mutate(block=rep("block 1", nrow(.))) %>% 
-  select(term, difference, block)->block1
-
-#Get block 2
-conservative_models_ROC %>% 
-  #Be sure to get the right block here 
-  unnest(block2) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 2", nrow(.))) %>% 
-  select(term, difference, block)->block2
-
-#Get block 3
-conservative_models_ROC %>% 
-  unnest(block3) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 3", nrow(.))) %>% 
-  select(term, difference, block)->block3
-
-#Get block 4
-conservative_models_ROC %>% 
-  unnest(block4) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 4", nrow(.))) %>% 
-  select(term, difference, block)->block4
-
-#Get block 5
-conservative_models_ROC %>% 
-  unnest(block5) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 5", nrow(.))) %>% 
-  select(term, difference, block)->block5
-
-#Get block 6
-conservative_models_ROC %>% 
-  unnest(block6) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 6", nrow(.))) %>% 
-  select(term, difference, block)->block6
-
-#Bind them together
-block1 %>% 
-  bind_rows(., block2, block3, block4, block5, block6) %>% 
-  group_by(term)%>%
-  slice(1)%>%
-  arrange(block)->Conservative_ROC_block_difference_model
-
-Conservative_ROC_block_difference_model %>%
-  kable()
-
-#### Conservative QC ####
-out %>% 
-    filter(quebec==1) %>% 
-  group_by(survey) %>% 
-  nest() %>% 
-  mutate(
-    block1=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign, family="binomial", data=x)), 
-    block2=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, family="binomial", data=x)),
-    block3=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x)),
-    block4=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective, family="binomial", data=x)),
-    block5=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x)),
-    block6=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))
-  )->conservative_models_QC
-conservative_models_QC %>% 
-  mutate(block1=map(block1, tidy),
-         block2=map(block2, tidy), 
-         block3=map(block3, tidy),
-         block4=map(block4, tidy),
-         block5=map(block5, tidy),
-         block6=map(block6, tidy)) ->conservative_models_QC
-
-#Get block 1
-conservative_models_QC %>% 
-  unnest(block1) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  mutate(block=rep("block 1", nrow(.))) %>% 
-  select(term, difference, block)->block1
-
-#Get block 2
-conservative_models_QC %>% 
-  #Be sure to get the right block here 
-  unnest(block2) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 2", nrow(.))) %>% 
-  select(term, difference, block)->block2
-
-#Get block 3
-conservative_models_QC %>% 
-  unnest(block3) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 3", nrow(.))) %>% 
-  select(term, difference, block)->block3
-
-#Get block 4
-conservative_models_QC %>% 
-  unnest(block4) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 4", nrow(.))) %>% 
-  select(term, difference, block)->block4
-
-#Get block 5
-conservative_models_QC %>% 
-  unnest(block5) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 5", nrow(.))) %>% 
-  select(term, difference, block)->block5
-
-#Get block 6
-conservative_models_QC %>% 
-  unnest(block6) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 6", nrow(.))) %>% 
-  select(term, difference, block)->block6
-
-#Bind them together
-block1 %>% 
-  bind_rows(., block2, block3, block4, block5, block6) %>% 
-  group_by(term)%>%
-  slice(1)%>%
-  arrange(block)->Conservative_QC_block_difference_model
-
-Conservative_QC_block_difference_model %>%
-  kable()
-
-#### Bloc QC ####
-out %>% 
-  group_by(survey) %>% 
-  nest() %>% 
-  mutate(
-    block1=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign, family="binomial", data=x)), 
-    block2=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, family="binomial", data=x)),
-    block3=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x)),
-    block4=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective, family="binomial", data=x)),
-    block5=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x)),
-    block6=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))
-  )->bloc_models_QC
-bloc__models_QC %>% 
-  mutate(block1=map(block1, tidy),
-         block2=map(block2, tidy), 
-         block3=map(block3, tidy),
-         block4=map(block4, tidy),
-         block5=map(block5, tidy),
-         block6=map(block6, tidy)) ->bloc__models_QC
-
-#Get block 1
-bloc_models_QC %>% 
-  unnest(block1) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  mutate(block=rep("block 1", nrow(.))) %>% 
-  select(term, difference, block)->block1
-
-#Get block 2
-bloc_models_QC %>% 
-  #Be sure to get the right block here 
-  unnest(block2) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 2", nrow(.))) %>% 
-  select(term, difference, block)->block2
-
-#Get block 3
-bloc_models_QC %>% 
-  unnest(block3) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 3", nrow(.))) %>% 
-  select(term, difference, block)->block3
-
-#Get block 4
-bloc_models_QC %>% 
-  unnest(block4) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 4", nrow(.))) %>% 
-  select(term, difference, block)->block4
-
-#Get block 5
-bloc_models_QC %>% 
-  unnest(block5) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 5", nrow(.))) %>% 
-  select(term, difference, block)->block5
-
-#Get block 6
-bloc_models_QC %>% 
-  unnest(block6) %>% 
-  #Calculate the differences
-  group_by(term) %>% 
-  mutate(difference=estimate-lag(estimate)) %>% 
-  filter(survey==1) %>% 
-  ungroup() %>% 
-  #Name the correct block here 
-  mutate(block=rep("block 6", nrow(.))) %>% 
-  select(term, difference, block)->block6
-
-#Bind them together
-block1 %>% 
-  bind_rows(., block2, block3, block4, block5, block6) %>% 
-  group_by(term)%>%
-  slice(1)%>%
-  arrange(block)->Bloc_QC_block_difference_model
-
-Bloc_QC_block_difference_model %>%
-  kable()
+# 
+# out %>% 
+#   #this is how we filter for quebec / roc
+#   filter(quebec!=1) %>% 
+#   #group_by(survey) %>% 
+# nest() %>%
+#   mutate(
+#     block1=map(data, function(x) glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income)*survey, family="binomial", data=.)), 
+#     block2=map(data, function(x) glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism)*survey, family="binomial", data=x)),
+#     block3=map(data, function(x) glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id)*survey, family="binomial", data=x)),
+#     block4=map(data, function(x) glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective)*survey, family="binomial", data=x)),
+#     block5=map(data, function(x) glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence)*survey, family="binomial", data=x)),
+#     block6=map(data, function(x) glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader)*survey, family="binomial", data=x))
+#     #Get the interaction models
+#     #Note I found a quick way to do an interaction for all the terms. 
+#     #Group all the main effects in parenthesess, then multiply by the interaction variable
+# ) ->ndp_models_ROC
+# 
+# ndp_models_ROC
+#     ndp_models_ROC %>% 
+#   mutate(block1=map(block1, tidy),
+#          block2=map(block2, tidy), 
+#          block3=map(block3, tidy),
+#          block4=map(block4, tidy),
+#          block5=map(block5, tidy),
+#          block6=map(block6, tidy)) ->ndp_models_ROC
+# 
+# #Get block 1
+# ndp_models_ROC %>% 
+#   unnest(block1) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   mutate(block=rep("block 1", nrow(.))) %>% 
+#   select(term, difference, block)->block1
+# 
+# #Get block 2
+# ndp_models_ROC %>% 
+#   #Be sure to get the right block here 
+#   unnest(block2) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 2", nrow(.))) %>% 
+#     select(term, difference, block)->block2
+# 
+# #Get block 3
+# ndp_models_ROC %>% 
+#   unnest(block3) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#     #Name the correct block here 
+#   mutate(block=rep("block 3", nrow(.))) %>% 
+#   select(term, difference, block)->block3
+# 
+# #Get block 4
+# ndp_models_ROC %>% 
+#   unnest(block4) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 4", nrow(.))) %>% 
+#   select(term, difference, block)->block4
+# 
+# #Get block 5
+# ndp_models_ROC %>% 
+#   unnest(block5) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 5", nrow(.))) %>% 
+#   select(term, difference, block)->block5
+# 
+# #Get block 6
+# ndp_models_ROC %>% 
+#   unnest(block6) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 6", nrow(.))) %>% 
+#   select(term, difference, block)->block6
+# 
+# #Bind them together
+# library(knitr)
+# block1 %>% 
+#   #bind all the things together
+#   #the dot here just means what came before it (e.g. block 1)
+#   #then it binds all the following arguments to block 1 in successive order 
+#   bind_rows(., block2, block3, block4, block5, block6) %>% 
+#   #This next bit is to pick out the first occurrence of each term. 
+#   #We want to do this only to get the first time a variable is entered
+#   #Group by the term
+#   #So this creates a grouped data frame where each group is made up of all the variables with the same name (e.g. all the variables with the name 'young' ) are in one gtroup
+#   group_by(term)%>%
+#   #pick out the first occurrence of each term
+#   slice(1)%>%
+#   #Then we need to arrange these by block. 
+#   #I ran this without this and it seemed like the kable() caommand below was printing the table with the variables sorted alphabetically. We want them sorted by block
+#   #wE dumpt it out here into an object, because I think that was what was tripping you up.
+#   arrange(block)->NDP_ROC_block_difference_model #Name it whatever is most meanginful.
+# 
+# #Check
+# NDP_ROC_block_difference_model
+# 
+# #Fit a pooled model for the interactions
+# ndp_roc_interaction_model<-glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+survey)*survey, family="binomial", data=subset(out, quebec!=1))
+# summary(ndp_roc_interaction_model)
+# 
+# ###Note: there are almost no interaction effects. 
+# ### Does this help our story? Note that market_liberalism is kind of significant, and positive. And union_both gets kind of close, which also helps our story. Is this a sample size issue? There are a lot of variables here. 
+# 
+# #Tidy it
+# ndp_roc_interaction_model<-tidy(ndp_roc_interaction_model)
+# #We just need to merge the NDP with the significance terms from the block model 
+# #Because the interaction model contains terms for the main effects (e.g. "young", "old", "sector", we need to drop those because we only want the significance of the of the interaction terms, they contain the word survey, so we can drop any row that does not have the word survey)
+# ndp_roc_interaction_model %>% 
+#   filter(str_detect(term, "survey")) %>% 
+#   #Now we need to delete the :survey from the term to match what is in the block difference model 
+#   mutate(term=str_replace_all(term, ":survey", "")) %>% 
+# #Now keep on only the term and the p.value
+#   select(term, p.value) %>% 
+#   #join in the results from the block_difference_model with the interaction p-values
+#   left_join(NDP_ROC_block_difference_model, .) %>% 
+#   ungroup() %>% 
+# slice(-1)->ndp_roc_full_results
+# 
+# ndp_roc_full_results
+# 
+# #You may have to install these packages
+# library(readr)
+# library(kableExtra)
+# library(knitr)
+# #Define a bolding condition, here we're going to bold any term that has a p.value less than 0.1
+# col_bold<-ndp_roc_full_results$p.value<0.1
+# ndp_roc_full_results %>% 
+#   kable(format="html", digits=2) %>% 
+#   column_spec(column=2, bold=col_bold) %>% 
+# write_file(.,"Tables/NDP_Difference_Table.html" )
+# 
+# 
+# 
+# #### NDP QC ####
+# out %>% 
+#       filter(quebec==1) %>% 
+#   group_by(survey) %>% 
+#   nest() %>% 
+#   mutate(
+#     block1=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign, family="binomial", data=x)), 
+#     block2=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, family="binomial", data=x)),
+#     block3=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x)),
+#     block4=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective, family="binomial", data=x)),
+#     block5=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x)),
+#     block6=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))
+#   )->ndp_models_QC
+# ndp_models_QC %>% 
+#   mutate(block1=map(block1, tidy),
+#          block2=map(block2, tidy), 
+#          block3=map(block3, tidy),
+#          block4=map(block4, tidy),
+#          block5=map(block5, tidy),
+#          block6=map(block6, tidy)) ->ndp_models_QC
+# 
+# #Get block 1
+# ndp_models_QC %>% 
+#   unnest(block1) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   mutate(block=rep("block 1", nrow(.))) %>% 
+#   select(term, difference, block)->block1
+# 
+# #Get block 2
+# ndp_models_QC %>% 
+#   #Be sure to get the right block here 
+#   unnest(block2) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 2", nrow(.))) %>% 
+#   select(term, difference, block)->block2
+# 
+# #Get block 3
+# ndp_models_QC %>% 
+#   unnest(block3) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 3", nrow(.))) %>% 
+#   select(term, difference, block)->block3
+# 
+# #Get block 4
+# ndp_models_QC %>% 
+#   unnest(block4) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 4", nrow(.))) %>% 
+#   select(term, difference, block)->block4
+# 
+# #Get block 5
+# ndp_models_QC %>% 
+#   unnest(block5) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 5", nrow(.))) %>% 
+#   select(term, difference, block)->block5
+# 
+# #Get block 6
+# ndp_models_QC %>% 
+#   unnest(block6) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 6", nrow(.))) %>% 
+#   select(term, difference, block)->block6
+# 
+# #Bind them together
+# block1 %>% 
+#   bind_rows(., block2, block3, block4, block5, block6) %>% 
+#   group_by(term)%>%
+#   slice(1)%>%
+#   arrange(block)->NDP_QC_block_difference_model
+# 
+# NDP_QC_block_difference_model %>%
+#   kable()
+# 
+# #Model 2
+# #### Liberal ROC ####
+# out %>% 
+#   filter(quebec!=1) %>% 
+#   group_by(survey) %>% 
+#   nest() %>% 
+#   mutate(
+#     block1=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, family="binomial", data=x)), 
+#     block2=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, family="binomial", data=x)),
+#     block3=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id, family="binomial", data=x)),
+#     block4=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x)),
+#     block5=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x)),
+#     block6=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))
+#   )->liberal_models_ROC
+# liberal_models_ROC %>% 
+#   mutate(block1=map(block1, tidy),
+#          block2=map(block2, tidy), 
+#          block3=map(block3, tidy),
+#          block4=map(block4, tidy),
+#          block5=map(block5, tidy),
+#          block6=map(block6, tidy)) ->liberal_models_ROC
+# 
+# #Get block 1
+# liberal_models_ROC %>% 
+#   unnest(block1) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   mutate(block=rep("block 1", nrow(.))) %>% 
+#   select(term, difference, block)->block1
+# 
+# #Get block 2
+# liberal_models_ROC %>% 
+#   #Be sure to get the right block here 
+#   unnest(block2) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 2", nrow(.))) %>% 
+#   select(term, difference, block)->block2
+# 
+# #Get block 3
+# liberal_models_ROC %>% 
+#   unnest(block3) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 3", nrow(.))) %>% 
+#   select(term, difference, block)->block3
+# 
+# #Get block 4
+# liberal_models_ROC %>% 
+#   unnest(block4) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 4", nrow(.))) %>% 
+#   select(term, difference, block)->block4
+# 
+# #Get block 5
+# liberal_models_ROC %>% 
+#   unnest(block5) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 5", nrow(.))) %>% 
+#   select(term, difference, block)->block5
+# 
+# #Get block 6
+# liberal_models_ROC %>% 
+#   unnest(block6) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 6", nrow(.))) %>% 
+#   select(term, difference, block)->block6
+# 
+# #Bind them together
+# block1 %>% 
+#   bind_rows(., block2, block3, block4, block5, block6) %>% 
+#   group_by(term)%>%
+#   slice(1)%>%
+#   arrange(block)->Liberal_ROC_block_difference_model
+# 
+# Liberal_ROC_block_difference_model %>%
+#   kable()
+# 
+# #### Liberal QC ####
+# out %>% 
+#       filter(quebec==1) %>% 
+#   group_by(survey) %>% 
+#   nest() %>% 
+#   mutate(
+#     block1=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign, family="binomial", data=x)), 
+#     block2=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, family="binomial", data=x)),
+#     block3=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x)),
+#     block4=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective, family="binomial", data=x)),
+#     block5=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x)),
+#     block6=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))
+#   )->liberal_models_QC
+# liberal_models_QC %>% 
+#   mutate(block1=map(block1, tidy),
+#          block2=map(block2, tidy), 
+#          block3=map(block3, tidy),
+#          block4=map(block4, tidy),
+#          block5=map(block5, tidy),
+#          block6=map(block6, tidy)) ->liberal_models_QC
+# 
+# #Get block 1
+# liberal_models_QC %>% 
+#   unnest(block1) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   mutate(block=rep("block 1", nrow(.))) %>% 
+#   select(term, difference, block)->block1
+# 
+# #Get block 2
+# liberal_models_QC %>% 
+#   #Be sure to get the right block here 
+#   unnest(block2) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 2", nrow(.))) %>% 
+#   select(term, difference, block)->block2
+# 
+# #Get block 3
+# liberal_models_QC %>% 
+#   unnest(block3) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 3", nrow(.))) %>% 
+#   select(term, difference, block)->block3
+# 
+# #Get block 4
+# liberal_models_QC %>% 
+#   unnest(block4) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 4", nrow(.))) %>% 
+#   select(term, difference, block)->block4
+# 
+# #Get block 5
+# liberal_models_QC %>% 
+#   unnest(block5) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 5", nrow(.))) %>% 
+#   select(term, difference, block)->block5
+# 
+# #Get block 6
+# liberal_models_QC %>% 
+#   unnest(block6) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 6", nrow(.))) %>% 
+#   select(term, difference, block)->block6
+# 
+# #Bind them together
+# block1 %>% 
+#   bind_rows(., block2, block3, block4, block5, block6) %>% 
+#   group_by(term)%>%
+#   slice(1)%>%
+#   arrange(block)->Liberal_QC_block_difference_model
+# 
+# Liberal_QC_block_difference_model %>%
+#   kable()
+# 
+# #Model 3
+# #### Conservative ROC ####
+# out %>% 
+#     filter(quebec!=1) %>% 
+#   group_by(survey) %>% 
+#   nest() %>% 
+#   mutate(
+#     block1=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, family="binomial", data=x)), 
+#     block2=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, family="binomial", data=x)),
+#     block3=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id, family="binomial", data=x)),
+#     block4=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x)),
+#     block5=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x)),
+#     block6=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))
+#   )->conservative_models_ROC
+# conservative_models_ROC %>% 
+#   mutate(block1=map(block1, tidy),
+#          block2=map(block2, tidy), 
+#          block3=map(block3, tidy),
+#          block4=map(block4, tidy),
+#          block5=map(block5, tidy),
+#          block6=map(block6, tidy)) ->conservative_models_ROC
+# 
+# #Get block 1
+# conservative_models_ROC %>% 
+#   unnest(block1) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   mutate(block=rep("block 1", nrow(.))) %>% 
+#   select(term, difference, block)->block1
+# 
+# #Get block 2
+# conservative_models_ROC %>% 
+#   #Be sure to get the right block here 
+#   unnest(block2) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 2", nrow(.))) %>% 
+#   select(term, difference, block)->block2
+# 
+# #Get block 3
+# conservative_models_ROC %>% 
+#   unnest(block3) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 3", nrow(.))) %>% 
+#   select(term, difference, block)->block3
+# 
+# #Get block 4
+# conservative_models_ROC %>% 
+#   unnest(block4) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 4", nrow(.))) %>% 
+#   select(term, difference, block)->block4
+# 
+# #Get block 5
+# conservative_models_ROC %>% 
+#   unnest(block5) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 5", nrow(.))) %>% 
+#   select(term, difference, block)->block5
+# 
+# #Get block 6
+# conservative_models_ROC %>% 
+#   unnest(block6) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 6", nrow(.))) %>% 
+#   select(term, difference, block)->block6
+# 
+# #Bind them together
+# block1 %>% 
+#   bind_rows(., block2, block3, block4, block5, block6) %>% 
+#   group_by(term)%>%
+#   slice(1)%>%
+#   arrange(block)->Conservative_ROC_block_difference_model
+# 
+# Conservative_ROC_block_difference_model %>%
+#   kable()
+# 
+# #### Conservative QC ####
+# out %>% 
+#     filter(quebec==1) %>% 
+#   group_by(survey) %>% 
+#   nest() %>% 
+#   mutate(
+#     block1=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign, family="binomial", data=x)), 
+#     block2=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, family="binomial", data=x)),
+#     block3=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x)),
+#     block4=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective, family="binomial", data=x)),
+#     block5=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x)),
+#     block6=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))
+#   )->conservative_models_QC
+# conservative_models_QC %>% 
+#   mutate(block1=map(block1, tidy),
+#          block2=map(block2, tidy), 
+#          block3=map(block3, tidy),
+#          block4=map(block4, tidy),
+#          block5=map(block5, tidy),
+#          block6=map(block6, tidy)) ->conservative_models_QC
+# 
+# #Get block 1
+# conservative_models_QC %>% 
+#   unnest(block1) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   mutate(block=rep("block 1", nrow(.))) %>% 
+#   select(term, difference, block)->block1
+# 
+# #Get block 2
+# conservative_models_QC %>% 
+#   #Be sure to get the right block here 
+#   unnest(block2) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 2", nrow(.))) %>% 
+#   select(term, difference, block)->block2
+# 
+# #Get block 3
+# conservative_models_QC %>% 
+#   unnest(block3) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 3", nrow(.))) %>% 
+#   select(term, difference, block)->block3
+# 
+# #Get block 4
+# conservative_models_QC %>% 
+#   unnest(block4) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 4", nrow(.))) %>% 
+#   select(term, difference, block)->block4
+# 
+# #Get block 5
+# conservative_models_QC %>% 
+#   unnest(block5) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 5", nrow(.))) %>% 
+#   select(term, difference, block)->block5
+# 
+# #Get block 6
+# conservative_models_QC %>% 
+#   unnest(block6) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 6", nrow(.))) %>% 
+#   select(term, difference, block)->block6
+# 
+# #Bind them together
+# block1 %>% 
+#   bind_rows(., block2, block3, block4, block5, block6) %>% 
+#   group_by(term)%>%
+#   slice(1)%>%
+#   arrange(block)->Conservative_QC_block_difference_model
+# 
+# Conservative_QC_block_difference_model %>%
+#   kable()
+# 
+# #### Bloc QC ####
+# out %>% 
+#   group_by(survey) %>% 
+#   nest() %>% 
+#   mutate(
+#     block1=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign, family="binomial", data=x)), 
+#     block2=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, family="binomial", data=x)),
+#     block3=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x)),
+#     block4=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective, family="binomial", data=x)),
+#     block5=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x)),
+#     block6=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))
+#   )->bloc_models_QC
+# bloc__models_QC %>% 
+#   mutate(block1=map(block1, tidy),
+#          block2=map(block2, tidy), 
+#          block3=map(block3, tidy),
+#          block4=map(block4, tidy),
+#          block5=map(block5, tidy),
+#          block6=map(block6, tidy)) ->bloc__models_QC
+# 
+# #Get block 1
+# bloc_models_QC %>% 
+#   unnest(block1) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   mutate(block=rep("block 1", nrow(.))) %>% 
+#   select(term, difference, block)->block1
+# 
+# #Get block 2
+# bloc_models_QC %>% 
+#   #Be sure to get the right block here 
+#   unnest(block2) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 2", nrow(.))) %>% 
+#   select(term, difference, block)->block2
+# 
+# #Get block 3
+# bloc_models_QC %>% 
+#   unnest(block3) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 3", nrow(.))) %>% 
+#   select(term, difference, block)->block3
+# 
+# #Get block 4
+# bloc_models_QC %>% 
+#   unnest(block4) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 4", nrow(.))) %>% 
+#   select(term, difference, block)->block4
+# 
+# #Get block 5
+# bloc_models_QC %>% 
+#   unnest(block5) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 5", nrow(.))) %>% 
+#   select(term, difference, block)->block5
+# 
+# #Get block 6
+# bloc_models_QC %>% 
+#   unnest(block6) %>% 
+#   #Calculate the differences
+#   group_by(term) %>% 
+#   mutate(difference=estimate-lag(estimate)) %>% 
+#   filter(survey==1) %>% 
+#   ungroup() %>% 
+#   #Name the correct block here 
+#   mutate(block=rep("block 6", nrow(.))) %>% 
+#   select(term, difference, block)->block6
+# 
+# #Bind them together
+# block1 %>% 
+#   bind_rows(., block2, block3, block4, block5, block6) %>% 
+#   group_by(term)%>%
+#   slice(1)%>%
+#   arrange(block)->Bloc_QC_block_difference_model
+# 
+# Bloc_QC_block_difference_model %>%
+#   kable()
