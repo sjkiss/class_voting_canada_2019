@@ -36,8 +36,8 @@ ces15phone$low_income<-Recode(ces15phone$income, "2:5=0; 1=1")
 ces15phone$high_income<-Recode(ces15phone$income, "1:4=0; 5=1")
 ces15phone$no_religion<-Recode(ces15phone$religion, "0=1; 1:3=0; NA=NA")
 ces15phone$catholic<-Recode(ces15phone$religion, "1=1; 2:3=0; 0=0; NA=NA")
-ces15phone$young<-Recode(ces15phone$age, "35:100=0; 18:34=1")
-ces15phone$old<-Recode(ces15phone$age, "55:100=1; 18:54=0")
+ces15phone$young<-Recode(ces15phone$age, "35:115=0; 18:34=1")
+ces15phone$old<-Recode(ces15phone$age, "55:115=1; 18:54=0")
 ces15phone$foreign<-Recode(ces15phone$native, "1=0; 0=1")
 
 #Dummies coded missing as 0
@@ -201,6 +201,7 @@ table(ces19phone$conservative)
 table(ces19phone$ndp)
 table(ces19phone$bloc)
 table(ces19phone$green)
+
 #First make a ces15 roc data frame
 ces15phone %>% 
   select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
@@ -266,16 +267,175 @@ roc_ndp_table %>%
 
 #### NDP QC Interation ####
 
+block1<-glm(ndp~(working_class2+union_both+young+old+male+degree+language+foreign)*survey, family="binomial", data=qc)
+block2<-glm(ndp~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty)*survey, family="binomial", data=qc)
+block3<-glm(ndp~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id)*survey, family="binomial", data=qc)
+block4<-glm(ndp~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective)*survey, family="binomial", data=qc)
+block5<-glm(ndp~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence)*survey, family="binomial", data=qc)
+block6<-glm(ndp~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader)*survey, family="binomial", data=qc)
+#Turn into a list
+qc_ndp<-list(block1, block2, block3, block4, block5, block6)
+names(qc_ndp)<-c("block1", "block2", "block3", "block4", "block5", "block6")
+
+qc_ndp %>% 
+  map(., tidy) %>% 
+  bind_rows(., .id="Block") %>% 
+  filter(str_detect(term,":survey")) %>% 
+  group_by(term) %>% 
+  slice(1) %>% 
+  mutate(term=str_replace_all(term, ":survey", "")) %>% 
+  arrange(Block) %>% 
+  select(Block, term, estimate,p.value)->qc_ndp_table
+
+#Save the values to be bolded here
+to_bold<-qc_ndp_table$p.value<0.05
+qc_ndp_table %>% 
+  kable(., digits=2) %>% 
+  column_spec(3:4, bold=to_bold) %>% 
+  save_kable(file="Tables/ndp_qc_interaction.html")
+
 #### Conservative ROC Interation ####
 
+block1<-glm(conservative~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income)*survey, family="binomial", data=roc)
+block2<-glm(conservative~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism)*survey, family="binomial", data=roc)
+block3<-glm(conservative~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id)*survey, family="binomial", data=roc)
+block4<-glm(conservative~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective)*survey, family="binomial", data=roc)
+block5<-glm(conservative~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence)*survey, family="binomial", data=roc)
+block6<-glm(conservative~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader)*survey, family="binomial", data=roc)
+#Turn into a list
+conservative_ndp<-list(block1, block2, block3, block4, block5, block6)
+names(conservative_ndp)<-c("block1", "block2", "block3", "block4", "block5", "block6")
+
+conservative_ndp %>% 
+  map(., tidy) %>% 
+  bind_rows(., .id="Block") %>% 
+  filter(str_detect(term,":survey")) %>% 
+  group_by(term) %>% 
+  slice(1) %>% 
+  mutate(term=str_replace_all(term, ":survey", "")) %>% 
+  arrange(Block) %>% 
+  select(Block, term, estimate,p.value)->roc_conservative_table
+
+#Save the values to be bolded here
+to_bold<-roc_conservative_table$p.value<0.05
+roc_conservative_table %>% 
+  kable(., digits=2) %>% 
+  column_spec(3:4, bold=to_bold) %>% 
+  save_kable(file="Tables/conservative_roc_interaction.html")
+
 #### Conservative QC Interation ####
+block1<-glm(conservative~(working_class2+union_both+young+old+male+degree+language+foreign)*survey, family="binomial", data=qc)
+block2<-glm(conservative~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty)*survey, family="binomial", data=qc)
+block3<-glm(conservative~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id)*survey, family="binomial", data=qc)
+block4<-glm(conservative~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective)*survey, family="binomial", data=qc)
+block5<-glm(conservative~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence)*survey, family="binomial", data=qc)
+block6<-glm(conservative~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader)*survey, family="binomial", data=qc)
+#Turn into a list
+qc_conservative<-list(block1, block2, block3, block4, block5, block6)
+names(qc_conservative)<-c("block1", "block2", "block3", "block4", "block5", "block6")
+
+qc_conservative %>% 
+  map(., tidy) %>% 
+  bind_rows(., .id="Block") %>% 
+  filter(str_detect(term,":survey")) %>% 
+  group_by(term) %>% 
+  slice(1) %>% 
+  mutate(term=str_replace_all(term, ":survey", "")) %>% 
+  arrange(Block) %>% 
+  select(Block, term, estimate,p.value)->qc_conservative_table
+
+#Save the values to be bolded here
+to_bold<-qc_conservative_table$p.value<0.05
+qc_conservative_table %>% 
+  kable(., digits=2) %>% 
+  column_spec(3:4, bold=to_bold) %>% 
+  save_kable(file="Tables/conservative_qc_interaction.html")
 
 #### Liberal ROC Interation ####
 
+block1<-glm(liberal~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income)*survey, family="binomial", data=roc)
+block2<-glm(liberal~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism)*survey, family="binomial", data=roc)
+block3<-glm(liberal~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id)*survey, family="binomial", data=roc)
+block4<-glm(liberal~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective)*survey, family="binomial", data=roc)
+block5<-glm(liberal~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence)*survey, family="binomial", data=roc)
+block6<-glm(liberal~(region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader)*survey, family="binomial", data=roc)
+#Turn into a list
+roc_liberal<-list(block1, block2, block3, block4, block5, block6)
+names(roc_liberal)<-c("block1", "block2", "block3", "block4", "block5", "block6")
+
+roc_liberal %>% 
+  map(., tidy) %>% 
+  bind_rows(., .id="Block") %>% 
+  filter(str_detect(term,":survey")) %>% 
+  group_by(term) %>% 
+  slice(1) %>% 
+  mutate(term=str_replace_all(term, ":survey", "")) %>% 
+  arrange(Block) %>% 
+  select(Block, term, estimate,p.value)->roc_liberal_table
+
+#Save the values to be bolded here
+to_bold<-roc_liberal_table$p.value<0.05
+roc_liberal_table %>% 
+  kable(., digits=2) %>% 
+  column_spec(3:4, bold=to_bold) %>% 
+  save_kable(file="Tables/liberal_roc_interaction.html")
+
 #### Liberal QC Interation ####
+block1<-glm(liberal~(working_class2+union_both+young+old+male+degree+language+foreign)*survey, family="binomial", data=qc)
+block2<-glm(liberal~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty)*survey, family="binomial", data=qc)
+block3<-glm(liberal~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id)*survey, family="binomial", data=qc)
+block4<-glm(liberal~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective)*survey, family="binomial", data=qc)
+block5<-glm(liberal~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence)*survey, family="binomial", data=qc)
+block6<-glm(liberal~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader)*survey, family="binomial", data=qc)
+#Turn into a list
+qc_liberal<-list(block1, block2, block3, block4, block5, block6)
+names(qc_liberal)<-c("block1", "block2", "block3", "block4", "block5", "block6")
 
+qc_liberal %>% 
+  map(., tidy) %>% 
+  bind_rows(., .id="Block") %>% 
+  filter(str_detect(term,":survey")) %>% 
+  group_by(term) %>% 
+  slice(1) %>% 
+  mutate(term=str_replace_all(term, ":survey", "")) %>% 
+  arrange(Block) %>% 
+  select(Block, term, estimate,p.value)->qc_liberal_table
 
-# 
+#Save the values to be bolded here
+to_bold<-qc_liberal_table$p.value<0.05
+qc_liberal_table %>% 
+  kable(., digits=2) %>% 
+  column_spec(3:4, bold=to_bold) %>% 
+  save_kable(file="Tables/liberal_qc_interaction.html")
+
+#### Bloc QC Interation ####
+block1<-glm(bloc~(working_class2+union_both+young+old+male+degree+language+foreign)*survey, family="binomial", data=qc)
+block2<-glm(bloc~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty)*survey, family="binomial", data=qc)
+block3<-glm(bloc~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id)*survey, family="binomial", data=qc)
+block4<-glm(bloc~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective)*survey, family="binomial", data=qc)
+block5<-glm(bloc~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence)*survey, family="binomial", data=qc)
+block6<-glm(bloc~(working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader)*survey, family="binomial", data=qc)
+#Turn into a list
+qc_bloc<-list(block1, block2, block3, block4, block5, block6)
+names(qc_bloc)<-c("block1", "block2", "block3", "block4", "block5", "block6")
+
+qc_bloc %>% 
+  map(., tidy) %>% 
+  bind_rows(., .id="Block") %>% 
+  filter(str_detect(term,":survey")) %>% 
+  group_by(term) %>% 
+  slice(1) %>% 
+  mutate(term=str_replace_all(term, ":survey", "")) %>% 
+  arrange(Block) %>% 
+  select(Block, term, estimate,p.value)->qc_bloc_table
+
+#Save the values to be bolded here
+to_bold<-qc_bloc_table$p.value<0.05
+qc_bloc_table %>% 
+  kable(., digits=2) %>% 
+  column_spec(3:4, bold=to_bold) %>% 
+  save_kable(file="Tables/bloc_qc_interaction.html")
+
 # out %>% 
 #   #this is how we filter for quebec / roc
 #   filter(quebec!=1) %>% 

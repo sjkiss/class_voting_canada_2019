@@ -796,3 +796,16 @@ ces15phone%>%
   select(NDP_rating) %>% 
   summary()
 
+#### Most Important Issue ####
+barplot(table(ces19phone$mip_cat),
+        main="Most Important Issue 2019",
+        border="black",
+        col="red",)
+
+barplot(table(ces15phone$mip),
+        main="Most Important Issue 2015",
+        border="black",
+        col="red",
+        names.arg=c("Other","Enviro","Crime","Ethics","Education", "Energy","Jobs","Economy","Health","Taxes", 
+                    
+                    "Deficit_Debt","Democracy","For_Affairs","Immig","Culture", "Soc_Programs"),)
