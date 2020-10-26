@@ -539,3 +539,4 @@ theme_set(theme_bw())
 #source("R_scripts/5_ces19_block_models.R", echo=T)
 
 #source("R_scripts/7_class_logistic_models.R", echo=T)
+source("R_scripts/8_block_recursive_models.R", echo=T)
