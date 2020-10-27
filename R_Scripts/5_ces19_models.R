@@ -797,10 +797,15 @@ ces15phone%>%
   summary()
 
 #### Most Important Issue ####
+# Here's how I would do this in a tidyverse kind of way.
+#Just start with the first data frame
+
+
+
 barplot(table(ces19phone$mip_cat),
         main="Most Important Issue 2019",
         border="black",
-        col="red",)
+        col="red")
 
 barplot(table(ces15phone$mip),
         main="Most Important Issue 2015",

@@ -47,7 +47,7 @@ mip19$mip_number<-rep("", nrow(mip19))
 library(openxlsx)
 
 val_labels(ces15phone$CPS15_1) %>% 
-  data.frame()-mip15
+  data.frame()->mip15
 #Create the workbook
 mip<-createWorkbook()
 #addWorksheet(mip, sheetName="Examples_2015")

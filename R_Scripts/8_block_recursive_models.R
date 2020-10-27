@@ -2,6 +2,13 @@
 library(nnet)
 library(broom)
 library(purrr)
+# ces15phone %>%
+#   mutate(union_both=case_when(
+#     PES15_93==1 | PES15_94==1 ~ 1,
+#     PES15_93==5 | PES15_94==5 ~ 0,
+#     PES15_93==8 & PES15_94==8 ~ NA_real_,
+#     PES15_93==9 & PES15_94==9 ~ NA_real_,
+#   ))->ces15phone
 #### Some 2015 recodes ####
 ###These could be cleaned up
 ces15phone$working_class<-Recode(ces15phone$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
@@ -487,7 +494,7 @@ bold(., i=~sig_con< 0.05, j=~Conservative+sig_con) %>%
 bg(., i=~str_detect(Block, "block1|block3|block5"), bg="grey") %>% 
   add_header_lines(values=c("Quebec Block Recursive Model Coefficients, 2015 and 2019")) %>% 
   save_as_html(., "Tables/qc_block_recursive_model.html")
-
+#save_as_docx(., path="Tables/qc_block_recursive_model.docx")
 #### Run some checks with what appears itn the table####
   #Could you please just check a few coefficients randomly to be sure they are correct
   #EAch model is stored in either roc_ndp, qc_ndp etc. etc. etc. followed by $block1, $block2, #Just pick four or five randomly in different blocks and in qc, roc. Just enough to be sure we are not making a mistake. 
