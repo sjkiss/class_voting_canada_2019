@@ -1,8 +1,6 @@
 
 #File to Recode 2015 CES Data 
-#load data
 data("ces15phone")
-
 #recode Gender (RGENDER)
 look_for(ces15phone, "gender")
 ces15phone$male<-Recode(ces15phone$RGENDER, "1=1; 5=0")
@@ -232,14 +230,18 @@ ces15phone$immigration_jobs<-Recode(ces15phone$PES15_51, "7=1; 5=0.75; 3=0.25; 1
 #checks
 #val_labels(ces15phone$immigration_jobs)
 table(ces15phone$immigration_jobs)
+ces15phone$PES15_19
 
-ces15phone$immigration_feel1<-Recode(ces15phone$PES15_19, "998:999=NA")
-table(ces15phone$immigration_feel1)
-ces15phone$immigration_feel<-(ces15phone$immigration_feel1 /100)
+ces15phone$immigration_feel1<-car::Recode(as.numeric(ces15phone$PES15_19), "998:999=NA", as.numeric=T)
+
+ces15phone$immigration_feel<-ces15phone$immigration_feel1 /100
+summary(ces15phone$immigration_feel)
+class(ces15phone$immigration_feel)
+class(ces15phone$immigration_feel1)
 #checks
 #val_labels(ces15phone$immigrations_feel)
 table(ces15phone$immigration_feel)
-
+ces15phone$immigration_rate
 ces15phone$immigration_rate<-Recode(ces15phone$PES15_28, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
 #val_labels(ces15phone$immigration_rate)<-c(Less=0, Same=0.5, More=1)
 #checks
@@ -247,32 +249,37 @@ ces15phone$immigration_rate<-Recode(ces15phone$PES15_28, "1=1; 3=0; 5=0.5; 8=0.5
 table(ces15phone$immigration_rate)
 
 #Combine the 3 immigration variables and divide by 3
-ces15phone$immigration3<-(ces15phone$immigration_jobs + ces15phone$immigration_feel + ces15phone$immigration_rate)
-table(ces15phone$immigration3)
-ces15phone$immigration<-(ces15phone$immigration3 /3)
+ces15phone$immigration_feel
+
+ces15phone %>% 
+  rowwise() %>% 
+  mutate(immigration=mean(c_across(c(immigration_jobs, immigration_rate, immigration_feel)), na.rm=T))->ces15phone
+
 #Check distribution of immigration
 qplot(ces15phone$immigration, geom="histogram")
 
 #recode Racial Minorities sentiment (PES15_18, PES15_42) into an index 0-1 
 #1 = pro-racial minority sentiment 0 = anti-racial minority sentiment
 look_for(ces15phone, "minor")
-ces15phone$r_minorities_feel<-Recode(ces15phone$PES15_18, "998:999=NA")
+ces15phone$r_minorities_feel<-Recode(as.numeric(ces15phone$PES15_18), "998:999=NA")
 table(ces15phone$r_minorities_feel)
 ces15phone$minorities_feel<-(ces15phone$r_minorities_feel /100)
 #checks
 #val_labels(ces15phone$minorities_feel)
 table(ces15phone$minorities_feel)
+ces15phone$minorities_help<-Recode(as.numeric(ces15phone$PES15_42), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 8=0.5; else=NA", as.numeric=T)
 
-ces15phone$minorities_help<-Recode(ces15phone$PES15_42, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 8=0.5; else=NA", as.numeric=T)
 #val_labels(ces15phone$minorities_help)<-c(Much_less=0, Somewhat_less=0.25, Same=0.5, Somewhat_more=0.75, Much_more=1)
 #checks
 #val_labels(ces15phone$minorities_help)
 table(ces15phone$minorities_help)
 
 #Combine the 2 racial minority variables and divide by 2
-ces15phone$minorities<-(ces15phone$minorities_feel + ces15phone$minorities_help)
-table(ces15phone$minorities)
-ces15phone$minorities<-(ces15phone$minorities /2)
+
+ces15phone %>% 
+  rowwise() %>% 
+  mutate(minorities=mean(c_across(c(minorities_help, minorities_feel)), na.rm=T))->ces15phone
+
 #Check distribution of immigration
 qplot(ces15phone$minorities, geom="histogram")
 
@@ -288,12 +295,13 @@ ces15phone %>%
   alpha(.)
 
 ## Or Create a 5 variable immigration/racial minority sentiment index by dividing by 5
-ces15phone$immigration5<-(ces15phone$immigration_jobs + ces15phone$immigration_feel + ces15phone$immigration_rate + ces15phone$minorities_feel + ces15phone$minorities_help)
-table(ces15phone$immigration5)
-ces15phone$immigration2<-(ces15phone$immigration5 /5)
+
+ces15phone %>% 
+  mutate(immigration2=mean(c_across(c(immigration_jobs, immigration_feel, immigration_rate, minorities_feel, minorities_help)), na.rm=T))->ces15phone
 qplot(ces15phone$immigration2, geom="histogram")
 
 #Calculate Cronbach's alpha
+library(psych)
 ces15phone %>% 
   select(immigration_jobs, immigration_feel, immigration_rate, minorities_feel, minorities_help) %>% 
   alpha(.)

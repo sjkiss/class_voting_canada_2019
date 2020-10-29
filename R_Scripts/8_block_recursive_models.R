@@ -213,13 +213,14 @@ table(ces19phone$green)
 ces15phone %>% 
   select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
          market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
-         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec)->out15
+         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration)->out15
 #Now an ces19data frame
 ces19phone %>% 
 #  filter(quebec!=1) %>% 
   select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
          market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
-         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec)->out19
+         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration)->out19
+
 out15$survey<-rep(0, nrow(out15))
 out19$survey<-rep(1, nrow(out19))
 out15 %>% 
@@ -510,3 +511,17 @@ roc_liberal_table %>%
 roc_conservative_table %>% 
   filter(term=="union_both")
 
+#### ####
+out %>% 
+  select(immigration, redistribution, minorities, moral_traditionalism, market_liberalism, survey, occupation4) %>% 
+  pivot_longer(cols=immigration:market_liberalism) %>% 
+  group_by(survey, occupation4, name)  %>% 
+  summarize(Average=mean(value, na.rm=T)) %>% 
+  arrange(occupation4, name, survey) %>% 
+  group_by(name, occupation4) %>% 
+  mutate(Difference=Average-lag(Average)) %>% 
+  filter(survey==1) %>% 
+  ggplot(., aes(x=name, y=Difference))+geom_point()+facet_grid(~occupation4)+coord_flip()
+
+  
+  
