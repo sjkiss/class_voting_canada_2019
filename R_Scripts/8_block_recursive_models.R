@@ -513,7 +513,7 @@ roc_conservative_table %>%
 
 #### ####
 out %>% 
-  select(immigration, redistribution, minorities, moral_traditionalism, market_liberalism, survey, occupation4) %>% 
+  select(immigration, redistribution, moral_traditionalism, market_liberalism, survey, occupation4) %>% 
   pivot_longer(cols=immigration:market_liberalism) %>% 
   group_by(survey, occupation4, name)  %>% 
   summarize(Average=mean(value, na.rm=T)) %>% 
@@ -521,7 +521,6 @@ out %>%
   group_by(name, occupation4) %>% 
   mutate(Difference=Average-lag(Average)) %>% 
   filter(survey==1) %>% 
-  ggplot(., aes(x=name, y=Difference))+geom_point()+facet_grid(~occupation4)+coord_flip()
+  ggplot(., aes(x=occupation4, y=Difference, col=name))+geom_point(position="jitter")+ylim(-0.115,0.15)+labs(x="Class", y="Difference (2019-2015)")
 
-  
   
