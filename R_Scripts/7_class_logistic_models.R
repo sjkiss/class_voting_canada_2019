@@ -40,6 +40,18 @@ ces$region3<-Recode(as.factor(ces$region), "1='East' ; 2='Ontario' ; 3='West'", 
 levels(ces$region3)
 table(ces$region3)
 
+#Recode low income
+ces$low_income<-Recode(ces$income, "1=1; 2:5=0; else=NA")
+table(ces$low_income)
+
+#Recode high moral traditionalism=authoritarian
+table(ces19phone$moral_traditionalism)
+ces19phone$authoritarian<-Recode(ces19phone$moral_traditionalism, "0.38:1=1; 0:3.75=0; else=NA")
+table(ces19phone$authoritarian)
+table(ces15phone$moral_traditionalism)
+ces15phone$authoritarian<-Recode(ces15phone$moral_traditionalism, "0.38:1=1; 0:3.75=0; else=NA")
+table(ces15phone$authoritarian)
+
 #Party voting
 ces19phone$bloc<-Recode(ces19phone$vote, "4=1; 0:3=0; 5=0; else=NA")
 ces19phone$green<-Recode(ces19phone$vote, "5=1; 0:4=0; else=NA")
@@ -234,6 +246,12 @@ ces %>%
   ggplot(., aes(x=election, y=avg_age))+geom_point()+labs(title="Average redistribution of WC respondents in ces studies")
 
 ces %>% 
+  group_by(election, low_income) %>% 
+  filter(!is.na(low_income)) %>%
+  summarize(avg_age=mean(redistribution, na.rm=T)) %>% 
+  ggplot(., aes(x=election, y=avg_age))+geom_point()+labs(title="Average redistribution of low income respondents in ces studies")
+
+ces %>% 
   group_by(election) %>% 
   summarize(avg_age=mean(pro_redistribution, na.rm=T)) %>% 
   ggplot(., aes(x=election, y=avg_age))+geom_point()+labs(title="Average pro-redistribution of respondents in ces studies")
@@ -243,6 +261,12 @@ ces %>%
   filter(!is.na(working_class)) %>%
   summarize(avg_age=mean(pro_redistribution, na.rm=T)) %>% 
   ggplot(., aes(x=election, y=avg_age))+geom_point()+labs(title="Average pro-redistribution of WC respondents in ces studies")
+
+ces %>% 
+  group_by(election, low_income) %>% 
+  filter(!is.na(low_income)) %>%
+  summarize(avg_age=mean(pro_redistribution, na.rm=T)) %>% 
+  ggplot(., aes(x=election, y=avg_age))+geom_point()+labs(title="Average pro-redistribution of low income respondents in ces studies")
 
 ces %>%
   filter(!is.na(redistribution)) %>%
@@ -334,13 +358,13 @@ ces19phone %>%
   group_by(working_class) %>%
   summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
 
-# Working Class voting by pro-redistribution
+# Working Class voting by pro-redistribution 2019
 ces19phone %>%
   select(working_class, pro_redistribution, liberal, conservative, ndp, bloc, green) %>% 
   group_by(working_class, pro_redistribution) %>%
   summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
   as.data.frame() %>% 
-  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro-redistribution Working Class Vote 2019.html"))
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_Working_Class_Vote_2019.html"))
 
 # Working Class voting pro-redistribution by election
 ces %>%
@@ -349,6 +373,78 @@ ces %>%
   summarise_at(vars(liberal, conservative, ndp), mean, na.rm=T) %>% 
   as.data.frame() %>%
   stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_Working_Class_Vote_by_election.html"))
+
+# Low Incomes voting by pro-redistribution 2019
+ces19phone %>%
+  select(low_income, pro_redistribution, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(low_income, pro_redistribution) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_low_income_Vote_2019.html"))
+
+# Low Income voting pro-redistribution by election
+ces %>%
+  select(election, low_income, pro_redistribution, liberal, conservative, ndp) %>% 
+  group_by(election, low_income, pro_redistribution) %>%
+  summarise_at(vars(liberal, conservative, ndp), mean, na.rm=T) %>% 
+  as.data.frame() %>%
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_low_income_Vote_by_election.html"))
+
+##### Moral traditionalism comparison ####
+# Working Class voting by moral traditionalism 2019
+ces19phone %>%
+  select(working_class, authoritarian, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(working_class, authoritarian) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "moral_traditionalism_Working_Class_Vote_2019.html"))
+
+# Low Incomes voting by moral traditionalism 
+ces19phone %>%
+  select(low_income, authoritarian, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(low_income, authoritarian) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "moral_traditionalism_low_income_Vote_2019.html"))
+
+ces15phone %>%
+  select(working_class, authoritarian, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(working_class, authoritarian) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "moral_traditionalism_Working_Class_Vote_2015.html"))
+
+# Low Income voting by moral traditionalism 
+ces15phone %>%
+  select(low_income, authoritarian, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(low_income, authoritarian) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "moral_traditionalism_low_income_Vote_2015.html"))
+
+ces19phone %>%
+  #  filter(!is.na(occupation4)) %>%
+  select(authoritarian, Jagmeet_Singh, Andrew_Scheer, immigration, redistribution, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology) %>% 
+  group_by(authoritarian) %>%
+  summarise_at(vars(Jagmeet_Singh, Andrew_Scheer, immigration, redistribution, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology), mean, na.rm=T)
+
+ces15phone %>%
+  #  filter(!is.na(occupation4)) %>%
+  select(authoritarian, Tom_Mulcair, Stephen_Harper, immigration, redistribution, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology) %>% 
+  group_by(authoritarian) %>%
+  summarise_at(vars(Tom_Mulcair, Stephen_Harper, immigration, redistribution, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology), mean, na.rm=T)
+
+ces19phone %>%
+  #  filter(!is.na(occupation4)) %>%
+  select(pro_redistribution, Jagmeet_Singh, Andrew_Scheer, immigration, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology) %>% 
+  group_by(pro_redistribution) %>%
+  summarise_at(vars(Jagmeet_Singh, Andrew_Scheer, immigration, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology), mean, na.rm=T)
+
+ces15phone %>%
+  #  filter(!is.na(occupation4)) %>%
+  select(pro_redistribution, Tom_Mulcair, Stephen_Harper, immigration, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology) %>% 
+  group_by(pro_redistribution) %>%
+  summarise_at(vars(Tom_Mulcair, Stephen_Harper, immigration, environment, minorities_help, continentalism, market_liberalism, political_disaffection, ideology), mean, na.rm=T)
 
 #------------------------------------------------------------------------------------------------
 #### Working Class descriptives ####

@@ -292,6 +292,30 @@ summary(model38ALL)
 summary(model38ROC)
 summary(model38QC)
 
+#M39 basic model with low income:class interaction
+model39ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+low_income+working_class:low_income, data=ces19.roc, family="binomial")
+model39QC<-glm(ndp~working_class+union_both+age+male+sector+low_income+working_class:low_income, data=ces19.qc, family="binomial")
+summary(model39ROC)
+summary(model39QC)
+
+#M40 basic model with high income:class interaction
+model40ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+high_income+working_class:high_income, data=ces19.roc, family="binomial")
+model40QC<-glm(ndp~working_class+union_both+age+male+sector+high_income+working_class:high_income, data=ces19.qc, family="binomial")
+summary(model40ROC)
+summary(model40QC)
+
+#M41 Conservative basic model with low income:class interaction
+model41ROC<-glm(conservative~region3+working_class+union_both+age+male+sector+low_income+working_class:low_income, data=ces19.roc, family="binomial")
+model41QC<-glm(conservative~working_class+union_both+age+male+sector+low_income+working_class:low_income, data=ces19.qc, family="binomial")
+summary(model41ROC)
+summary(model41QC)
+
+#M42 Conservative basic model with high income:class interaction
+model42ROC<-glm(conservative~region3+working_class+union_both+age+male+sector+high_income+working_class:high_income, data=ces19.roc, family="binomial")
+model42QC<-glm(conservative~working_class+union_both+age+male+sector+high_income+working_class:high_income, data=ces19.qc, family="binomial")
+summary(model42ROC)
+summary(model42QC)
+
 stargazer(model34ROC, model34QC, type="html", out=here("Tables", "ndp_vs_right_models.html"))
 stargazer(model35ROC, model35QC, type="html", out=here("Tables", "ndp_vs_liberal_models.html"))
 stargazer(model36ALL, model36ROC, model36QC, model38ALL, model38ROC, model38QC, type="html", out=here("Tables", "basic_class_models1.html"), column.labels = rep(c("CAN", "ROC", "QC"),2))
@@ -806,6 +830,5 @@ barplot(table(ces15phone$mip),
         main="Most Important Issue 2015",
         border="black",
         col="red",
-        names.arg=c("Other","Enviro","Crime","Ethics","Education", "Energy","Jobs","Economy","Health","Taxes", 
-                    
-                    "Deficit_Debt","Democracy","For_Affairs","Immig","Culture", "Soc_Programs"),)
+        names.arg=c("Other", "Enviro", "Crime", "Ethics", "Educ", "Energy", "Jobs", "Economy", "Health", "Taxes", 
+                    "Deficit_Debt", "Democracy", "For_Affairs", "Immig", "Culture", "Soc_Programs"),)

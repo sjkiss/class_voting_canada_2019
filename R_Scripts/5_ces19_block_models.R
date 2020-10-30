@@ -35,6 +35,10 @@ ces19phone$income3<-Recode(as.factor(ces19phone$income), "1='Low_Income' ; 2:4='
 levels(ces19phone$income3)
 table(ces19phone$income3)
 
+#Recode low income sub-sample
+ces19phone$income1<-Recode(ces19phone$income, "1=1; else=NA")
+table(ces19phone$income1)
+
 #Other dummies
 ces19phone$low_income<-Recode(ces19phone$income, "2:5=0; 1=1")
 ces19phone$high_income<-Recode(ces19phone$income, "1:4=0; 5=1")
@@ -328,3 +332,43 @@ stargazer(ndp_model6ROC, lib_model6ROC, con_model6ROC, ndp_model6QC, lib_model6Q
 stargazer(ndp_model7ROC, lib_model7ROC, con_model7ROC, ndp_model7QC, lib_model7QC, con_model7QC, bloc_model7QC ,type="html", out=here("Tables", "ces19_block6.html"))
 stargazer(ndp_model8ROC, lib_model8ROC, con_model8ROC, ndp_model8QC, lib_model8QC, con_model8QC, bloc_model8QC ,type="html", out=here("Tables", "ces19_block1_working_class2.html"))
 stargazer(ndp_model9ROC, lib_model9ROC, con_model9ROC, ndp_model9QC, lib_model9QC, con_model9QC, bloc_model9QC ,type="html", out=here("Tables", "ces19_block6_working_class2.html"))
+
+#Model 0 - low income sub-sample
+#NDP
+ndp_model0ROC<-glm(ndp~region3+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+income1+moral_traditionalism+redistribution, data=ces19.roc, family="binomial")
+ndp_model0QC<-glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+income1+moral_traditionalism+redistribution, data=ces19.qc, family="binomial")
+summary(ndp_model0ROC)
+summary(ndp_model0QC)
+
+#Liberal
+lib_model0ROC<-glm(liberal~region3+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+income1+moral_traditionalism+redistribution, data=ces19.roc, family="binomial")
+lib_model0QC<-glm(liberal~union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+income1+moral_traditionalism+redistribution, data=ces19.qc, family="binomial")
+summary(lib_model0ROC)
+summary(lib_model0QC)
+
+#Conservative
+con_model0ROC<-glm(conservative~region3+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+income+moral_traditionalism+redistribution, data=ces19.roc, family="binomial")
+con_model0QC<-glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+income+moral_traditionalism+redistribution, data=ces19.qc, family="binomial")
+summary(con_model0ROC)
+summary(con_model0QC)
+
+#Model 10 - moral traditionalism and redistribution added
+#NDP
+ndp_model10ROC<-glm(ndp~region3+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+low_income+high_income+moral_traditionalism+redistribution, data=ces19.roc, family="binomial")
+ndp_model10QC<-glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+low_income+high_income+moral_traditionalism+redistribution, data=ces19.qc, family="binomial")
+summary(ndp_model10ROC)
+summary(ndp_model10QC)
+
+#Liberal
+lib_model10ROC<-glm(liberal~region3+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+low_income+high_income+moral_traditionalism+redistribution, data=ces19.roc, family="binomial")
+lib_model10QC<-glm(liberal~union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+low_income+high_income+moral_traditionalism+redistribution, data=ces19.qc, family="binomial")
+summary(lib_model10ROC)
+summary(lib_model10QC)
+
+#Conservative
+con_model10ROC<-glm(conservative~region3+union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+low_income+high_income+moral_traditionalism+redistribution, data=ces19.roc, family="binomial")
+con_model10QC<-glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+language+foreign+low_income+high_income+moral_traditionalism+redistribution, data=ces19.qc, family="binomial")
+summary(con_model10ROC)
+summary(con_model10QC)
+
+stargazer(ndp_model10ROC, lib_model10ROC, con_model10ROC, ndp_model10QC, lib_model10QC, con_model10QC, type="html", out=here("Tables", "ces19_block10.html"))
