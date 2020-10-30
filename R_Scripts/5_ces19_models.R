@@ -282,7 +282,7 @@ summary(model36QC)
 # model37QC<-glm(ndp~working_class4+union_both+income+degree+sector, data=ces19.qc, family="binomial")
 # summary(model37ALL)
 # summary(model37ROC)
-summary(model37QC)
+#summary(model37QC)
 
 #M38 Basic Class Model with self-employed careved out into 0 (including age, gender, region)
 model38ALL<-glm(ndp~working_class3+union_both+income+degree+sector+age+male+as.factor(region4), data=ces19phone, family="binomial")
@@ -823,17 +823,3 @@ ces15phone%>%
 #### Most Important Issue ####
 # Here's how I would do this in a tidyverse kind of way.
 #Just start with the first data frame
-
-
-
-barplot(table(ces19phone$mip_cat),
-        main="Most Important Issue 2019",
-        border="black",
-        col="red")
-
-barplot(table(ces15phone$mip),
-        main="Most Important Issue 2015",
-        border="black",
-        col="red",
-        names.arg=c("Other", "Enviro", "Crime", "Ethics", "Educ", "Energy", "Jobs", "Economy", "Health", "Taxes", 
-                    "Deficit_Debt", "Democracy", "For_Affairs", "Immig", "Culture", "Soc_Programs"),)
