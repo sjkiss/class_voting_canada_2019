@@ -213,13 +213,13 @@ table(ces19phone$green)
 ces15phone %>% 
   select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
          market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
-         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration)->out15
+         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help)->out15
 #Now an ces19data frame
 ces19phone %>% 
 #  filter(quebec!=1) %>% 
   select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
          market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
-         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration)->out19
+         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help)->out19
 
 out15$survey<-rep(0, nrow(out15))
 out19$survey<-rep(1, nrow(out19))
@@ -511,9 +511,69 @@ roc_liberal_table %>%
 roc_conservative_table %>% 
   filter(term=="union_both")
 
-#### ####
+#### Policy variation change between 2015-19####
+
+#scales goes from -1 Left to +1 Right
+library(psych)
+
+#Positive RW scales (no need to reverse code)
+table(ces15phone$moral_traditionalism, useNA="ifany")
+table(ces15phone$market_liberalism, useNA="ifany")
+table(ces15phone$continentalism, useNA="ifany")
+
+#Reverse code positive LW scales to positive RW scales
+ces15phone$environment<-reverse.code(-1, ces15phone[,'environment'])
+ces15phone$redistribution<-reverse.code(-1, ces15phone[,'redistribution'])
+ces15phone$immigration<-reverse.code(-1, ces15phone[,'immigration'])
+ces15phone$immigration2<-reverse.code(-1, ces15phone[,'immigration2'])
+ces15phone$immigration_rate<-reverse.code(-1, ces15phone[,'immigration_rate'])
+ces15phone$minorities_help<-reverse.code(-1, ces15phone[,'minorities_help'])
+ces19phone$environment<-reverse.code(-1, ces19phone[,'environment'])
+ces19phone$redistribution<-reverse.code(-1, ces19phone[,'redistribution'])
+ces19phone$immigration<-reverse.code(-1, ces19phone[,'immigration'])
+ces19phone$immigration2<-reverse.code(-1, ces19phone[,'immigration2'])
+ces19phone$immigration_rate<-reverse.code(-1, ces19phone[,'immigration_rate'])
+ces19phone$minorities_help<-reverse.code(-1, ces19phone[,'minorities_help'])
+
+#checks
+table(ces15phone$environment, useNA="ifany")
+table(ces15phone$redistribution, useNA="ifany")
+table(ces15phone$immigration, useNA="ifany")
+table(ces15phone$immigration2, useNA="ifany")
+table(ces15phone$immigration_rate, useNA="ifany")
+table(ces15phone$minorities_help, useNA="ifany")
+table(ces19phone$environment, useNA="ifany")
+table(ces19phone$redistribution, useNA="ifany")
+table(ces19phone$immigration, useNA="ifany")
+table(ces19phone$immigration2, useNA="ifany")
+table(ces19phone$immigration_rate, useNA="ifany")
+table(ces19phone$minorities_help, useNA="ifany")
+
+#update dataframe
+#First make a ces15 roc data frame
+ces15phone %>% 
+  select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
+         market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
+         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help)->out15
+#Now an ces19data frame
+ces19phone %>% 
+  #  filter(quebec!=1) %>% 
+  select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
+         market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
+         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help)->out19
+
+out15$survey<-rep(0, nrow(out15))
+out19$survey<-rep(1, nrow(out19))
+out15 %>% 
+  bind_rows(., out19)->out
+roc<-out %>% 
+  filter(quebec!=1)
+qc<-out %>% 
+  filter(quebec==1)
+
+#Policy rating changes
 out %>% 
-  select(immigration, redistribution, moral_traditionalism, market_liberalism, survey, occupation4) %>% 
+  select(immigration, immigration2, immigration_rate, minorities_help, environment, redistribution, continentalism, moral_traditionalism, market_liberalism, survey, occupation4) %>% 
   pivot_longer(cols=immigration:market_liberalism) %>% 
   group_by(survey, occupation4, name)  %>% 
   summarize(Average=mean(value, na.rm=T)) %>% 
@@ -523,4 +583,14 @@ out %>%
   filter(survey==1) %>% 
   ggplot(., aes(x=occupation4, y=Difference, col=name))+geom_point(position="jitter")+ylim(-0.115,0.15)+labs(x="Class", y="Difference (2019-2015)")
 
-  
+#Leader rating changes
+out %>% 
+  select(liberal_leader, conservative_leader, ndp_leader, bloc_leader, survey, occupation4) %>% 
+  pivot_longer(cols=liberal_leader:bloc_leader) %>% 
+  group_by(survey, occupation4, name)  %>% 
+  summarize(Average=mean(value, na.rm=T)) %>% 
+  arrange(occupation4, name, survey) %>% 
+  group_by(name, occupation4) %>% 
+  mutate(Difference=Average-lag(Average)) %>% 
+  filter(survey==1) %>% 
+  ggplot(., aes(x=occupation4, y=Difference, col=name))+geom_point(position="jitter")+ylim(-0.115,0.15)+labs(x="Class", y="Difference (2019-2015)") 
