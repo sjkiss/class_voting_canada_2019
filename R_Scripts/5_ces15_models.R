@@ -174,6 +174,30 @@ models25QC<-glm(ndp~working_class+union_both+age+male+sector+income, data=ces15.
 summary(models25ROC)
 summary(models25QC)
 
+#M26 basic model with low income:class interaction
+models26ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+low_income+working_class:low_income, data=ces15.roc, family="binomial")
+models26QC<-glm(ndp~working_class+union_both+age+male+sector+low_income+working_class:low_income, data=ces15.qc, family="binomial")
+summary(models26ROC)
+summary(models26QC)
+
+#M27 basic model with high income:class interaction
+models27ROC<-glm(ndp~region3+working_class+union_both+age+male+sector+high_income+working_class:high_income, data=ces15.roc, family="binomial")
+models27QC<-glm(ndp~working_class+union_both+age+male+sector+high_income+working_class:high_income, data=ces15.qc, family="binomial")
+summary(models27ROC)
+summary(models27QC)
+
+#M28 Conservative basic model with low income:class interaction
+models28ROC<-glm(conservative~region3+working_class+union_both+age+male+sector+low_income+working_class:low_income, data=ces15.roc, family="binomial")
+models28QC<-glm(conservative~working_class+union_both+age+male+sector+low_income+working_class:low_income, data=ces15.qc, family="binomial")
+summary(models28ROC)
+summary(models28QC)
+
+#M29 Conservative basic model with high income:class interaction
+models29ROC<-glm(conservative~region3+working_class+union_both+age+male+sector+high_income+working_class:high_income, data=ces15.roc, family="binomial")
+models29QC<-glm(conservative~working_class+union_both+age+male+sector+high_income+working_class:high_income, data=ces15.qc, family="binomial")
+summary(models29ROC)
+summary(models29QC)
+
 #Combine 5 models into one table
 #stargazer(modelsROC, models24ROC, models25ROC, models1ROC, models2ROC, models3ROC, models4ROC, models17ROC, models18ROC, type="html", out=here("Tables", "ROC_ces15_attitudinal_variables.html"))
 #stargazer(modelsQC, models24QC, models25QC, models1QC, models2QC, models3QC, models4QC, models17QC, models18QC, type="html", out=here("Tables", "QC_ces15_attitudinal_variables.html"))
