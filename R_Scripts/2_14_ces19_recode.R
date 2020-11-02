@@ -452,7 +452,7 @@ look_for(ces19phone, "women")
 look_for(ces19phone, "gays")
 ces19phone$moral1<-Recode(ces19phone$p20_e, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
 ces19phone$moral2<-Recode(ces19phone$p35_b, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
-ces19phone$moral3<-Recode(ces19phone$p35_c, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
+ces19phone$moral3<-Recode(as.numeric(ces19phone$p35_c), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
 #val_labels(ces19phone$moral1)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
 #checks
 table(ces19phone$moral1)
@@ -584,35 +584,40 @@ table(ces19phone$education)
 
 
 
-#convert q7 to mip
-ces19phone$mip<-tolower(ces19phone$q7)
+#convert q7 to q7_out
+ces19phone$q7_out<-tolower(ces19phone$q7)
 #### Most important Problem for Environment ####
 #convert mip to mip_cat
+ces19phone$q7_out
+
 ces19phone %>% 
-  mutate(mip_cat=case_when(
-    str_detect(mip, "climate") ~ "environment",
-        str_detect(mip, "environ") ~ "environment",
-    str_detect(mip, "health") ~ "health care",
-       str_detect(mip, "tax") ~ "taxes",
-           str_detect(mip, "impots") ~ "taxes",
-               str_detect(mip, "santé") ~ "health care",
-                   str_detect(mip, "crim[ei]") ~ "crime",
-                       str_detect(mip, "jobs") ~ "jobs",
-                           str_detect(mip, "deficit") ~ "debt_deficit",
-                               str_detect(mip, "debt") ~ "debt_deficit",
-                                   str_detect(mip, "trudeau") ~ "leadership",
-                                   str_detect(mip, "ethics") ~ "ethics",
-                                       str_detect(mip, "immigr") ~ "immigration",
-                                           str_detect(mip, "pipeline") ~ "environment",
-                                               str_detect(mip, "ecologie") ~ "environment",
+  mutate(mip=case_when(
+    str_detect(q7_out, "climate") ~ 1,
+        str_detect(q7_out, "environ") ~ 1,
+    str_detect(q7_out, "health") ~ 8,
+       str_detect(q7_out, "tax") ~ 9,
+           str_detect(q7_out, "impots") ~ 9,
+               str_detect(q7_out, "santé") ~ 8,
+                   str_detect(q7_out, "crim[ei]") ~ 2,
+                       str_detect(q7_out, "job") ~ 6,
+                           str_detect(q7_out, "deficit") ~ 10,
+                               str_detect(q7_out, "debt") ~ 10,
+                                   str_detect(q7_out, "trudeau") ~ 0,
+                                   str_detect(q7_out, "ethic") ~ 3,
+                                       str_detect(q7_out, "immigr") ~ 12,
+                                           str_detect(q7_out, "pipeline") ~ 1,
+                                               str_detect(q7_out, "ecologie") ~ 1,
   
-    TRUE ~ NA_character_
-  )) -> ces19phone
+    TRUE ~ NA_real_
+  )) ->ces19phone
+ces19phone$mip
+
+val_labels(ces19phone$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, 
+                              Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15)
 
 ces19phone %>% 
   mutate(mip_enviro=case_when(
-    mip_cat=='environment'~ 1,
-    TRUE ~ 0
+    mip_cat==1~1,
+    TRUE~0
   ))->ces19phone
-table(ces19phone$mip_enviro)
 

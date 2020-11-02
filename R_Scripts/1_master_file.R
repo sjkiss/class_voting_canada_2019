@@ -97,6 +97,7 @@ ces74%>%
 #Seprate ces79 and ces80 to two separate files
 ces7980 %>% 
   filter(V4002==1)->ces79
+
 ces7980 %>% 
   filter(V4008==1)->ces80
 
@@ -112,6 +113,7 @@ table(ces80$region, ces80$region80)
 ##but they are different for political variables for obvious reasons. Demographics didn't change much but vote changed quite a bit.
 table(ces80$vote, ces80$vote80)
 ##We just need to turn the variables that end with 80 into regularly named variables.
+
 ces80 %>% 
   select(male=male80, region=region80, quebec=quebec80, age=age80, language=language80, party_id=party_id80, vote=vote80, union, union_both, degree, employment, sector, income, occupation, occupation3, religion, non_charter_language, size, redistribution, pro_redistribution)->ces80
 names(ces80)
@@ -421,6 +423,7 @@ table(ces.list[["1984"]]$union_both)
 ces.list[["1984"]]
 
 library(haven)
+
 #Start with the data frame
 ces.list %>% 
   #WE have to zap the value labels (get rid of them to enable row b inding)
@@ -500,7 +503,7 @@ ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
 ### Value labels often go missing in the creation of the ces data frame
 ### assign value label
 val_labels(ces$sector)<-c(Private=0, Public=1)
-val_labels(ces$vote)<-c(Conservative=2, Liberal=1, NDP=3)
+val_labels(ces$vote)<-c(Conservative=2, Liberal=1, NDP=3, BQ=4, Green=5, Other=0)
 val_labels(ces$male)<-c(Female=0, Male=1)
 val_labels(ces$union_both)<-c(None=0, Union=1)
 val_labels(ces$degree)<-c(nodegree=0, degree=1)
@@ -529,14 +532,16 @@ group_by(election) %>%
 
 #### Set Theme ####
 theme_set(theme_bw())
+
 #This command calls the file 2_diagnostics.R
 #source("R_scripts/3_recode_diagnostics.R", echo=T)
 #source("R_scripts/4_make_models.R", echo=T)
 #source("R_scripts/5_ces15_models.R", echo=T)
 #source("R_scripts/5_ces15_block_models.R", echo=T)
 
-source("R_scripts/5_ces19_models.R", echo=T)
+#source("R_scripts/5_ces19_models.R", echo=T)
 #source("R_scripts/5_ces19_block_models.R", echo=T)
 
-source("R_scripts/7_class_logistic_models.R", echo=T)
-source("R_scripts/8_block_recursive_models.R", echo=T)
+#source("R_scripts/7_class_logistic_models.R", echo=T)
+#source("R_scripts/8_block_recursive_models.R", echo=T)
+source("R_scripts/8_analysis_script.R", echo=T)
