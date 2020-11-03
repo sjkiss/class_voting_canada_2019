@@ -156,6 +156,19 @@ ces19phone$occupation2<-fct_relevel(ces19phone$occupation2, "Managers", "Profess
 ces19phone$occupation4<-fct_relevel(ces19phone$occupation4, "Managers", "Self-Employed", "Professionals", "Routine_Nonmanual", 'Working_Class')
 table(ces19phone$occupation4)
 ces19phone$working_class2<-Recode(ces19phone$occupation3, "4:5=1; 3=0; 2=0; 1=0; 6=0; else=NA")
+#Turn region into all of Canada (4 regions)
+ces19phone %>% 
+  mutate(region2=case_when(
+    region==1 ~ "Atlantic",
+    region==2 ~ "Ontario",
+    region==3 ~"West",
+    quebec==1 ~ "Quebec"
+  ))->ces19phone
+table(ces19phone$region2)
+ces19phone$region4<-factor(ces19phone$region2, levels=c("Atlantic", "Quebec", "Ontario", "West"))
+levels(ces19phone$region4)
+table(ces19phone$region4)
+ces19phone$region4<-factor(ces19phone$region2, levels=c("Atlantic", "Quebec", "Ontario", "West"))
 table(ces19phone$working_class2)
 
 #Turn region into factor with East as reference case
