@@ -189,6 +189,7 @@ table(ces19phone$old)
 table(ces19phone$foreign)
 ces19phone$working_class<-Recode(ces19phone$working_class, "1=1; else=0")
 ces19phone$working_class2<-Recode(ces19phone$working_class2, "1=1; else=0")
+ces19phone$working_class3<-Recode(ces19phone$working_class2, "1=1; else=0")
 #ces19phone$union_both<-Recode(ces19phone$union_both, "1=1; else=0")
 #ces19phone$male<-Recode(ces19phone$male, "1=1; else=0")
 #ces19phone$sector<-Recode(ces19phone$sector, "1=1; else=0")
@@ -544,20 +545,6 @@ ces19phone$immigration<-reverse.code(-1, ces19phone[,'immigration'])
 ces19phone$immigration2<-reverse.code(-1, ces19phone[,'immigration2'])
 ces19phone$immigration_rate<-reverse.code(-1, ces19phone[,'immigration_rate'])
 ces19phone$minorities_help<-reverse.code(-1, ces19phone[,'minorities_help'])
-
-#checks
-table(ces15phone$environment, useNA="ifany")
-table(ces15phone$redistribution, useNA="ifany")
-table(ces15phone$immigration, useNA="ifany")
-table(ces15phone$immigration2, useNA="ifany")
-table(ces15phone$immigration_rate, useNA="ifany")
-table(ces15phone$minorities_help, useNA="ifany")
-table(ces19phone$environment, useNA="ifany")
-table(ces19phone$redistribution, useNA="ifany")
-table(ces19phone$immigration, useNA="ifany")
-table(ces19phone$immigration2, useNA="ifany")
-table(ces19phone$immigration_rate, useNA="ifany")
-table(ces19phone$minorities_help, useNA="ifany")
 
 #update dataframe
 #First make a ces15 roc data frame
