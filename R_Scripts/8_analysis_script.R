@@ -85,13 +85,7 @@ ces15phone$foreign<-Recode(ces15phone$native, "1=0; 0=1")
 #ces15phone$young<-Recode(ces15phone$age, "else=0; 18:34=1")
 #ces15phone$old<-Recode(ces15phone$age, "55:100=1; else=0")
 #ces15phone$foreign<-Recode(ces15phone$native, "else=0; 0=1")
-table(ces15phone$low_income)
-table(ces15phone$high_income)
-table(ces15phone$no_religion)
-table(ces15phone$catholic)
-table(ces15phone$young)
-table(ces15phone$old)
-table(ces15phone$foreign)
+
 ces15phone$working_class<-Recode(ces15phone$working_class, "1=1; else=0")
 ces15phone$working_class2<-Recode(ces15phone$working_class2, "1=1; else=0")
 #ces15phone$union_both<-Recode(ces15phone$union_both, "1=1; else=0")
@@ -99,13 +93,6 @@ ces15phone$working_class2<-Recode(ces15phone$working_class2, "1=1; else=0")
 #ces15phone$sector<-Recode(ces15phone$sector, "1=1; else=0")
 #ces15phone$degree<-Recode(ces15phone$degree, "1=1; else=0")
 #ces15phone$language<-Recode(ces15phone$language, "1=1; else=0")
-table(ces15phone$working_class)
-table(ces15phone$working_class2)
-table(ces15phone$union_both)
-table(ces15phone$male)
-table(ces15phone$sector)
-table(ces15phone$degree)
-table(ces15phone$language)
 
 # Party Id
 #ces15phone$liberal_id<-Recode(ces15phone$party_id, "1=1; 0=0; 2:4=0; else=NA")
@@ -116,10 +103,6 @@ ces15phone$liberal_id<-Recode(ces15phone$party_id, "1=1; else=0")
 ces15phone$conservative_id<-Recode(ces15phone$party_id, "2=1; else=0")
 ces15phone$ndp_id<-Recode(ces15phone$party_id, "3=1; else=0")
 ces15phone$bloc_id<-Recode(ces15phone$party_id, "4=1; else=0")
-table(ces15phone$liberal_id)
-table(ces15phone$conservative_id)
-table(ces15phone$ndp_id)
-table(ces15phone$bloc_id)
 
 # Party vote
 #ces15phone$liberal<-Recode(ces15phone$vote, "1=1; 0=0; 2:5=0; else=NA")
@@ -132,11 +115,7 @@ ces15phone$conservative<-Recode(ces15phone$vote, "2=1; else=0")
 ces15phone$ndp<-Recode(ces15phone$vote, "3=1; else=0")
 ces15phone$bloc<-Recode(ces15phone$vote, "4=1; else=0")
 ces15phone$green<-Recode(ces15phone$vote, "5=1; else=0")
-table(ces15phone$liberal)
-table(ces15phone$conservative)
-table(ces15phone$ndp)
-table(ces15phone$bloc)
-table(ces15phone$green)
+
 
 #### 2019 Recodes ####
 
@@ -193,13 +172,7 @@ ces19phone$foreign<-Recode(ces19phone$native, "1=0; 0=1")
 #ces19phone$young<-Recode(ces19phone$age, "else=0; 18:34=1")
 #ces19phone$old<-Recode(ces19phone$age, "55:100=1; else=0")
 #ces19phone$foreign<-Recode(ces19phone$native, "else=0; 0=1")
-table(ces19phone$low_income)
-table(ces19phone$high_income)
-table(ces19phone$no_religion)
-table(ces19phone$catholic)
-table(ces19phone$young)
-table(ces19phone$old)
-table(ces19phone$foreign)
+
 ces19phone$working_class<-Recode(ces19phone$working_class, "1=1; else=0")
 ces19phone$working_class2<-Recode(ces19phone$working_class2, "1=1; else=0")
 ces19phone$working_class3<-Recode(ces19phone$working_class2, "1=1; else=0")
@@ -208,13 +181,6 @@ ces19phone$working_class3<-Recode(ces19phone$working_class2, "1=1; else=0")
 #ces19phone$sector<-Recode(ces19phone$sector, "1=1; else=0")
 #ces19phone$degree<-Recode(ces19phone$degree, "1=1; else=0")
 #ces19phone$language<-Recode(ces19phone$language, "1=1; else=0")
-table(ces19phone$working_class)
-table(ces19phone$working_class2)
-table(ces19phone$union_both)
-table(ces19phone$male)
-table(ces19phone$sector)
-table(ces19phone$degree)
-table(ces19phone$language)
 
 # Party Id
 #ces19phone$liberal_id<-Recode(ces19phone$party_id, "1=1; 0=0; 2:4=0; else=NA")
@@ -287,13 +253,13 @@ stargazer(model36ALL, model36ROC, model36QC, model38ALL, model38ROC, model38QC, 
 ces15phone %>% 
   select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
          market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
-         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help)->out15
+         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip)->out15
 #Now an ces19data frame
 ces19phone %>% 
 #  filter(quebec!=1) %>% 
   select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
          market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
-         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help)->out19
+         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip)->out19
 
 out15$survey<-rep(0, nrow(out15))
 out19$survey<-rep(1, nrow(out19))
@@ -526,6 +492,7 @@ bg(., i=~str_detect(Block, "block1|block3|block5"), bg="grey") %>%
 summary(roc_ndp$block1)#Interaction coefficient for male:survey is -0.38; I have confirmed visually it is -0.39 in the file roc_block_recursive_table. 
 summary(roc_liberal$block1)
 summary(roc_conservative$block3)
+#### Check on union variable ####
 
 ## Did the union movement really go down for all parties?
 roc_ndp_table %>% 
@@ -537,80 +504,85 @@ roc_conservative_table %>%
 
 #### Policy variation change between 2015-19####
 
-#scales goes from -1 Left to +1 Right
+## Currently all policy variables are coded 0 to 1 such that 1 is *more* of the variable name
 library(psych)
+out %>% 
+  select(survey, market_liberalism, moral_traditionalism, defence, environment) %>% 
+  summary()
+## This works well for the purposes of fitting models, because a positive coefficient reflects an inclination that greater support for that variable is positively linked to whatever DV you ahve. 
+  out %>% 
+  select(survey, market_liberalism, moral_traditionalism, continentalism, defence, environment) %>% 
+pivot_longer(cols=-survey) %>% 
+  group_by(survey, name) %>% 
+  summarize(avg=mean(value, na.rm=T))
 
-#Positive RW scales (no need to reverse code)
-table(ces15phone$moral_traditionalism, useNA="ifany")
-table(ces15phone$market_liberalism, useNA="ifany")
-table(ces15phone$continentalism, useNA="ifany")
+#Howevr, for th gtraph that we want, we need this to look different.
+#We want a positive number to reflect a *right-ward* shift from 2015 to 2019 and a negative number to reflect a left-ward shift. This is just purely visual. 
+  
+#We know from the above there was a shift *away* from market liberalism, *toward* moral_traditionalism, *toward* environme ntalism and *toward* defence spending, *awa* from continentalism
 
-#Reverse code positive LW scales to positive RW scales
-ces15phone$environment<-reverse.code(-1, ces15phone[,'environment'])
-ces15phone$redistribution<-reverse.code(-1, ces15phone[,'redistribution'])
-ces15phone$immigration<-reverse.code(-1, ces15phone[,'immigration'])
-ces15phone$immigration2<-reverse.code(-1, ces15phone[,'immigration2'])
-ces15phone$immigration_rate<-reverse.code(-1, ces15phone[,'immigration_rate'])
-ces15phone$minorities_help<-reverse.code(-1, ces15phone[,'minorities_help'])
-ces19phone$environment<-reverse.code(-1, ces19phone[,'environment'])
-ces19phone$redistribution<-reverse.code(-1, ces19phone[,'redistribution'])
-ces19phone$immigration<-reverse.code(-1, ces19phone[,'immigration'])
-ces19phone$immigration2<-reverse.code(-1, ces19phone[,'immigration2'])
-ces19phone$immigration_rate<-reverse.code(-1, ces19phone[,'immigration_rate'])
-ces19phone$minorities_help<-reverse.code(-1, ces19phone[,'minorities_help'])
+test1<-t.test(market_liberalism~survey, data=out)
+test2<-t.test(moral_traditionalism~survey, data=out)
+#The term estimate reports the difference
+tidy(test1)
+tidy(test2)
 
-#update dataframe
-#First make a ces15 roc data frame
-ces15phone %>% 
-  select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
-         market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
-         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip)->out15
-#Now an ces19data frame
-ces19phone %>% 
-  #  filter(quebec!=1) %>% 
-  select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
-         market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
-         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip)->out19
+#So the term estimate reports the value for 2015-2019. When 2015-2019 is a right-ward shift, we want that number to be positive; when 2015-2019 is a *left-ward* shift, we need it to be negative. 
 
-out15$survey<-rep(0, nrow(out15))
-out19$survey<-rep(1, nrow(out19))
-out15 %>% 
-  bind_rows(., out19)->out
-roc<-out %>% 
-  filter(quebec!=1)
-qc<-out %>% 
-  filter(quebec==1)
+#So right now, there is a positive sign for the shift in market_liberalism, because the 2015 score was higher than in 2019
+#But it actually was a *left-ward shift*. 
+#So, if we reverse the sign, on those variables where 1 = a right-wing position, we'll get the results we want. 
+#I am storing the negative-coded variables in _x
+out$moral_traditionalism_x<-out$moral_traditionalism*-1
+out$market_liberalism_x<-out$market_liberalism*-1
+out$continentalism_x<-out$continentalism*-1
+out$defence_x<-out$defence*-1
+out$immigration_rate<-out$immigration_rate*-1
+#Now check:
+test3<-t.test(market_liberalism_x~survey, data=out)
+tidy(test3)
+tidy(test1)
+#The sign for market liberalism is just reversed, so it works. 
+rm(test1, test2, test3)
 
 #Policy rating changes
+#Start with tghe combined 15 and 19 data frame
 out %>% 
-  select(immigration, immigration2, immigration_rate, minorities_help, environment, redistribution, continentalism, moral_traditionalism, market_liberalism, survey, occupation4) %>% 
-  pivot_longer(cols=immigration:market_liberalism) %>% 
-  group_by(survey, occupation4, name)  %>% 
-  summarize(Average=mean(value, na.rm=T)) %>% 
-  arrange(occupation4, name, survey) %>% 
-  group_by(name, occupation4) %>% 
-  mutate(Difference=Average-lag(Average)) %>% 
-  filter(survey==1) %>% 
-  ggplot(., aes(x=occupation4, y=Difference, col=name))+geom_point(position="jitter")+ylim(-0.115,0.15)+labs(x="Class", y="Difference (2019-2015)")
+  #select the variables we need for the attitudinal shifts
+  #pay attention to selecting the variables that have been recoded i.e. they end with _x
+  select(ends_with("_x"),  environment,redistribution, immigration, immigration_rate, minorities_help, survey, quebec, occupation4) %>% 
+  #Rename the variables for aesthetic purposes
+rename(., `Moral Traditionalism`=1, `Market Liberalism`=2, `Continentalism`=3, Defence=4, Environment=5, Redistribution=6, Immigration=7, `Immigration Rate`=8, `Help Minorities`=9) %>% 
+  #Pivot these down into one single variable
+  pivot_longer(cols=1:9) %>% 
+  #There are a few cases missing on this variable
+    filter(!is.na(quebec)) %>% 
+ # form groups by variable name, occupation and quebec
+  nest_by(name, occupation4, quebec=as_factor(quebec)) %>% 
+#Tidy the t.test results for value ~ survey
+  mutate(mod=tidy(t.test(value~survey, data=data))) %>% 
+  #Plot with occupation4 on the x, relevelled to put workers at the bottom and mamnagers at the top; y is the estimate
+ ggplot(., aes(x=fct_relevel(occupation4, "Working_Class", "Routine_Nonmanual", "Self-Employed", "Professionals", "Managers"), y=mod$estimate))+labs(x="Class", y="Difference (2019-2015)", subtitle="CES 2015 and 2019")+geom_point(aes(col=quebec), size=0.5,position=position_dodge(width=0.5))+facet_wrap(~name)+coord_flip(expand=T, clip="off")+geom_hline(aes(yintercept=0), linetype=2)+scale_color_grey(start=0.2 ,end=0.5)+geom_linerange(aes(ymin=mod$conf.low, ymax=mod$conf.high, col=quebec), position=position_dodge(width=0.5))
+ggsave(here("Plots", "attitudinal_differences_2015_2019.png"), width=6, height=4)
 
 #Leader rating changes
 out %>% 
-  select(liberal_leader, conservative_leader, ndp_leader, bloc_leader, survey, occupation4) %>% 
-  pivot_longer(cols=liberal_leader:bloc_leader) %>% 
-  group_by(survey, occupation4, name)  %>% 
-  summarize(Average=mean(value, na.rm=T)) %>% 
-  arrange(occupation4, name, survey) %>% 
-  group_by(name, occupation4) %>% 
-  mutate(Difference=Average-lag(Average)) %>% 
-  filter(survey==1) %>% 
-  ggplot(., aes(x=occupation4, y=Difference, col=name))+geom_point(position="jitter")+ylim(-0.115,0.15)+labs(x="Class", y="Difference (2019-2015)") 
-
+  select(`Liberal`=liberal_leader, `Conservative`=conservative_leader, `NDP`=ndp_leader, `BQ`=bloc_leader, Survey=survey, Class=occupation4, Quebec=quebec) %>%
+  filter(!is.na(Quebec)) %>% 
+  pivot_longer(cols=1:4, names_to=c("Party")) %>% 
+    filter(!is.na(value)) %>% 
+  nest_by(Class, Quebec=as_factor(Quebec), Party) %>% 
+  mutate(mod=tidy(t.test(data=data, value~Survey))) %>% 
+  ggplot(., aes(x=fct_relevel(Class, "Working_Class", "Routine_Nonmanual", "Self-Employed", "Professionals", "Managers"), y=mod$estimate*-1, col=Quebec))+geom_point()+ylim(-0.2,0.2)+labs(x="Class", y="Difference (2019-2015)")+coord_flip()+scale_color_grey()+facet_wrap(~Party)+geom_hline(yintercept=0, linetype=2)
+ggsave(here("Plots", "leader_approval_ratings.png"), width=6, height=4)
 #### Most Important Issue ####
 out %>% 
-group_by(Survey=as_factor(survey), `Most Important Problem`=as_factor(mip)) %>% 
+group_by(Survey=as_factor(survey), `Most Important Problem`=as_factor(mip), Quebec=as_factor(quebec), occupation4) %>%
   summarise(n=n()) %>% 
+  mutate(pct=n/sum(n)) %>% 
+  mutate(Election=car::Recode(Survey, "0=2015; 1=2019", as.factor=T, levels=c("2019", "2015")))%>% 
   filter(!is.na(`Most Important Problem`)) %>% 
-  ggplot(., aes(y=reorder(`Most Important Problem`,n), x=n, fill=Survey))+geom_col(position="dodge")+scale_fill_grey()+labs(y="Most Important Problem")
+  ggplot(., aes(y=reorder(`Most Important Problem`,n), x=pct, fill=Election))+geom_col(position=position_dodge(preserve="single"))+scale_fill_grey()+labs(y="Most Important Problem")+facet_grid(Quebec~occupation4)
 ggsave("Plots/mip_2015_2019.png")
 #------------------------------------------------------------------------------------------------
 #### Redistribution descriptives ####
@@ -699,160 +671,162 @@ ces93 %>%
   select(occupation, redistribution, pro_redistribution) %>% 
   group_by(occupation) %>%
   summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
-
-ces97 %>%
-  select(working_class, redistribution, pro_redistribution) %>% 
-  group_by(working_class) %>%
-  summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
-
-ces0411 %>%
-  select(working_class04, redistribution04, pro_redistribution04) %>% 
-  group_by(working_class04) %>%
-  summarise_at(vars(redistribution04, pro_redistribution04), mean, na.rm=T)
-
-ces0411 %>%
-  select(working_class06, redistribution06, pro_redistribution06) %>% 
-  group_by(working_class06) %>%
-  summarise_at(vars(redistribution06, pro_redistribution06), mean, na.rm=T)
-
-ces0411 %>%
-  select(working_class08, redistribution08, pro_redistribution08) %>% 
-  group_by(working_class08) %>%
-  summarise_at(vars(redistribution08, pro_redistribution08), mean, na.rm=T)
-
-ces0411 %>%
-  select(working_class11, redistribution11, pro_redistribution11) %>% 
-  group_by(working_class11) %>%
-  summarise_at(vars(redistribution11, pro_redistribution11), mean, na.rm=T)
-
-ces15phone %>%
-  select(working_class, redistribution, pro_redistribution) %>% 
-  group_by(working_class) %>%
-  summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
-
-ces19phone %>%
-  select(working_class, redistribution, pro_redistribution) %>% 
-  group_by(working_class) %>%
-  summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
+# 
+# ces97 %>%
+#   select(working_class, redistribution, pro_redistribution) %>% 
+#   group_by(working_class) %>%
+#   summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
+# 
+# ces0411 %>%
+#   select(working_class04, redistribution04, pro_redistribution04) %>% 
+#   group_by(working_class04) %>%
+#   summarise_at(vars(redistribution04, pro_redistribution04), mean, na.rm=T)
+# 
+# ces0411 %>%
+#   select(working_class06, redistribution06, pro_redistribution06) %>% 
+#   group_by(working_class06) %>%
+#   summarise_at(vars(redistribution06, pro_redistribution06), mean, na.rm=T)
+# 
+# ces0411 %>%
+#   select(working_class08, redistribution08, pro_redistribution08) %>% 
+#   group_by(working_class08) %>%
+#   summarise_at(vars(redistribution08, pro_redistribution08), mean, na.rm=T)
+# 
+# ces0411 %>%
+#   select(working_class11, redistribution11, pro_redistribution11) %>% 
+#   group_by(working_class11) %>%
+#   summarise_at(vars(redistribution11, pro_redistribution11), mean, na.rm=T)
+# 
+# ces15phone %>%
+#   select(working_class, redistribution, pro_redistribution) %>% 
+#   group_by(working_class) %>%
+#   summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
+# 
+# ces19phone %>%
+#   select(working_class, redistribution, pro_redistribution) %>% 
+#   group_by(working_class) %>%
+#   summarise_at(vars(redistribution, pro_redistribution), mean, na.rm=T)
 
 # Working Class voting by pro-redistribution
-ces19phone %>%
-  select(working_class, pro_redistribution, liberal, conservative, ndp, bloc, green) %>% 
-  group_by(working_class, pro_redistribution) %>%
-  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
-  as.data.frame() %>% 
-  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_Working_Class_Vote_2019.html"))
-
-# Working Class voting pro-redistribution by election
-ces %>%
-  select(election, working_class, pro_redistribution, liberal, conservative, ndp) %>% 
-  group_by(election, working_class, pro_redistribution) %>%
-  summarise_at(vars(liberal, conservative, ndp), mean, na.rm=T) %>% 
-  as.data.frame() %>%
-  filter(!is.na(working_class)) %>% 
-  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_Working_Class_Vote_by_election.html"))
-
-#------------------------------------------------------------------------------------------------
-#### Working Class descriptives ####
-
-#Share of Working class voting NDP
-ces %>% 
-  group_by(election, working_class, ndp) %>% 
-  summarize(n=n()) %>% 
-  filter(is.na(working_class)==F) %>% 
-  filter(is.na(ndp)==F) %>% 
-  mutate(percent=n/sum(n)) %>% 
-  filter(working_class==1) %>% 
-  filter(ndp==1) %>% 
-  ggplot(., aes(x=election, y=percent, fill=as_factor(working_class)))+geom_col(position="dodge")+labs(title="Share of Working Class respondents voting NDP")
-ggsave(here("Plots", "NDP_working_class_vote.png"))
-
-#Share of Working class voting Liberal
-ces %>% 
-  group_by(election, working_class, liberal) %>% 
-  summarize(n=n()) %>% 
-  filter(is.na(working_class)==F) %>% 
-  filter(is.na(liberal)==F) %>% 
-  mutate(percent=n/sum(n)) %>% 
-  filter(working_class==1) %>% 
-  filter(liberal==1) %>% 
-  ggplot(., aes(x=election, y=percent, fill=as_factor(working_class)))+geom_col(position="dodge")+labs(title="Share of Working Class respondents voting Liberal")
-ggsave(here("Plots", "Liberal_working_class_vote.png"))
-
-#Share of Working class voting Conservative
-ces %>% 
-  group_by(election, working_class, conservative) %>% 
-  summarize(n=n()) %>% 
-  filter(is.na(working_class)==F) %>% 
-  filter(is.na(conservative)==F) %>% 
-  mutate(percent=n/sum(n)) %>% 
-  filter(working_class==1) %>% 
-  filter(conservative==1) %>% 
-  ggplot(., aes(x=election, y=percent, fill=as_factor(working_class)))+geom_col(position="dodge")+labs(title="Share of Working Class respondents voting Conservative")
-ggsave(here("Plots", "Conservative_working_class_vote.png"))
-
-#Share of Working class voting Other
-ces %>% 
-  group_by(election, working_class, other) %>% 
-  summarize(n=n()) %>% 
-  filter(is.na(working_class)==F) %>% 
-  filter(is.na(other)==F) %>% 
-  mutate(percent=n/sum(n)) %>% 
-  filter(working_class==1) %>% 
-  filter(other==1) %>% 
-  ggplot(., aes(x=election, y=percent, fill=as_factor(working_class)))+geom_col(position="dodge")+labs(title="Share of Working Class respondents voting Other")
-ggsave(here("Plots", "Other_working_class_vote.png"))
-
-#Party Vote Shares of Working Class
-#This was your code
-
-# ces %>% 
-#   group_by(election, working_class, vote) %>% 
-#   summarize(n=n()) %>% 
-#   mutate(pct=n/sum(n)) %>%
-#   filter(working_class==1 & (vote<4 & vote>0)) %>% 
-#   ggplot(.,aes(x=as.numeric(election), y=pct))+
-#   geom_point()+
-#   geom_smooth(method="lm", se=F)+
-#   facet_grid(~as_factor(vote))+
-#   labs(title="Share of Working Class voting for political parties over time")
-# ggsave(here("Plots", "Party_shares_working_class_vote.png"))
-
-# #My modifications
-# ces %>% 
-#   group_by(election, working_class, vote) %>% 
-#   summarize(n=n()) %>% 
-#   mutate(pct=n/sum(n)*100) %>%
-#   filter(working_class==1 & (vote<4 & vote>0)) %>% 
-#   ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
-#   geom_line()+
-#   geom_point()+
-#   scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
-#   labs(title="Share of Working Class voting for political parties over time", x="Year", y="Percent")
-# ggsave(here("Plots", "Party_shares_working_class_vote.png"))
-# #Percent of NDP Voters Working Class
-# ces %>% 
-#   group_by(election, vote, working_class) %>% 
-#   summarize(n=n()) %>% 
-#   mutate(pct=n/sum(n)) %>%
-#   filter(working_class==1 & vote==3) %>% 
-#   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="NDP Voter % that are Working Class")
-# ggsave(here("Plots", "NDP_Voters_Working_Class_Percent.png"))
+# ces19phone %>%
+#   select(working_class, pro_redistribution, liberal, conservative, ndp, bloc, green) %>% 
+#   group_by(working_class, pro_redistribution) %>%
+#   summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+#   as.data.frame() %>% 
+#   stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_Working_Class_Vote_2019.html"))
 # 
-# #Percent of Liberal Voters Working Class
-# ces %>% 
-#   group_by(election, vote, working_class) %>% 
-#   summarize(n=n()) %>% 
-#   mutate(pct=n/sum(n)) %>%
-#   filter(working_class==1 & vote==1) %>% 
-#   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Liberal Voter % that are Working Class")
-# ggsave(here("Plots", "Lib_Voters_Working_Class_Percent.png"))
+# # Working Class voting pro-redistribution by election
+# ces %>%
+#   select(election, working_class, pro_redistribution, liberal, conservative, ndp) %>% 
+#   group_by(election, working_class, pro_redistribution) %>%
+#   summarise_at(vars(liberal, conservative, ndp), mean, na.rm=T) %>% 
+#   as.data.frame() %>%
+#   filter(!is.na(working_class)) %>% 
+#   stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Pro_redistribution_Working_Class_Vote_by_election.html"))
 # 
-# #Percent of Conservative Voters Working Class
+# #------------------------------------------------------------------------------------------------
+# #### Working Class descriptives ####
+# 
+# #Share of Working class voting NDP
 # ces %>% 
-#   group_by(election, vote, working_class) %>% 
+#   group_by(election, working_class, ndp) %>% 
 #   summarize(n=n()) %>% 
-#   mutate(pct=n/sum(n)) %>%
-#   filter(working_class==1 & vote==2) %>% 
-#   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Conservative Voter % that are Working Class")
-# ggsave(here("Plots", "Con_Voters_Working_Class_Percent.png"))
+#   filter(is.na(working_class)==F) %>% 
+#   filter(is.na(ndp)==F) %>% 
+#   mutate(percent=n/sum(n)) %>% 
+#   filter(working_class==1) %>% 
+#   filter(ndp==1) %>% 
+#   ggplot(., aes(x=election, y=percent, fill=as_factor(working_class)))+geom_col(position="dodge")+labs(title="Share of Working Class respondents voting NDP")
+# ggsave(here("Plots", "NDP_working_class_vote.png"))
+# 
+# #Share of Working class voting Liberal
+# ces %>% 
+#   group_by(election, working_class, liberal) %>% 
+#   summarize(n=n()) %>% 
+#   filter(is.na(working_class)==F) %>% 
+#   filter(is.na(liberal)==F) %>% 
+#   mutate(percent=n/sum(n)) %>% 
+#   filter(working_class==1) %>% 
+#   filter(liberal==1) %>% 
+#   ggplot(., aes(x=election, y=percent, fill=as_factor(working_class)))+geom_col(position="dodge")+labs(title="Share of Working Class respondents voting Liberal")
+# ggsave(here("Plots", "Liberal_working_class_vote.png"))
+# 
+# #Share of Working class voting Conservative
+# ces %>% 
+#   group_by(election, working_class, conservative) %>% 
+#   summarize(n=n()) %>% 
+#   filter(is.na(working_class)==F) %>% 
+#   filter(is.na(conservative)==F) %>% 
+#   mutate(percent=n/sum(n)) %>% 
+#   filter(working_class==1) %>% 
+#   filter(conservative==1) %>% 
+#   ggplot(., aes(x=election, y=percent, fill=as_factor(working_class)))+geom_col(position="dodge")+labs(title="Share of Working Class respondents voting Conservative")
+# ggsave(here("Plots", "Conservative_working_class_vote.png"))
+# 
+# #Share of Working class voting Other
+# ces %>% 
+#   group_by(election, working_class, other) %>% 
+#   summarize(n=n()) %>% 
+#   filter(is.na(working_class)==F) %>% 
+#   filter(is.na(other)==F) %>% 
+#   mutate(percent=n/sum(n)) %>% 
+#   filter(working_class==1) %>% 
+#   filter(other==1) %>% 
+#   ggplot(., aes(x=election, y=percent, fill=as_factor(working_class)))+geom_col(position="dodge")+labs(title="Share of Working Class respondents voting Other")
+# ggsave(here("Plots", "Other_working_class_vote.png"))
+# 
+# #Party Vote Shares of Working Class
+# #This was your code
+# 
+# # ces %>% 
+# #   group_by(election, working_class, vote) %>% 
+# #   summarize(n=n()) %>% 
+# #   mutate(pct=n/sum(n)) %>%
+# #   filter(working_class==1 & (vote<4 & vote>0)) %>% 
+# #   ggplot(.,aes(x=as.numeric(election), y=pct))+
+# #   geom_point()+
+# #   geom_smooth(method="lm", se=F)+
+# #   facet_grid(~as_factor(vote))+
+# #   labs(title="Share of Working Class voting for political parties over time")
+# # ggsave(here("Plots", "Party_shares_working_class_vote.png"))
+# 
+# # #My modifications
+# # ces %>% 
+# #   group_by(election, working_class, vote) %>% 
+# #   summarize(n=n()) %>% 
+# #   mutate(pct=n/sum(n)*100) %>%
+# #   filter(working_class==1 & (vote<4 & vote>0)) %>% 
+# #   ggplot(.,aes(x=as.numeric(election), y=pct, col=as_factor(vote)))+
+# #   geom_line()+
+# #   geom_point()+
+# #   scale_color_manual(values=c("red", "blue", "orange"), name="Party")+
+# #   labs(title="Share of Working Class voting for political parties over time", x="Year", y="Percent")
+# # ggsave(here("Plots", "Party_shares_working_class_vote.png"))
+# # #Percent of NDP Voters Working Class
+# # ces %>% 
+# #   group_by(election, vote, working_class) %>% 
+# #   summarize(n=n()) %>% 
+# #   mutate(pct=n/sum(n)) %>%
+# #   filter(working_class==1 & vote==3) %>% 
+# #   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="NDP Voter % that are Working Class")
+# # ggsave(here("Plots", "NDP_Voters_Working_Class_Percent.png"))
+# # 
+# # #Percent of Liberal Voters Working Class
+# # ces %>% 
+# #   group_by(election, vote, working_class) %>% 
+# #   summarize(n=n()) %>% 
+# #   mutate(pct=n/sum(n)) %>%
+# #   filter(working_class==1 & vote==1) %>% 
+# #   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Liberal Voter % that are Working Class")
+# # ggsave(here("Plots", "Lib_Voters_Working_Class_Percent.png"))
+# # 
+# # #Percent of Conservative Voters Working Class
+# # ces %>% 
+# #   group_by(election, vote, working_class) %>% 
+# #   summarize(n=n()) %>% 
+# #   mutate(pct=n/sum(n)) %>%
+# #   filter(working_class==1 & vote==2) %>% 
+# #   ggplot(., aes(x=election, y=pct))+geom_point()+labs(title="Conservative Voter % that are Working Class")
+# # ggsave(here("Plots", "Con_Voters_Working_Class_Percent.png"))
+# 
+# 
