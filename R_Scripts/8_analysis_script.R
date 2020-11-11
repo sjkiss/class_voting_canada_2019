@@ -3,7 +3,7 @@ library(stargazer)
 library(broom)
 library(nnet)
 library(purrr)
-
+Recode
 
 #CREATE WORKING CLASS DICHOTOMOUS VARIABLE; NOTE HERE ONLY EMPLOYED AND SELF-EMPLOYED PEOPLE ARE SET TO 0 OR 1; ELSE = NA
 ces$working_class<-Recode(ces$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
@@ -260,13 +260,15 @@ ces19phone %>%
   select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
          market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
          national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip)->out19
-
+#### Build out combining ces2015 and 2019 ####
 out15$survey<-rep(0, nrow(out15))
 out19$survey<-rep(1, nrow(out19))
 out15 %>% 
   bind_rows(., out19)->out
+#Split out into ROC 
 roc<-out %>% 
   filter(quebec!=1)
+#Split out into Quebec
 qc<-out %>% 
   filter(quebec==1)
 
@@ -282,6 +284,8 @@ block6<-glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholi
 #Turn into a list
 roc_ndp<-list(block1, block2, block3, block4, block5, block6)
 names(roc_ndp)<-c("block1", "block2", "block3", "block4", "block5", "block6")
+
+
 
 library(kableExtra)
 library(knitr)
@@ -326,6 +330,7 @@ qc_ndp %>%
   mutate(term=str_replace_all(term, ":survey", "")) %>% 
   arrange(Block) %>% 
   select(Block, term, estimate,p.value)->qc_ndp_table
+
 
 
 #### Conservative ROC####
@@ -439,6 +444,7 @@ qc_bloc %>%
 #### Format Nice comprehensive QC and ROC Tables
 #Step 1 combine all the parties' tables into roc and qc
 roc_table<-cbind(roc_ndp_table, roc_liberal_table, roc_conservative_table)
+
 qc_table<-cbind(qc_ndp_table, qc_bloc_table, qc_liberal_table, qc_conservative_table)
 library(flextable)
 #### C
@@ -465,9 +471,25 @@ bold(., i=~sig_con< 0.05, j=~Conservative+sig_con) %>%
   #This sets the background colour conditional on the term
   #So if it is block1, 3 or 5, grey it out. 
   bg(., i=~str_detect(Block, "block1|block3|block5"), bg="grey") %>% 
-    add_header_lines(values=c("ROC Block Recursive Model Coefficients, 2015 and 2019")) %>% save_as_html("Tables/roc_block_recursive_table.html")
+    add_header_lines(values=c("ROC Block Recursive Model Coefficients, 2015 and 2019")) %>% 
+#  add_footer_row(pseudos, colwidths=c(4,4))
+save_as_html("Tables/roc_block_recursive_table.html")
+#pseudos<-c(PseudoR2("", roc_ndp[[6]]), PseudoR2(roc_liberal[[6]]), PseudoR2(roc_conservative[[6]]))
 
+names(summary(roc_ndp[[6]]))
+names(roc_ndp[[6]])
+summary(roc_ndp[[6]])
+roc_ndp[[6]]$model
+stargazer(roc_ndp[[6]], type="text")
+nrow(roc)
+names(roc)
+table(roc$survey)
+summary(roc)
+table(roc$survey, roc$continentalism, useNA = "ifany")
+length(roc_ndp[[6]]$fitted.values)
+length(roc_liberal[[6]]$fitted.values)
 
+#?add_footer_lines
 ####Combine Quebec Table ####
 #Drop out terms we don't need.
 #First chekc the names
@@ -582,7 +604,7 @@ group_by(Survey=as_factor(survey), `Most Important Problem`=as_factor(mip), Queb
   mutate(pct=n/sum(n)) %>% 
   mutate(Election=car::Recode(Survey, "0=2015; 1=2019", as.factor=T, levels=c("2019", "2015")))%>% 
   filter(!is.na(`Most Important Problem`)) %>% 
-  ggplot(., aes(y=reorder(`Most Important Problem`,n), x=pct, fill=Election))+geom_col(position=position_dodge(preserve="single"))+scale_fill_grey()+labs(y="Most Important Problem")+facet_grid(Quebec~occupation4)
+  ggplot(., aes(y=reorder(`Most Important Problem`,n), x=n))+geom_col(position=position_dodge(preserve="single"))+scale_fill_grey()+labs(y="Most Important Problem")+facet_wrap(~Election)
 ggsave("Plots/mip_2015_2019.png")
 #------------------------------------------------------------------------------------------------
 #### Redistribution descriptives ####
@@ -830,3 +852,27 @@ ces93 %>%
 # # ggsave(here("Plots", "Con_Voters_Working_Class_Percent.png"))
 # 
 # 
+
+#### Performance Models ####
+
+#ROC NDP
+table(roc$quebec)
+table(qc$quebec)
+#Start with ROC
+roc%>%
+  #nest by everything survey to fit one model per survey year
+  nest(-survey)%>%
+#Createacolumn called mod that is the result of fitting binomial m odel; data=x i.e. data is each separate survety
+  mutate(ndp_demographics=map(data, function(x) glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, family="binomial", data=x))) %>%
+  #Tidy each model for nice use 
+ #mutate(tidied=map(demographics, tidy)) %>%
+  #add column of PseudoR2 for each 
+  mutate(ndp_demographics_r2=map(ndp_demographics, PseudoR2))%>%
+  unnest(ndp_demographics_r2)
+
+
+# Repeat for QC
+
+
+#for subset just start with out
+#out
