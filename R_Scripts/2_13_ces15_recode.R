@@ -1,6 +1,6 @@
 
 #File to Recode 2015 CES Data 
-data("ces15phone")
+
 #recode Gender (RGENDER)
 look_for(ces15phone, "gender")
 ces15phone$male<-Recode(ces15phone$RGENDER, "1=1; 5=0")
@@ -554,4 +554,77 @@ ces15phone$mip<-Recode(ces15phone$CPS15_1, "75=1; 71=2; 77=2; 18=2; 4=2; 5=3; 2=
                                                   80:82=0; 84=0; 92:97=0; 6=0; 8=0; 46=0; 31:33=0; 58:59=0; 35=0; 1=0; else=NA")
 val_labels(ces15phone$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, 
                               Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15)
+
+#### Visible minority status####
+ces15phone$CPS15_85
+ces15phone %>% 
+  mutate(vismin=case_when(
+  CPS15_85==2~ 0,
+  CPS15_85==3~0,
+  CPS15_85==5~1,
+    CPS15_85==6~1,
+    CPS15_85==7~0,
+    CPS15_85==8~1,
+    CPS15_85==9~0,
+    CPS15_85==10~0,
+    CPS15_85==11~0,
+    CPS15_85==12~0,
+    CPS15_85==13~0,
+    CPS15_85==14~1,
+    CPS15_85==15~1,
+    CPS15_85==16~0,
+    CPS15_85==17~0,
+    CPS15_85==18~0,
+  CPS15_85==19~0,
+    CPS15_85==20~1,
+    CPS15_85==21~1,
+    CPS15_85==22~0,
+    CPS15_85==23~0,
+    CPS15_85==24~0,
+    CPS15_85==25~0,
+    CPS15_85==26~1,
+    CPS15_85==27~0,
+    CPS15_85==28~1,
+    CPS15_85==29~1,
+    CPS15_85==30~0,
+    CPS15_85==31~1,
+    CPS15_85==32~1,
+    CPS15_85==34~0,
+    CPS15_85==37~0,
+    CPS15_85==38~0,
+  CPS15_85==39~1,
+    CPS15_85==40~0,
+    CPS15_85==41~0,
+    CPS15_85==42~0,
+    CPS15_85==43~0,
+    CPS15_85==44~0,
+    CPS15_85==45~0,
+    CPS15_85==45~1,
+    CPS15_85==47~0,
+    CPS15_85==48~0,
+    CPS15_85==49~1,
+  CPS15_85==50~0,
+    CPS15_85==51~1,
+    CPS15_85==52~1,
+    CPS15_85==53~0,
+    CPS15_85==54~0,
+    CPS15_85==55~0,
+    CPS15_85==56~0,
+  CPS15_85==57~0,
+    CPS15_85==58~0,
+    CPS15_85==59~1,
+    CPS15_85==60~1,
+    CPS15_85==61~1,
+    CPS15_85==62~1,
+    CPS15_85==63~1,
+    CPS15_85==64~1,
+    CPS15_85==66~0,
+    CPS15_85==70~0,
+    CPS15_85==94~0,  
+  CPS15_85==95~1,
+    CPS15_85==96~0,
+    CPS15_85==98~NA_real_,
+  TRUE ~ NA_real_
+      ))->ces15phone
+val_labels(ces15phone$vismin)<-c('Visible Minority'=1, 'Non Visible Minority'=0)
 

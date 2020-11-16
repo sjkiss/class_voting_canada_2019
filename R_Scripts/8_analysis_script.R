@@ -76,7 +76,7 @@ ces15phone$catholic<-Recode(ces15phone$religion, "1=1; 2:3=0; 0=0; NA=NA")
 ces15phone$young<-Recode(ces15phone$age, "35:115=0; 18:34=1")
 ces15phone$old<-Recode(ces15phone$age, "55:115=1; 18:54=0")
 ces15phone$foreign<-Recode(ces15phone$native, "1=0; 0=1")
-
+val_labels(ces15phone$foreign)<-c(Foreign=1, Native=0)
 #Dummies coded missing as 0
 #ces15phone$low_income<-Recode(ces15phone$income, "else=0; 1=1")
 #ces15phone$high_income<-Recode(ces15phone$income, "else=0; 5=1")
@@ -163,7 +163,7 @@ ces19phone$catholic<-Recode(ces19phone$religion, "1=1; 2:3=0; 0=0; NA=NA")
 ces19phone$young<-Recode(ces19phone$age, "35:100=0; 18:34=1")
 ces19phone$old<-Recode(ces19phone$age, "55:100=1; 18:54=0")
 ces19phone$foreign<-Recode(ces19phone$native, "1=0; 0=1")
-
+val_labels(ces19phone$foreign)<-c(Foreign=1, Native=0)
 #Dummies coded missing as 0
 #ces19phone$low_income<-Recode(ces19phone$income, "else=0; 1=1")
 #ces19phone$high_income<-Recode(ces19phone$income, "else=0; 5=1")
@@ -220,7 +220,7 @@ ces19phone %>%
 ces19phone %>% 
   filter(quebec!=1)->ces19.roc
 
-#M36 Basic Class Model with self-employed carved out
+#Logistic Regression Models for Class Variables
 model36ALL<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces19phone, family="binomial")
 model36ROC<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces19.roc, family="binomial")
 model36QC<-glm(ndp~working_class3+union_both+income+degree+sector, data=ces19.qc, family="binomial")
@@ -228,16 +228,8 @@ summary(model36ALL)
 summary(model36ROC)
 summary(model36QC)
 
-#### M37 Basic Class Model with self-employed lumped in ####
-# #note: if we want to lump the self-employed with the working class we need to change this to working_class4
-# model37ALL<-glm(ndp~working_class4+union_both+income+degree+sector, data=ces19phone, family="binomial")
-# model37ROC<-glm(ndp~working_class4+union_both+income+degree+sector, data=ces19.roc, family="binomial")
-# model37QC<-glm(ndp~working_class4+union_both+income+degree+sector, data=ces19.qc, family="binomial")
-# summary(model37ALL)
-# summary(model37ROC)
-#summary(model37QC)
 
-#M38 Basic Class Model with self-employed careved out into 0 (including age, gender, region)
+#Logistic Regression MOdels with Demographic Controls
 model38ALL<-glm(ndp~working_class3+union_both+income+degree+sector+age+male+as.factor(region4), data=ces19phone, family="binomial")
 model38ROC<-glm(ndp~working_class3+union_both+income+degree+sector+age+male+region3, data=ces19.roc, family="binomial")
 model38QC<-glm(ndp~working_class3+union_both+income+degree+sector+age+male, data=ces19.qc, family="binomial")
@@ -253,13 +245,13 @@ stargazer(model36ALL, model36ROC, model36QC, model38ALL, model38ROC, model38QC, 
 ces15phone %>% 
   select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
          market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
-         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip)->out15
+         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip, vismin)->out15
 #Now an ces19data frame
 ces19phone %>% 
 #  filter(quebec!=1) %>% 
   select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
          market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
-         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip)->out19
+         national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip, vismin)->out19
 #### Build out combining ces2015 and 2019 ####
 out15$survey<-rep(0, nrow(out15))
 out19$survey<-rep(1, nrow(out19))
@@ -474,22 +466,7 @@ bold(., i=~sig_con< 0.05, j=~Conservative+sig_con) %>%
     add_header_lines(values=c("ROC Block Recursive Model Coefficients, 2015 and 2019")) %>% 
 #  add_footer_row(pseudos, colwidths=c(4,4))
 save_as_html("Tables/roc_block_recursive_table.html")
-#pseudos<-c(PseudoR2("", roc_ndp[[6]]), PseudoR2(roc_liberal[[6]]), PseudoR2(roc_conservative[[6]]))
 
-names(summary(roc_ndp[[6]]))
-names(roc_ndp[[6]])
-summary(roc_ndp[[6]])
-roc_ndp[[6]]$model
-stargazer(roc_ndp[[6]], type="text")
-nrow(roc)
-names(roc)
-table(roc$survey)
-summary(roc)
-table(roc$survey, roc$continentalism, useNA = "ifany")
-length(roc_ndp[[6]]$fitted.values)
-length(roc_liberal[[6]]$fitted.values)
-
-#?add_footer_lines
 ####Combine Quebec Table ####
 #Drop out terms we don't need.
 #First chekc the names
@@ -508,6 +485,8 @@ bg(., i=~str_detect(Block, "block1|block3|block5"), bg="grey") %>%
   add_header_lines(values=c("Quebec Block Recursive Model Coefficients, 2015 and 2019")) %>% 
   save_as_html(., "Tables/qc_block_recursive_model.html")
 #save_as_docx(., path="Tables/qc_block_recursive_model.docx")
+
+
 #### Run some checks with what appears itn the table####
   #Could you please just check a few coefficients randomly to be sure they are correct
   #EAch model is stored in either roc_ndp, qc_ndp etc. etc. etc. followed by $block1, $block2, #Just pick four or five randomly in different blocks and in qc, roc. Just enough to be sure we are not making a mistake. 
@@ -524,6 +503,56 @@ roc_liberal_table %>%
 roc_conservative_table %>% 
   filter(term=="union_both")
 
+#### Vote Flow ####
+
+ces19phone %>% 
+  select(past_vote, vote, occupation4) %>% 
+  filter(past_vote!=0 & vote!=0) %>% 
+    group_by(vote, past_vote) %>% 
+  summarise(n=n()) %>% 
+  ungroup() %>% 
+  mutate(perc=n/sum(n)) %>% 
+  mutate(vote19=case_when(
+    past_vote==1&vote==1 ~ "Stay Liberal",
+    past_vote==2&vote==2 ~ "Stay Conservative",
+    past_vote==3&vote==3 ~ "Stay NDP",
+    past_vote==4 & vote==4 ~ "Stay BQ",
+    past_vote==5 & vote==5 ~ "Stay Green",
+   vote==1 & past_vote!=1 ~ "To Liberal",
+   vote==2 &past_vote!=2 ~ "To Conservative",
+   vote==3 & past_vote!=3 ~ "To NDP",
+   vote==4 & past_vote!=4 ~ "To BQ",
+   vote==5 & past_vote!=5 ~ "To Green"
+  )) %>% 
+  mutate(vote19=factor(vote19, levels=c("Stay Liberal","To Liberal" ,"Stay Conservative","To Conservative", "Stay NDP", "To NDP", "Stay BQ", "To BQ", "Stay Green", "To Green"))) %>% 
+  mutate(past_vote=fct_relevel(as_factor(past_vote),"Green", "Bloc", "NDP", "Conservative", "Liberal"), vote=as_factor(vote))%>%
+  ggplot(., aes(x=vote19, y=perc, fill=past_vote))+geom_col()+coord_flip()+labs(y="Percent", x="Past Vote")+scale_fill_grey(start=0.8, end=0.2, name="Past Vote")
+
+#### STatus of Race####
+
+#Are the working classes more racialized?
+
+out %>% 
+select(survey, vismin, occupation4) %>% 
+  as_factor() %>% 
+  group_by(survey, occupation4, vismin) %>% 
+  filter(!is.na(vismin)) %>% 
+  filter(!is.na(occupation4)) %>% 
+  summarize(n=n()) %>% 
+  mutate(perc=n/sum(n)) %>% 
+  print(n=100)
+
+  table(out15$vismin)
+table(out19$vismin, out19$occupation4)
+
+mod1<-glm(conservative~working_class2*vismin, data=out19, family="binomial")
+mod2<-glm(ndp~working_class2*vismin, data=out19, family="binomial")
+mod2<-glm(ndp~working_class2+vismin, data=out15, family="binomial")
+mod3<-glm(ndp~working_class2+vismin, data=out19, family="binomial")
+summary(mod3)
+summary(mod2)
+summary(mod2)
+summary(vismin_model)
 #### Policy variation change between 2015-19####
 
 ## Currently all policy variables are coded 0 to 1 such that 1 is *more* of the variable name

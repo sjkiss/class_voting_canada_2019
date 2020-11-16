@@ -1,7 +1,6 @@
 
 #File to Recode 2019 CES Data 
-#Load Data
-data("ces19phone")
+
 #recode Gender (q3)
 look_for(ces19phone, "gender")
 ces19phone$male<-Recode(ces19phone$q3, "1=1; 2=0; else=NA")
@@ -178,9 +177,10 @@ val_labels(ces19phone$size)
 table(ces19phone$size)
 
 #recode Native-born (q64)
-look_for(ces19phone, "born")
+ces19phone$q64
 ces19phone$native<-Recode(ces19phone$q64, "1:2=1; 3:13=0; else=NA")
 val_labels(ces19phone$native)<-c(Foreign=0, Native=1)
+
 #checks
 val_labels(ces19phone$native)
 table(ces19phone$native)
@@ -458,11 +458,12 @@ ces19phone$moral3<-Recode(as.numeric(ces19phone$p35_c), "1=0; 2=0.25; 3=0.5; 4=0
 table(ces19phone$moral1)
 table(ces19phone$moral2)
 table(ces19phone$moral3)
-
+ces19phone %>% 
+  names()
 ces19phone %>% 
   rowwise() %>% 
   mutate(moral_traditionalism=mean(
-    c_across(moral1:moral2:moral3)
+    c_across(moral1:moral3)
     , na.rm=T )) -> out
 out %>% 
   ungroup() %>% 
@@ -521,10 +522,7 @@ ces19phone %>%
 qplot(ces19phone$political_disaffection, geom="histogram")
 table(ces19phone$political_disaffection, useNA="ifany")
 
-#Calculate Cronbach's alpha
-ces19phone %>% 
-  select(disaffection1, disaffection2) %>% 
-  alpha(.)
+
 
 #recode Continentalism (p43)
 look_for(ces19phone, "united states")
@@ -617,7 +615,12 @@ val_labels(ces19phone$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Educati
 
 ces19phone %>% 
   mutate(mip_enviro=case_when(
-    mip_cat==1~1,
+    mip==1~1,
     TRUE~0
   ))->ces19phone
 
+# Recode visible minority
+source(here('R_Scripts/2_14_ces_19_vismin_recode.R'))
+
+
+  
