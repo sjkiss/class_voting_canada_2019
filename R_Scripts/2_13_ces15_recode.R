@@ -392,13 +392,29 @@ val_labels(ces15phone$pro_redistribution)<-c(Non_Pro=0, Pro=1)
 val_labels(ces15phone$pro_redistribution)
 table(ces15phone$pro_redistribution)
 
-#recode NDP_rating (CPS15_20)
+#recode NDP rating (CPS15_20)
 look_for(ces15phone, "NDP")
 ces15phone$NDP_therm<-Recode(ces15phone$CPS15_20, "996=NA; 998=NA; 999=NA")
 #checks
 table(ces15phone$NDP_therm)
 ces15phone$NDP_rating<-(ces15phone$NDP_therm /100)
 table(ces15phone$NDP_rating)
+
+#recode Liberal rating (CPS15_19)
+look_for(ces15phone, "Liberal")
+ces15phone$Liberal_therm<-Recode(ces15phone$CPS15_19, "996=NA; 998=NA; 999=NA")
+#checks
+table(ces15phone$Liberal_therm)
+ces15phone$Liberal_rating<-(ces15phone$Liberal_therm /100)
+table(ces15phone$Liberal_rating)
+
+#recode Conservative rating (CPS15_18)
+look_for(ces15phone, "Conservative")
+ces15phone$Conservative_therm<-Recode(ces15phone$CPS15_18, "996=NA; 998=NA; 999=NA")
+#checks
+table(ces15phone$Conservative_therm)
+ces15phone$Conservative_rating<-(ces15phone$Conservative_therm /100)
+table(ces15phone$Conservative_rating)
 
 #recode Manage economy (CPS15_40b)
 look_for(ces15phone, "economy")

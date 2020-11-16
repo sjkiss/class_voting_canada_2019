@@ -3,7 +3,6 @@ library(stargazer)
 library(broom)
 library(nnet)
 library(purrr)
-Recode
 
 #CREATE WORKING CLASS DICHOTOMOUS VARIABLE; NOTE HERE ONLY EMPLOYED AND SELF-EMPLOYED PEOPLE ARE SET TO 0 OR 1; ELSE = NA
 ces$working_class<-Recode(ces$occupation, "4:5=1; 3=0; 2=0; 1=0; else=NA")
@@ -213,6 +212,53 @@ table(ces19phone$ndp)
 table(ces19phone$bloc)
 table(ces19phone$green)
 
+#Create manage economy dummy variables
+ces15phone$liberal_economy<-Recode(ces15phone$manage_economy, "1=1; else=0")
+ces15phone$conservative_economy<-Recode(ces15phone$manage_economy, "2=1; else=0")
+ces15phone$ndp_economy<-Recode(ces15phone$manage_economy, "3=1; else=0")
+ces15phone$bloc_economy<-Recode(ces15phone$manage_economy, "4=1; else=0")
+ces15phone$green_economy<-Recode(ces15phone$manage_economy, "5=1; else=0")
+table(ces15phone$liberal_economy)
+table(ces15phone$conservative_economy)
+table(ces15phone$ndp_economy)
+table(ces15phone$bloc_economy)
+table(ces15phone$green_economy)
+
+ces19phone$liberal_economy<-Recode(ces19phone$manage_economy, "1=1; else=0")
+ces19phone$conservative_economy<-Recode(ces19phone$manage_economy, "2=1; else=0")
+ces19phone$ndp_economy<-Recode(ces19phone$manage_economy, "3=1; else=0")
+ces19phone$bloc_economy<-Recode(ces19phone$manage_economy, "4=1; else=0")
+ces19phone$green_economy<-Recode(ces19phone$manage_economy, "5=1; else=0")
+table(ces19phone$liberal_economy)
+table(ces19phone$conservative_economy)
+table(ces19phone$ndp_economy)
+table(ces19phone$bloc_economy)
+table(ces19phone$green_economy)
+
+#Create manage environment dummy variables
+ces19phone$liberal_environment<-Recode(ces19phone$manage_environment, "1=1; else=0")
+ces19phone$conservative_environment<-Recode(ces19phone$manage_environment, "2=1; else=0")
+ces19phone$ndp_environment<-Recode(ces19phone$manage_environment, "3=1; else=0")
+ces19phone$bloc_environment<-Recode(ces19phone$manage_environment, "4=1; else=0")
+ces19phone$green_environment<-Recode(ces19phone$manage_environment, "5=1; else=0")
+table(ces19phone$liberal_environment)
+table(ces19phone$conservative_environment)
+table(ces19phone$ndp_environment)
+table(ces19phone$bloc_environment)
+table(ces19phone$green_environment)
+
+#Create address main issue dummy variables
+ces19phone$liberal_issue<-Recode(ces19phone$address_issue, "1=1; else=0")
+ces19phone$conservative_issue<-Recode(ces19phone$address_issue, "2=1; else=0")
+ces19phone$ndp_issue<-Recode(ces19phone$address_issue, "3=1; else=0")
+ces19phone$bloc_issue<-Recode(ces19phone$address_issue, "4=1; else=0")
+ces19phone$green_issue<-Recode(ces19phone$address_issue, "5=1; else=0")
+table(ces19phone$liberal_issue)
+table(ces19phone$conservative_issue)
+table(ces19phone$ndp_issue)
+table(ces19phone$bloc_issue)
+table(ces19phone$green_issue)
+
 #### Logistic models ####
 #Split QC out into ces19.qc
 ces19phone %>% 
@@ -252,13 +298,13 @@ stargazer(model36ALL, model36ROC, model36QC, model38ALL, model38ROC, model38QC, 
 #First make a ces15 roc data frame
 ces15phone %>% 
   select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
-         market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
+         market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, liberal_economy, ndp_economy, conservative_economy, bloc_economy, 
          national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip)->out15
 #Now an ces19data frame
 ces19phone %>% 
 #  filter(quebec!=1) %>% 
-  select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, 
-         market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, 
+  select(ndp, liberal, conservative, bloc, region3, working_class2, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, liberal_environment, ndp_environment, conservative_environment,
+         market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, liberal_economy, ndp_economy, conservative_economy, bloc_economy, liberal_issue, conservative_issue, ndp_issue,
          national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip)->out19
 #### Build out combining ces2015 and 2019 ####
 out15$survey<-rep(0, nrow(out15))
@@ -285,8 +331,6 @@ block6<-glm(ndp~(region3+working_class2+union_both+young+old+male+sector+catholi
 roc_ndp<-list(block1, block2, block3, block4, block5, block6)
 names(roc_ndp)<-c("block1", "block2", "block3", "block4", "block5", "block6")
 
-
-
 library(kableExtra)
 library(knitr)
 ## This code  pulls it all nicely together. 
@@ -307,7 +351,6 @@ roc_ndp %>%
   #arrange them by block so that block1 variables appear first
   arrange(Block) %>% 
   select(Block, term, estimate,p.value)->roc_ndp_table
-
 
 #### NDP QC ####
 
@@ -330,8 +373,6 @@ qc_ndp %>%
   mutate(term=str_replace_all(term, ":survey", "")) %>% 
   arrange(Block) %>% 
   select(Block, term, estimate,p.value)->qc_ndp_table
-
-
 
 #### Conservative ROC####
 
@@ -854,15 +895,17 @@ ces93 %>%
 # 
 
 #### Performance Models ####
+library(DescTools)
 
-#ROC NDP
 table(roc$quebec)
 table(qc$quebec)
-#Start with ROC
+
+#### NDP ####
+# Block 1 - Demographics
 roc%>%
   #nest by everything survey to fit one model per survey year
   nest(-survey)%>%
-#Createacolumn called mod that is the result of fitting binomial m odel; data=x i.e. data is each separate survety
+#Create a column called mod that is the result of fitting binomial m odel; data=x i.e. data is each separate survety
   mutate(ndp_demographics=map(data, function(x) glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, family="binomial", data=x))) %>%
   #Tidy each model for nice use 
  #mutate(tidied=map(demographics, tidy)) %>%
@@ -870,9 +913,859 @@ roc%>%
   mutate(ndp_demographics_r2=map(ndp_demographics, PseudoR2))%>%
   unnest(ndp_demographics_r2)
 
+qc%>%
+  nest(-survey)%>%
+  mutate(ndp_demographics=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign, family="binomial", data=x))) %>%
+  mutate(ndp_demographics_r2=map(ndp_demographics, PseudoR2))%>%
+  unnest(ndp_demographics_r2)
 
-# Repeat for QC
+# Block 2 - Underlying Values
+roc%>%
+  nest(-survey)%>%
+  mutate(ndp_values=map(data, function(x) glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, family="binomial", data=x))) %>%
+  mutate(ndp_values_r2=map(ndp_values, PseudoR2))%>%
+  unnest(ndp_values_r2)
 
+qc%>%
+  nest(-survey)%>%
+  mutate(ndp_values=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, family="binomial", data=x))) %>%
+  mutate(ndp_values_r2=map(ndp_values, PseudoR2))%>%
+  unnest(ndp_values_r2)
+
+# Block 3 - Partisanship
+roc%>%
+  nest(-survey)%>%
+  mutate(ndp_partisanship=map(data, function(x) glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id, family="binomial", data=x))) %>%
+  mutate(ndp_partisanship_r2=map(ndp_partisanship, PseudoR2))%>%
+  unnest(ndp_partisanship_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(ndp_partisanship=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x))) %>%
+  mutate(ndp_partisanship_r2=map(ndp_partisanship, PseudoR2))%>%
+  unnest(ndp_partisanship_r2)
+
+# Block 4 - Retrospection
+roc%>%
+  nest(-survey)%>%
+  mutate(ndp_retrospection=map(data, function(x) glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x))) %>%
+  mutate(ndp_retrospection_r2=map(ndp_retrospection, PseudoR2))%>%
+  unnest(ndp_retrospection_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(ndp_retrospection=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x))) %>%
+  mutate(ndp_retrospection_r2=map(ndp_retrospection, PseudoR2))%>%
+  unnest(ndp_retrospection_r2)
+
+# Block 5 - Policy
+roc%>%
+  nest(-survey)%>%
+  mutate(ndp_policy=map(data, function(x) glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x))) %>%
+  mutate(ndp_policy_r2=map(ndp_policy, PseudoR2))%>%
+  unnest(ndp_policy_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(ndp_policy=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x))) %>%
+  mutate(ndp_policy_r2=map(ndp_policy, PseudoR2))%>%
+  unnest(ndp_policy_r2)
+
+# Block 6 - Leaders
+roc%>%
+  nest(-survey)%>%
+  mutate(ndp_leaders=map(data, function(x) glm(ndp~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))) %>%
+  mutate(ndp_leaders_r2=map(ndp_leaders, PseudoR2))%>%
+  unnest(ndp_leaders_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(ndp_leaders=map(data, function(x) glm(ndp~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))) %>%
+  mutate(ndp_leaders_r2=map(ndp_leaders, PseudoR2))%>%
+  unnest(ndp_leaders_r2)
+
+#### Liberals ####
+# Block 1 - Demographics
+roc%>%
+  nest(-survey)%>%
+  mutate(liberal_demographics=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, family="binomial", data=x))) %>%
+  mutate(liberal_demographics_r2=map(liberal_demographics, PseudoR2))%>%
+  unnest(liberal_demographics_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(liberal_demographics=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign, family="binomial", data=x))) %>%
+  mutate(liberal_demographics_r2=map(liberal_demographics, PseudoR2))%>%
+  unnest(liberal_demographics_r2)
+
+# Block 2 - Underlying Values
+roc%>%
+  nest(-survey)%>%
+  mutate(liberal_values=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, family="binomial", data=x))) %>%
+  mutate(liberal_values_r2=map(liberal_values, PseudoR2))%>%
+  unnest(liberal_values_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(liberal_values=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, family="binomial", data=x))) %>%
+  mutate(liberal_values_r2=map(liberal_values, PseudoR2))%>%
+  unnest(liberal_values_r2)
+
+# Block 3 - Partisanship
+roc%>%
+  nest(-survey)%>%
+  mutate(liberal_partisanship=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id, family="binomial", data=x))) %>%
+  mutate(liberal_partisanship_r2=map(liberal_partisanship, PseudoR2))%>%
+  unnest(liberal_partisanship_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(liberal_partisanship=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x))) %>%
+  mutate(liberal_partisanship_r2=map(liberal_partisanship, PseudoR2))%>%
+  unnest(liberal_partisanship_r2)
+
+# Block 4 - Retrospection
+roc%>%
+  nest(-survey)%>%
+  mutate(liberal_retrospection=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x))) %>%
+  mutate(liberal_retrospection_r2=map(liberal_retrospection, PseudoR2))%>%
+  unnest(liberal_retrospection_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(liberal_retrospection=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x))) %>%
+  mutate(liberal_retrospection_r2=map(liberal_retrospection, PseudoR2))%>%
+  unnest(liberal_retrospection_r2)
+
+# Block 5 - Policy
+roc%>%
+  nest(-survey)%>%
+  mutate(liberal_policy=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x))) %>%
+  mutate(liberal_policy_r2=map(liberal_policy, PseudoR2))%>%
+  unnest(liberal_policy_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(liberal_policy=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x))) %>%
+  mutate(liberal_policy_r2=map(liberal_policy, PseudoR2))%>%
+  unnest(liberal_policy_r2)
+
+# Block 6 - Leaders
+roc%>%
+  nest(-survey)%>%
+  mutate(liberal_leaders=map(data, function(x) glm(liberal~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))) %>%
+  mutate(liberal_leaders_r2=map(liberal_leaders, PseudoR2))%>%
+  unnest(liberal_leaders_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(liberal_leaders=map(data, function(x) glm(liberal~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))) %>%
+  mutate(liberal_leaders_r2=map(liberal_leaders, PseudoR2))%>%
+  unnest(liberal_leaders_r2)
+
+#### Conservatives ####
+# Block 1 - Demographics
+roc%>%
+  nest(-survey)%>%
+  mutate(conservative_demographics=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, family="binomial", data=x))) %>%
+  mutate(conservative_demographics_r2=map(conservative_demographics, PseudoR2))%>%
+  unnest(conservative_demographics_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(conservative_demographics=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign, family="binomial", data=x))) %>%
+  mutate(conservative_demographics_r2=map(conservative_demographics, PseudoR2))%>%
+  unnest(conservative_demographics_r2)
+
+# Block 2 - Underlying Values
+roc%>%
+  nest(-survey)%>%
+  mutate(conservative_values=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, family="binomial", data=x))) %>%
+  mutate(conservative_values_r2=map(conservative_values, PseudoR2))%>%
+  unnest(conservative_values_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(conservative_values=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, family="binomial", data=x))) %>%
+  mutate(conservative_values_r2=map(conservative_values, PseudoR2))%>%
+  unnest(conservative_values_r2)
+
+# Block 2 - Underlying Values (market liberalism only)
+roc%>%
+  nest(-survey)%>%
+  mutate(conservative_values1=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism, family="binomial", data=x))) %>%
+  mutate(conservative_values1_r2=map(conservative_values1, PseudoR2))%>%
+  unnest(conservative_values1_r2)
+
+# Block 2 - Underlying Values (moral traditionalism only)
+roc%>%
+  nest(-survey)%>%
+  mutate(conservative_values2=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+moral_traditionalism, family="binomial", data=x))) %>%
+  mutate(conservative_values2_r2=map(conservative_values2, PseudoR2))%>%
+  unnest(conservative_values2_r2)
+
+# Block 2 - Underlying Values (continentalism only)
+roc%>%
+  nest(-survey)%>%
+  mutate(conservative_values3=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+continentalism, family="binomial", data=x))) %>%
+  mutate(conservative_values3_r2=map(conservative_values3, PseudoR2))%>%
+  unnest(conservative_values3_r2)
+
+# Block 2 - Underlying Values (political disaffection only)
+roc%>%
+  nest(-survey)%>%
+  mutate(conservative_values4=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+political_disaffection, family="binomial", data=x))) %>%
+  mutate(conservative_values4_r2=map(conservative_values4, PseudoR2))%>%
+  unnest(conservative_values4_r2)
+
+# Block 3 - Partisanship
+roc%>%
+  nest(-survey)%>%
+  mutate(conservative_partisanship=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id, family="binomial", data=x))) %>%
+  mutate(conservative_partisanship_r2=map(conservative_partisanship, PseudoR2))%>%
+  unnest(conservative_partisanship_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(conservative_partisanship=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x))) %>%
+  mutate(conservative_partisanship_r2=map(conservative_partisanship, PseudoR2))%>%
+  unnest(conservative_partisanship_r2)
+
+# Block 4 - Retrospection
+roc%>%
+  nest(-survey)%>%
+  mutate(conservative_retrospection=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x))) %>%
+  mutate(conservative_retrospection_r2=map(conservative_retrospection, PseudoR2))%>%
+  unnest(conservative_retrospection_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(conservative_retrospection=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x))) %>%
+  mutate(conservative_retrospection_r2=map(conservative_retrospection, PseudoR2))%>%
+  unnest(conservative_retrospection_r2)
+
+# Block 5 - Policy
+roc%>%
+  nest(-survey)%>%
+  mutate(conservative_policy=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x))) %>%
+  mutate(conservative_policy_r2=map(conservative_policy, PseudoR2))%>%
+  unnest(conservative_policy_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(conservative_policy=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x))) %>%
+  mutate(conservative_policy_r2=map(conservative_policy, PseudoR2))%>%
+  unnest(conservative_policy_r2)
+
+# Block 6 - Leaders
+roc%>%
+  nest(-survey)%>%
+  mutate(conservative_leaders=map(data, function(x) glm(conservative~region3+working_class2+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))) %>%
+  mutate(conservative_leaders_r2=map(conservative_leaders, PseudoR2))%>%
+  unnest(conservative_leaders_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(conservative_leaders=map(data, function(x) glm(conservative~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))) %>%
+  mutate(conservative_leaders_r2=map(conservative_leaders, PseudoR2))%>%
+  unnest(conservative_leaders_r2)
+
+#### Bloc Quebecois ####
+# Block 1 - Demographics
+qc%>%
+  nest(-survey)%>%
+  mutate(bloc_demographics=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign, family="binomial", data=x))) %>%
+  mutate(bloc_demographics_r2=map(bloc_demographics, PseudoR2))%>%
+  unnest(bloc_demographics_r2)
+
+# Block 2 - Underlying Values
+qc%>%
+  nest(-survey)%>%
+  mutate(bloc_values=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, family="binomial", data=x))) %>%
+  mutate(bloc_values_r2=map(bloc_values, PseudoR2))%>%
+  unnest(bloc_values_r2)
+
+# Block 2 - Underlying Values (Quebec sovereignty only)
+qc%>%
+  nest(-survey)%>%
+  mutate(bloc_values1=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+quebec_sovereignty, family="binomial", data=x))) %>%
+  mutate(bloc_values1_r2=map(bloc_values1, PseudoR2))%>%
+  unnest(bloc_values1_r2)
+
+# Block 3 - Partisanship
+qc%>%
+  nest(-survey)%>%
+  mutate(bloc_partisanship=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x))) %>%
+  mutate(bloc_partisanship_r2=map(bloc_partisanship, PseudoR2))%>%
+  unnest(bloc_partisanship_r2)
+
+# Block 4 - Retrospection
+qc%>%
+  nest(-survey)%>%
+  mutate(bloc_retrospection=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x))) %>%
+  mutate(bloc_retrospection_r2=map(bloc_retrospection, PseudoR2))%>%
+  unnest(bloc_retrospection_r2)
+
+# Block 5 - Policy
+qc%>%
+  nest(-survey)%>%
+  mutate(bloc_policy=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x))) %>%
+  mutate(bloc_policy_r2=map(bloc_policy, PseudoR2))%>%
+  unnest(bloc_policy_r2)
+
+# Block 6 - Leaders
+qc%>%
+  nest(-survey)%>%
+  mutate(bloc_leaders=map(data, function(x) glm(bloc~working_class2+union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))) %>%
+  mutate(bloc_leaders_r2=map(bloc_leaders, PseudoR2))%>%
+  unnest(bloc_leaders_r2)
 
 #for subset just start with out
 #out
+#### NDP ####
+# Block 1 - Demographics
+out%>%
+  filter(working_class2==1 & quebec!=1)%>%
+  nest(-survey)%>%
+  mutate(ndp_demographics=map(data, function(x) glm(ndp~region3+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, family="binomial", data=x))) %>%
+  mutate(ndp_demographics_r2=map(ndp_demographics, PseudoR2))%>%
+  unnest(ndp_demographics_r2)
+
+# QC
+out%>%
+  filter(working_class2==1 & quebec==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_QC_demographics=map(data, function(x) glm(ndp~union_both+young+old+male+degree+language+foreign, family="binomial", data=x))) %>%
+  mutate(ndp_QC_demographics_r2=map(ndp_QC_demographics, PseudoR2))%>%
+  unnest(ndp_QC_demographics_r2)
+
+# Block 2 - Underlying Values
+out%>%
+  filter(working_class2==1 & quebec!=1)%>%
+  nest(-survey)%>%
+  mutate(ndp_values=map(data, function(x) glm(ndp~region3+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, family="binomial", data=x))) %>%
+  mutate(ndp_values_r2=map(ndp_values, PseudoR2))%>%
+  unnest(ndp_values_r2)
+
+# QC
+out%>%
+  filter(working_class2==1 & quebec==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_QC_values=map(data, function(x) glm(ndp~union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty, family="binomial", data=x))) %>%
+  mutate(ndp_QC_values_r2=map(ndp_QC_values, PseudoR2))%>%
+  unnest(ndp_QC_values_r2)
+
+# Block 3 - Partisanship
+out%>%
+  filter(working_class2==1 & quebec!=1)%>%
+  nest(-survey)%>%
+  mutate(ndp_partisanship=map(data, function(x) glm(ndp~region3+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id, family="binomial", data=x))) %>%
+  mutate(ndp_partisanship_r2=map(ndp_partisanship, PseudoR2))%>%
+  unnest(ndp_partisanship_r2)
+
+# QC
+out%>%
+  filter(working_class2==1 & quebec==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_QC_partisanship=map(data, function(x) glm(ndp~union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x))) %>%
+  mutate(ndp_QC_partisanship_r2=map(ndp_QC_partisanship, PseudoR2))%>%
+  unnest(ndp_QC_partisanship_r2)
+
+# Block 4 - Retrospection
+out%>%
+  filter(working_class2==1 & quebec!=1)%>%
+  nest(-survey)%>%
+  mutate(ndp_retrospection=map(data, function(x) glm(ndp~region3+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x))) %>%
+  mutate(ndp_retrospection_r2=map(ndp_retrospection, PseudoR2))%>%
+  unnest(ndp_retrospection_r2)
+
+# QC
+out%>%
+  filter(working_class2==1 & quebec==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_QC_retrospection=map(data, function(x) glm(ndp~union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x))) %>%
+  mutate(ndp_QC_retrospection_r2=map(ndp_QC_retrospection, PseudoR2))%>%
+  unnest(ndp_QC_retrospection_r2)
+
+# Block 5 - Policy
+out%>%
+  filter(working_class2==1 & quebec!=1)%>%
+  nest(-survey)%>%
+  mutate(ndp_policy=map(data, function(x) glm(ndp~region3+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x))) %>%
+  mutate(ndp_policy_r2=map(ndp_policy, PseudoR2))%>%
+  unnest(ndp_policy_r2)
+
+# QC
+out%>%
+  filter(working_class2==1 & quebec==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_QC_policy=map(data, function(x) glm(ndp~union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x))) %>%
+  mutate(ndp_QC_policy_r2=map(ndp_QC_policy, PseudoR2))%>%
+  unnest(ndp_QC_policy_r2)
+
+# Block 6 - Leaders
+out%>%
+  filter(working_class2==1 & quebec!=1)%>%
+  nest(-survey)%>%
+  mutate(ndp_leaders=map(data, function(x) glm(ndp~region3+union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))) %>%
+  mutate(ndp_leaders_r2=map(ndp_leaders, PseudoR2))%>%
+  unnest(ndp_leaders_r2)
+
+# QC
+out%>%
+  filter(working_class2==1 & quebec==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_QC_leaders=map(data, function(x) glm(ndp~union_both+young+old+male+degree+language+foreign+market_liberalism+moral_traditionalism+political_disaffection+continentalism+quebec_sovereignty+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))) %>%
+  mutate(ndp_QC_leaders_r2=map(ndp_QC_leaders, PseudoR2))%>%
+  unnest(ndp_QC_leaders_r2)
+
+#NDP All of Canada
+# Block 1 - Demographics
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_demographics=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_demographics_r2=map(ndp_AOC_demographics, PseudoR2))%>%
+  unnest(ndp_AOC_demographics_r2)
+
+# Block 2 - Underlying Values
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_values=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_values_r2=map(ndp_AOC_values, PseudoR2))%>%
+  unnest(ndp_AOC_values_r2)
+
+# Block 2 - Underlying Values (only market liberalism)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_values4=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_values4_r2=map(ndp_AOC_values4, PseudoR2))%>%
+  unnest(ndp_AOC_values4_r2)
+
+# Block 2 - Underlying Values (only moral traditionalism)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_values4=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+moral_traditionalism, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_values4_r2=map(ndp_AOC_values4, PseudoR2))%>%
+  unnest(ndp_AOC_values4_r2)
+
+# Block 2 - Underlying Values (only continentalism)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_values4=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+continentalism, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_values4_r2=map(ndp_AOC_values4, PseudoR2))%>%
+  unnest(ndp_AOC_values4_r2)
+
+# Block 2 - Underlying Values (only political disaffection)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_values4=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+political_disaffection, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_values4_r2=map(ndp_AOC_values4, PseudoR2))%>%
+  unnest(ndp_AOC_values4_r2)
+
+# Block 3 - Partisanship
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_partisanship=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_partisanship_r2=map(ndp_AOC_partisanship, PseudoR2))%>%
+  unnest(ndp_AOC_partisanship_r2)
+
+# Block 4 - Retrospection
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_retrospection=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_retrospection_r2=map(ndp_AOC_retrospection, PseudoR2))%>%
+  unnest(ndp_AOC_retrospection_r2)
+
+# Block 5 - Policy
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_policy=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_policy_r2=map(ndp_AOC_policy, PseudoR2))%>%
+  unnest(ndp_AOC_policy_r2)
+
+# Block 5 - Policy (only immigration)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_policy1=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_policy1_r2=map(ndp_AOC_policy1, PseudoR2))%>%
+  unnest(ndp_AOC_policy1_r2)
+
+# Block 5 - Policy (only environment)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_policy2=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+environment, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_policy2_r2=map(ndp_AOC_policy2, PseudoR2))%>%
+  unnest(ndp_AOC_policy2_r2)
+
+# Block 5 - Policy (only defence)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_policy3=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+defence, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_policy3_r2=map(ndp_AOC_policy3, PseudoR2))%>%
+  unnest(ndp_AOC_policy3_r2)
+
+# Block 5 - Policy (only redistribution)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_policy4=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+redistribution, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_policy4_r2=map(ndp_AOC_policy4, PseudoR2))%>%
+  unnest(ndp_AOC_policy4_r2)
+
+# Block 6 - Leaders
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(ndp_AOC_leaders=map(data, function(x) glm(ndp~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))) %>%
+  mutate(ndp_AOC_leaders_r2=map(ndp_AOC_leaders, PseudoR2))%>%
+  unnest(ndp_AOC_leaders_r2)
+
+#Liberals All of Canada
+# Block 1 - Demographics
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(liberal_AOC_demographics=map(data, function(x) glm(liberal~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, family="binomial", data=x))) %>%
+  mutate(liberal_AOC_demographics_r2=map(liberal_AOC_demographics, PseudoR2))%>%
+  unnest(liberal_AOC_demographics_r2)
+
+# Block 2 - Underlying Values
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(liberal_AOC_values=map(data, function(x) glm(liberal~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, family="binomial", data=x))) %>%
+  mutate(liberal_AOC_values_r2=map(liberal_AOC_values, PseudoR2))%>%
+  unnest(liberal_AOC_values_r2)
+
+# Block 3 - Partisanship
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(liberal_AOC_partisanship=map(data, function(x) glm(liberal~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id, family="binomial", data=x))) %>%
+  mutate(liberal_AOC_partisanship_r2=map(liberal_AOC_partisanship, PseudoR2))%>%
+  unnest(liberal_AOC_partisanship_r2)
+
+# Block 4 - Retrospection
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(liberal_AOC_retrospection=map(data, function(x) glm(liberal~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x))) %>%
+  mutate(liberal_AOC_retrospection_r2=map(liberal_AOC_retrospection, PseudoR2))%>%
+  unnest(liberal_AOC_retrospection_r2)
+
+# Block 5 - Policy
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(liberal_AOC_policy=map(data, function(x) glm(liberal~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x))) %>%
+  mutate(liberal_AOC_policy_r2=map(liberal_AOC_policy, PseudoR2))%>%
+  unnest(liberal_AOC_policy_r2)
+
+# Block 5 - Policy (only immigration)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(liberal_AOC_policy1=map(data, function(x) glm(liberal~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate, family="binomial", data=x))) %>%
+  mutate(liberal_AOC_policy1_r2=map(liberal_AOC_policy1, PseudoR2))%>%
+  unnest(liberal_AOC_policy1_r2)
+
+# Block 5 - Policy (only environment)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(liberal_AOC_policy2=map(data, function(x) glm(liberal~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+environment, family="binomial", data=x))) %>%
+  mutate(liberal_AOC_policy2_r2=map(liberal_AOC_policy2, PseudoR2))%>%
+  unnest(liberal_AOC_policy2_r2)
+
+# Block 5 - Policy (only defence)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(liberal_AOC_policy3=map(data, function(x) glm(liberal~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+defence, family="binomial", data=x))) %>%
+  mutate(liberal_AOC_policy3_r2=map(liberal_AOC_policy3, PseudoR2))%>%
+  unnest(liberal_AOC_policy3_r2)
+
+# Block 5 - Policy (only redistribution)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(liberal_AOC_policy4=map(data, function(x) glm(liberal~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+redistribution, family="binomial", data=x))) %>%
+  mutate(liberal_AOC_policy4_r2=map(liberal_AOC_policy4, PseudoR2))%>%
+  unnest(liberal_AOC_policy4_r2)
+
+# Block 6 - Leaders
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(liberal_AOC_leaders=map(data, function(x) glm(liberal~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))) %>%
+  mutate(liberal_AOC_leaders_r2=map(liberal_AOC_leaders, PseudoR2))%>%
+  unnest(liberal_AOC_leaders_r2)
+
+#Conservatives All of Canada
+# Block 1 - Demographics
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_demographics=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_demographics_r2=map(conservative_AOC_demographics, PseudoR2))%>%
+  unnest(conservative_AOC_demographics_r2)
+
+# Block 2 - Underlying Values
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_values=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_values_r2=map(conservative_AOC_values, PseudoR2))%>%
+  unnest(conservative_AOC_values_r2)
+
+# Block 2 - Underlying Values (only market liberalism)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_values4=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_values4_r2=map(conservative_AOC_values4, PseudoR2))%>%
+  unnest(conservative_AOC_values4_r2)
+
+# Block 2 - Underlying Values (only moral traditionalism)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_values4=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+moral_traditionalism, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_values4_r2=map(conservative_AOC_values4, PseudoR2))%>%
+  unnest(conservative_AOC_values4_r2)
+
+# Block 2 - Underlying Values (only continentalism)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_values4=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+continentalism, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_values4_r2=map(conservative_AOC_values4, PseudoR2))%>%
+  unnest(conservative_AOC_values4_r2)
+
+# Block 2 - Underlying Values (only political disaffection)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_values4=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+political_disaffection, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_values4_r2=map(conservative_AOC_values4, PseudoR2))%>%
+  unnest(conservative_AOC_values4_r2)
+
+# Block 3 - Partisanship
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_partisanship=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_partisanship_r2=map(conservative_AOC_partisanship, PseudoR2))%>%
+  unnest(conservative_AOC_partisanship_r2)
+
+# Block 4 - Retrospection
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_retrospection=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_retrospection_r2=map(conservative_AOC_retrospection, PseudoR2))%>%
+  unnest(conservative_AOC_retrospection_r2)
+
+# Block 5 - Policy
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_policy=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_policy_r2=map(conservative_AOC_policy, PseudoR2))%>%
+  unnest(conservative_AOC_policy_r2)
+
+# Block 5 - Policy (only immigration)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_policy1=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_policy1_r2=map(conservative_AOC_policy1, PseudoR2))%>%
+  unnest(conservative_AOC_policy1_r2)
+
+# Block 5 - Policy (only environment)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_policy2=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+environment, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_policy2_r2=map(conservative_AOC_policy2, PseudoR2))%>%
+  unnest(conservative_AOC_policy2_r2)
+
+# Block 5 - Policy (only defence)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_policy3=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+defence, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_policy3_r2=map(conservative_AOC_policy3, PseudoR2))%>%
+  unnest(conservative_AOC_policy3_r2)
+
+# Block 5 - Policy (only redistribution)
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_policy4=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+redistribution, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_policy4_r2=map(conservative_AOC_policy4, PseudoR2))%>%
+  unnest(conservative_AOC_policy4_r2)
+
+# Block 6 - Leaders
+out%>%
+  filter(working_class2==1)%>%
+  nest(-survey)%>%
+  mutate(conservative_AOC_leaders=map(data, function(x) glm(conservative~union_both+young+old+male+sector+catholic+no_religion+degree+foreign+low_income+high_income+market_liberalism+moral_traditionalism+political_disaffection+continentalism+ndp_id+liberal_id+conservative_id+personal_retrospective+national_retrospective+immigration_rate+environment+redistribution+defence+liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))) %>%
+  mutate(conservative_AOC_leaders_r2=map(conservative_AOC_leaders, PseudoR2))%>%
+  unnest(conservative_AOC_leaders_r2)
+
+#### Performance Model #### (Leadership, Partisanship, Most Important Issues)
+
+# NDP Leadership
+roc%>%
+  nest(-survey)%>%
+  mutate(ndp_leader=map(data, function(x) glm(ndp~liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))) %>%
+  mutate(ndp_leader_r2=map(ndp_leader, PseudoR2))%>%
+  unnest(ndp_leader_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(ndp_leader=map(data, function(x) glm(ndp~liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))) %>%
+  mutate(ndp_leader_r2=map(ndp_leader, PseudoR2))%>%
+  unnest(ndp_leader_r2)
+
+# NDP Partisanship
+roc%>%
+  nest(-survey)%>%
+  mutate(ndp_partyID=map(data, function(x) glm(ndp~ndp_id+liberal_id+conservative_id, family="binomial", data=x))) %>%
+  mutate(ndp_partyID_r2=map(ndp_partyID, PseudoR2))%>%
+  unnest(ndp_partyID_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(ndp_partyID=map(data, function(x) glm(ndp~ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x))) %>%
+  mutate(ndp_partyID_r2=map(ndp_partyID, PseudoR2))%>%
+  unnest(ndp_partyID_r2)
+
+# NDP Addressing Issues
+roc%>%
+  nest(-survey)%>%
+  mutate(ndp_economy=map(data, function(x) glm(ndp~ndp_economy+liberal_economy+conservative_economy, family="binomial", data=x))) %>%
+  mutate(ndp_economy_r2=map(ndp_economy, PseudoR2))%>%
+  unnest(ndp_economy_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(ndp_economy=map(data, function(x) glm(ndp~ndp_economy+liberal_economy+conservative_economy+bloc_economy, family="binomial", data=x))) %>%
+  mutate(ndp_economy_r2=map(ndp_economy, PseudoR2))%>%
+  unnest(ndp_economy_r2)
+
+# Liberals Leaders
+roc%>%
+  nest(-survey)%>%
+  mutate(liberal_leader=map(data, function(x) glm(liberal~liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))) %>%
+  mutate(liberal_leader_r2=map(liberal_leader, PseudoR2))%>%
+  unnest(liberal_leader_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(liberal_leader=map(data, function(x) glm(liberal~liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))) %>%
+  mutate(liberal_leader_r2=map(liberal_leader, PseudoR2))%>%
+  unnest(liberal_leader_r2)
+
+# Liberals Partisanship
+roc%>%
+  nest(-survey)%>%
+  mutate(liberal_partyID=map(data, function(x) glm(liberal~ndp_id+liberal_id+conservative_id, family="binomial", data=x))) %>%
+  mutate(liberal_partyID_r2=map(liberal_partyID, PseudoR2))%>%
+  unnest(liberal_partyID_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(liberal_partyID=map(data, function(x) glm(liberal~ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x))) %>%
+  mutate(liberal_partyID_r2=map(liberal_partyID, PseudoR2))%>%
+  unnest(liberal_partyID_r2)
+
+# Liberals Addressing Issues
+roc%>%
+  nest(-survey)%>%
+  mutate(liberal_economy=map(data, function(x) glm(liberal~ndp_economy+liberal_economy+conservative_economy, family="binomial", data=x))) %>%
+  mutate(liberal_economy_r2=map(liberal_economy, PseudoR2))%>%
+  unnest(liberal_economy_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(liberal_economy=map(data, function(x) glm(liberal~ndp_economy+liberal_economy+conservative_economy+bloc_economy, family="binomial", data=x))) %>%
+  mutate(liberal_economy_r2=map(liberal_economy, PseudoR2))%>%
+  unnest(liberal_economy_r2)
+
+# Conservatives  Leaders
+roc%>%
+  nest(-survey)%>%
+  mutate(conservative_leader=map(data, function(x) glm(conservative~liberal_leader+conservative_leader+ndp_leader, family="binomial", data=x))) %>%
+  mutate(conservative_leader_r2=map(conservative_leader, PseudoR2))%>%
+  unnest(conservative_leader_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(conservative_leader=map(data, function(x) glm(conservative~liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))) %>%
+  mutate(conservative_leader_r2=map(conservative_leader, PseudoR2))%>%
+  unnest(conservative_leader_r2)
+
+# Conservatives  Partisanship
+roc%>%
+  nest(-survey)%>%
+  mutate(conservative_partyID=map(data, function(x) glm(conservative~ndp_id+liberal_id+conservative_id, family="binomial", data=x))) %>%
+  mutate(conservative_partyID_r2=map(conservative_partyID, PseudoR2))%>%
+  unnest(conservative_partyID_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(conservative_partyID=map(data, function(x) glm(conservative~ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x))) %>%
+  mutate(conservative_partyID_r2=map(conservative_partyID, PseudoR2))%>%
+  unnest(conservative_partyID_r2)
+
+# Conservatives Addressing Issues
+roc%>%
+  nest(-survey)%>%
+  mutate(conservative_economy=map(data, function(x) glm(conservative~ndp_economy+liberal_economy+conservative_economy, family="binomial", data=x))) %>%
+  mutate(conservative_economy_r2=map(conservative_economy, PseudoR2))%>%
+  unnest(conservative_economy_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(conservative_economy=map(data, function(x) glm(conservative~ndp_economy+liberal_economy+conservative_economy+bloc_economy, family="binomial", data=x))) %>%
+  mutate(conservative_economy_r2=map(conservative_economy, PseudoR2))%>%
+  unnest(conservative_economy_r2)
+
+# Bloc
+qc%>%
+  nest(-survey)%>%
+  mutate(bloc_leader=map(data, function(x) glm(bloc~liberal_leader+conservative_leader+ndp_leader+bloc_leader, family="binomial", data=x))) %>%
+  mutate(bloc_leader_r2=map(bloc_leader, PseudoR2))%>%
+  unnest(bloc_leader_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(bloc_partyID=map(data, function(x) glm(bloc~ndp_id+liberal_id+conservative_id+bloc_id, family="binomial", data=x))) %>%
+  mutate(bloc_partyID_r2=map(bloc_partyID, PseudoR2))%>%
+  unnest(bloc_partyID_r2)
+
+qc%>%
+  nest(-survey)%>%
+  mutate(bloc_economy=map(data, function(x) glm(bloc~ndp_economy+liberal_economy+conservative_economy+bloc_economy, family="binomial", data=x))) %>%
+  mutate(bloc_economy_r2=map(bloc_economy, PseudoR2))%>%
+  unnest(bloc_economy_r2)
+
+#Detach Desctools
+detach(package:DescTools)
+
+
+

@@ -805,20 +805,34 @@ ces19phone %>%
 
 #### Leader/party ratings overall ####
 ces19phone%>% 
-  select(Jagmeet_Singh) %>% 
+  select(ndp_leader, liberal_leader, conservative_leader) %>% 
   summary()
 
 ces15phone%>% 
-  select(Tom_Mulcair) %>% 
+  select(ndp_leader, liberal_leader, conservative_leader) %>% 
   summary()
 
 ces19phone%>% 
-  select(NDP_rating) %>% 
+  select(NDP_rating, Liberal_rating, Conservative_rating) %>% 
   summary()
 
 ces15phone%>% 
-  select(NDP_rating) %>% 
+  select(NDP_rating, Liberal_rating, Conservative_rating) %>% 
   summary()
+
+ces19phone %>%
+  select(occupation4, liberal_leader, Liberal_rating, ndp_leader, NDP_rating, conservative_leader, Conservative_rating) %>%
+  pivot_longer(-occupation4,values_to=c("Score"), names_to=c("Variable")) %>% 
+  group_by(occupation4, Variable) %>% 
+  summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sqrt(sd)/n) %>% 
+  ggplot(., aes(x=Variable, y=Average, col=occupation4))+geom_jitter()
+
+ces15phone %>%
+  select(occupation4, liberal_leader, Liberal_rating, ndp_leader, NDP_rating, conservative_leader, Conservative_rating) %>%
+  pivot_longer(-occupation4,values_to=c("Score"), names_to=c("Variable")) %>% 
+  group_by(occupation4, Variable) %>% 
+  summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sqrt(sd)/n) %>% 
+  ggplot(., aes(x=Variable, y=Average, col=occupation4))+geom_jitter()
 
 #### Most Important Issue ####
 # Here's how I would do this in a tidyverse kind of way.
