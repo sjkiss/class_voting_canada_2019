@@ -239,9 +239,6 @@ ces19phone %>%
 #table(ces19phone$minorities_help)
 
 #Combine the 4 immigration variables and divide by 4
-ces19phone$immigration4<-(ces19phone$immigration_economy + ces19phone$immigration_culture + ces19phone$immigration_crime + ces19phone$immigration_rate)
-table(ces19phone$immigration4)
-ces19phone$immigration<-(ces19phone$immigration4 /4)
 ces19phone %>% 
   rowwise() %>% 
   mutate(immigration=mean(c_across(c(immigration_economy, immigration_culture, immigration_crime, immigration_rate)), na.rm=T))->ces19phone
@@ -369,13 +366,29 @@ val_labels(ces19phone$pro_redistribution)<-c(Non_Pro=0, Pro=1)
 val_labels(ces19phone$pro_redistribution)
 table(ces19phone$pro_redistribution)
 
-#recode NDP_rating (q16)
+#recode NDP rating (q16)
 look_for(ces19phone, "NDP")
 ces19phone$NDP_therm<-Recode(ces19phone$q16, "-6=NA; -8=NA; -9=NA")
 #checks
 table(ces19phone$NDP_therm)
 ces19phone$NDP_rating<-(ces19phone$NDP_therm /100)
 table(ces19phone$NDP_rating)
+
+#recode Liberal rating (q14)
+look_for(ces19phone, "Liberal")
+ces19phone$Liberal_therm<-Recode(ces19phone$q14, "996=NA; 998=NA; 999=NA")
+#checks
+table(ces19phone$Liberal_therm)
+ces19phone$Liberal_rating<-(ces19phone$Liberal_therm /100)
+table(ces19phone$Liberal_rating)
+
+#recode Conservative rating (q15)
+look_for(ces19phone, "Conservative")
+ces19phone$Conservative_therm<-Recode(ces19phone$q15, "996=NA; 998=NA; 999=NA")
+#checks
+table(ces19phone$Conservative_therm)
+ces19phone$Conservative_rating<-(ces19phone$Conservative_therm /100)
+table(ces19phone$Conservative_rating)
 
 #recode Manage economy (q33)
 look_for(ces19phone, "economy")
