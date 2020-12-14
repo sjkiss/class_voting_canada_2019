@@ -27,7 +27,7 @@ ces19phone %>%
 #Turn the remainder into all lower text
 ces19phone$vismin_text<-str_to_lower(ces19phone$q66a_17_)
 
-#This is the beast recode that assigns a 0 to vismin2 if it's not a visible minority and a 1 if it is. 
+
 ces19phone %>% 
   mutate(vismin2=case_when(
     str_detect(vismin_text, "akan")~1, 
@@ -76,12 +76,12 @@ ces19phone %>%
                 str_detect(vismin_text, "british")~0,
                 str_detect(vismin_text, "breton")~1,
                 str_detect(vismin_text, "bosnian")~1,
-                str_detect(vismin_text, "bulgarian")~1,
+                str_detect(vismin_text, "bulgarian")~0,
                 str_detect(vismin_text, "cameroun")~1,
                 str_detect(vismin_text, "brézilien")~1,
-                str_detect(vismin_text, "swiss")~1,
-                str_detect(vismin_text, "ukrainian")~1,
-                str_detect(vismin_text, "canadien")~1,
+                str_detect(vismin_text, "swiss")~0,
+                str_detect(vismin_text, "ukrainian")~0,
+                str_detect(vismin_text, "canadien")~0,
                 str_detect(vismin_text, "caraibéenne")~1,
                   str_detect(vismin_text, "carrabian")~1,
                     str_detect(vismin_text, "carribean")~1,
@@ -144,8 +144,8 @@ str_detect(vismin_text, "german")~0,
 str_detect(vismin_text, "culturally dominant")~0,
 str_detect(vismin_text, "text")~1, 
 str_detect(vismin_text, "greek")~0,
-str_detect(vismin_text, "greque")~1, 
-str_detect(vismin_text, "greece")~1, 
+str_detect(vismin_text, "greque")~0, 
+str_detect(vismin_text, "greece")~0, 
 str_detect(vismin_text, "gujarati")~1, 
 str_detect(vismin_text, "haiti")~1, 
 str_detect(vismin_text, "haitien")~1, 
@@ -157,8 +157,8 @@ str_detect(vismin_text, "haiti")~1,
 str_detect(vismin_text, "heinz")~0, 
 str_detect(vismin_text, "hindu")~1, 
 str_detect(vismin_text, "hispanic")~1, 
-str_detect(vismin_text, "hipanophone")~0,
-str_detect(vismin_text, "hispanophone")~0, 
+str_detect(vismin_text, "hipanophone")~1,
+str_detect(vismin_text, "hispanophone")~1, 
 str_detect(vismin_text, "human")~0, 
 str_detect(vismin_text, "hongrois")~0, 
 str_detect(vismin_text, "hungarian")~0, 
@@ -196,7 +196,7 @@ str_detect(vismin_text, "lithuanian")~0,
 str_detect(vismin_text, "liban")~1,
 str_detect(vismin_text, "libanaise")~1,
 str_detect(vismin_text, "lebanese")~1, 
-str_detect(vismin_text, "lithuanian")~1, 
+str_detect(vismin_text, "lithuanian")~0, 
 str_detect(vismin_text, "maltese")~0, 
 str_detect(vismin_text, "lithuwaning")~0,
 str_detect(vismin_text, "maritime")~0,
@@ -242,9 +242,9 @@ str_detect(vismin_text, "philippino")~1,
 str_detect(vismin_text, "portug")~0, 
 str_detect(vismin_text, "persian")~1, 
 str_detect(vismin_text, "poto")~0,
-str_detect(vismin_text, "punjabi")~0,
+str_detect(vismin_text, "punjabi")~1,
 str_detect(vismin_text, "romanian")~0,
-str_detect(vismin_text, "roumain")~1, 
+str_detect(vismin_text, "roumain")~0, 
 str_detect(vismin_text, "rushion")~0, 
 str_detect(vismin_text, "russia")~0, 
 str_detect(vismin_text, "saxophon")~0,
@@ -287,8 +287,6 @@ str_detect(vismin_text, "ango saxon")~0,
 str_detect(vismin_text, "wap")~0,
 str_detect(vismin_text, "wosp")~0, 
     ))->ces19phone
-
-
 #Running the code from the top of the script to line 268 (View) Will run the whole mutate case_when and then bring up a View screen that shows the remaining text answers to be coded. It helps to make things go really quickly 
 ces19phone %>% 
   filter(is.na(vismin2)) %>% 

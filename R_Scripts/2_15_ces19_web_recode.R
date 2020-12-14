@@ -56,3 +56,21 @@ table(is.na(ces19web$occupation))
 table(is.na(ces19web$occupation2))
 table(is.na(ces19web$NOC))
 
+
+
+look_for(ces19web, "ethnic")
+ces19web$cps19_ethnicity_41_TEXT
+ces19web$cps19_ethnicity_23
+ces19web %>% 
+  select(contains("_ethnicity_")) %>% 
+  val_labels()
+  
+ces19web %>% 
+  mutate(vismin=case_when(
+    cps19_ethnicity_23==1~1,
+            cps19_ethnicity_25==1~1,
+        cps19_ethnicity_32==1~1,
+    TRUE~0
+  ))->ces19web
+ces19web$cps19_ethnicity_41_TEXT
+prop.table(table(ces19web$vismin))

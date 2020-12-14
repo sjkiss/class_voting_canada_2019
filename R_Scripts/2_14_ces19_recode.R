@@ -254,8 +254,6 @@ ces19phone %>%
   alpha(.)
 
 ## Or Create a 5 variable immigration/racial minority sentiment index by dividing by 5
-ces19phone$immigration5<-(ces19phone$immigration_economy + ces19phone$immigration_culture + ces19phone$immigration_crime + ces19phone$immigration_rate + ces19phone$minorities_help)
-table(ces19phone$immigration5)
 ces19phone %>% 
   rowwise() %>% 
   mutate(immigration2=mean(c_across(c(immigration_economy, immigration_culture, immigration_crime, immigration_rate, minorities_help))))->ces19phone
@@ -399,7 +397,8 @@ val_labels(ces19phone$manage_economy)
 table(ces19phone$manage_economy)
 
 #recode Manage environment (q34)
-look_for(ces19phone, "economy")
+look_for(ces19phone, "environment")
+
 ces19phone$manage_environment<-Recode(ces19phone$q34, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
 val_labels(ces19phone$manage_environment)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
@@ -417,6 +416,7 @@ table(ces19phone$address_issue)
 #recode Market Liberalism (p20_a and p20_f)
 look_for(ces19phone, "leave")
 look_for(ces19phone, "blame")
+
 ces19phone$market1<-Recode(ces19phone$p20_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
 ces19phone$market2<-Recode(ces19phone$p20_f, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
 #val_labels(ces19phone$market1)<-c(Strongly_disagree=0, Somewhat_disagree=0.25, Neither=0.5, Somewhat_agree=0.75, Strongly_agree=1)
@@ -594,44 +594,62 @@ val_labels(ces19phone$education)
 table(ces19phone$education)
 
 
+#### mip ####
+#In another package I have turned added the MIP recodes to the level of the 2015 Recodes 
+
+#The original response is ces19phone$q7
+ces19phone$q7
+#The lowered case response is 
+ces19phone$q7_lower
+#The variable that includes the recodes contained the Excel file is
+ces19phone$q7_out
+table(as_factor(ces19phone$q7_out))
+
+#Matt: Can you recode this into an mip variable that matches the mip variable in the 2015 recodes? 
 
 #convert q7 to q7_out
-ces19phone$q7_out<-tolower(ces19phone$q7)
-#### Most important Problem for Environment ####
-#convert mip to mip_cat
-ces19phone$q7_out
-
-ces19phone %>% 
-  mutate(mip=case_when(
-    str_detect(q7_out, "climate") ~ 1,
-        str_detect(q7_out, "environ") ~ 1,
-    str_detect(q7_out, "health") ~ 8,
-       str_detect(q7_out, "tax") ~ 9,
-           str_detect(q7_out, "impots") ~ 9,
-               str_detect(q7_out, "santé") ~ 8,
-                   str_detect(q7_out, "crim[ei]") ~ 2,
-                       str_detect(q7_out, "job") ~ 6,
-                           str_detect(q7_out, "deficit") ~ 10,
-                               str_detect(q7_out, "debt") ~ 10,
-                                   str_detect(q7_out, "trudeau") ~ 0,
-                                   str_detect(q7_out, "ethic") ~ 3,
-                                       str_detect(q7_out, "immigr") ~ 12,
-                                           str_detect(q7_out, "pipeline") ~ 1,
-                                               str_detect(q7_out, "ecologie") ~ 1,
-  
-    TRUE ~ NA_real_
-  )) ->ces19phone
-ces19phone$mip
-
-val_labels(ces19phone$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, 
-                              Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15)
-
-ces19phone %>% 
-  mutate(mip_enviro=case_when(
-    mip==1~1,
-    TRUE~0
-  ))->ces19phone
-
+# ces19phone$q7_out<-tolower(ces19phone$q7)
+# #### Most important Problem for Environment ####
+# #convert mip to mip_cat
+# ces19phone$q7_out
+# 
+# ces19phone %>% 
+#   mutate(mip=case_when(
+#     str_detect(q7_out, "climat") ~ 1,
+#         str_detect(q7_out, "environ") ~ 1,
+#     str_detect(mip, "ecologie") ~1,
+#     str_detect(q7_out, "health") ~ 8,
+#        str_detect(q7_out, "tax") ~ 9,
+#            str_detect(q7_out, "impots") ~ 9,
+#                str_detect(q7_out, "santé") ~ 8,
+#                    str_detect(q7_out, "crim[ei]") ~ 2,
+#                        str_detect(q7_out, "job") ~ 6,
+#                            str_detect(q7_out, "deficit") ~ 10,
+#                                str_detect(q7_out, "debt") ~ 10,
+#                                    str_detect(q7_out, "trudeau") ~ 0,
+#                                    str_detect(q7_out, "ethic") ~ 3,
+#                                        str_detect(q7_out, "immigr") ~ 13,
+#                                            str_detect(q7_out, "pipeline") ~ 6,
+#                                                str_detect(q7_out, "ecologie") ~ 1,
+#                                                      str_detect(q7_out, "economy") ~ 6,
+#                                                    str_detect(q7_out, "économie") ~ 6,
+#                                                        str_detect(q7_out, "emploi") ~ 6,
+#                                                               str_detect(q7_out, "oil") ~ 5,
+#                                                               str_detect(q7_out, "gas") ~ 5,
+#                                                                   str_detect(q7_out, "nuclear") ~ 5,
+#     TRUE ~ NA_real_
+#   )) ->ces19phone
+# ces19phone$mip
+# 
+# val_labels(ces19phone$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs_Economy=6, Economy=7, Health=8, Taxes=9, 
+#                               Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Pipeline=20)
+# 
+# ces19phone %>% 
+#   mutate(mip_enviro=case_when(
+#     mip==1~1,
+#     TRUE~0
+#   ))->ces19phone
+# table(as_factor(ces19phone$mip))
 # Recode visible minority
 source(here('R_Scripts/2_14_ces_19_vismin_recode.R'))
 

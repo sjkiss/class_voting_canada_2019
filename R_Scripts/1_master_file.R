@@ -500,6 +500,20 @@ ces$ndp<-Recode(ces$vote, "3=1; 0:2=0; 4:5=0; NA=NA")
 ces$liberal<-Recode(ces$vote, "1=1; 2:5=0; NA=NA")
 ces$conservative<-Recode(ces$vote, "0:1=0; 2=1; 3:5=0; NA=NA")
 
+
+names(ces)
+
+#### Some occupatoin recodes ####
+#This collapses the two labour categories into one working class
+#so occupation2 is always 1 working class but no self-employed/.
+ces$occupation2<-Recode(as.factor(ces$occupation), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual'))
+
+#This collapses the two labour categories into one working class; maintaining self-employed as a unique distinction
+#occupation 4 is always 1 working class but with self-employed carved out. 
+ces$occupation4<-Recode(as.factor(ces$occupation3), "4:5='Working_Class' ; 3='Routine_Nonmanual' ; 2='Managers' ; 1='Professionals'; 6='Self-Employed'", levels=c('Working_Class', 'Managers', 'Professionals', 'Routine_Nonmanual', 'Self-Employed'))
+#make working class dichotomies out of ouccupation 4
+ces$working_cass3<-Recode(ces$occupation4, "'Working_Class'=1; else=0; NA=NA")
+ces$working_class4<-Recode(ces$occupation4, "'Working_Class'=1; else=0")
 ### Value labels often go missing in the creation of the ces data frame
 ### assign value label
 val_labels(ces$sector)<-c(Private=0, Public=1)
@@ -518,7 +532,7 @@ val_labels(ces$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, S
 val_labels(ces$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
 val_labels(ces$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 val_labels(ces$redistribution)<-c(Less=0, More=1)
-val_labels(ces$working_class)<-c(Other=0, Working_Class=1)
+
 
 ####
 names(ces)
@@ -544,4 +558,5 @@ theme_set(theme_bw())
 
 #source("R_scripts/7_class_logistic_models.R", echo=T)
 #source("R_scripts/8_block_recursive_models.R", echo=T)
+
 source("R_scripts/8_analysis_script.R", echo=T)
