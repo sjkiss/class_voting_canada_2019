@@ -835,5 +835,139 @@ ces15phone %>%
   ggplot(., aes(x=Variable, y=Average, col=occupation4))+geom_jitter()
 
 #### Most Important Issue ####
-# Here's how I would do this in a tidyverse kind of way.
-#Just start with the first data frame
+#MIP dummies
+ces19phone$mip_environment<-Recode(ces19phone$mip, "1=1; 2:15=0; 0=0; else=NA")
+ces19phone$mip_energy<-Recode(ces19phone$mip, "5=1; 6:15=0; 0:4=0; else=NA")
+ces19phone$mip_jobs<-Recode(ces19phone$mip, "6=1; 7:15=0; 0:5=0; else=NA")
+ces19phone$mip_economy<-Recode(ces19phone$mip, "7=1; 8:15=0; 0:6=0; else=NA")
+ces19phone$mip_tax<-Recode(ces19phone$mip, "9=1; 10:15=0; 0:8=0; else=NA")
+ces19phone$mip_immigration<-Recode(ces19phone$mip, "13=1; 14:15=0; 0=0; else=NA")
+ces19phone$mip_programs<-Recode(ces19phone$mip, "15=1; 0:14=0; else=NA")
+ces19phone$mip_education<-Recode(ces19phone$mip, "4=1; 5:15=0; 0:3=0; else=NA")
+ces19phone$mip_health<-Recode(ces19phone$mip, "8=1; 9:15=0; 0:7=0; else=NA")
+ces19phone$mip_ethics<-Recode(ces19phone$mip, "3=1; 4:15=0; 0:2=0; else=NA")
+
+library(knitr)
+library(kableExtra)
+
+#MIP by class
+ces19phone %>%
+  select(occupation4, mip_environment, mip_energy, mip_jobs, mip_economy, mip_tax, mip_immigration, mip_programs, mip_education, mip_health, mip_ethics) %>% 
+  group_by(occupation4) %>%
+  summarise_at(vars(mip_environment, mip_energy, mip_jobs, mip_economy, mip_tax, mip_immigration, mip_programs, mip_education, mip_health, mip_ethics), mean, na.rm=T)
+#Graph it
+ces19phone %>%
+  select(occupation4, mip_environment, mip_energy, mip_jobs, mip_economy, mip_tax, mip_immigration, mip_programs, mip_education, mip_health, mip_ethics) %>%
+  pivot_longer(-occupation4,values_to=c("Score"), names_to=c("Variable")) %>% 
+  group_by(occupation4, Variable) %>% 
+  summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sqrt(sd)/n) %>% 
+  ggplot(., aes(x=Variable, y=Average, col=occupation4))+geom_jitter()
+
+#MIP Voting
+#MIP Environment by class and vote
+ces19phone %>%
+  select(working_class4, mip_environment, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(working_class4, mip_environment) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "MIP_Environment Working Class Vote 2019.html"))
+
+#MIP Energy by class and vote
+ces19phone %>%
+  select(working_class4, mip_energy, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(working_class4, mip_energy) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "MIP_Energy Working Class Vote 2019.html"))
+
+#MIP Tax by class and vote
+ces19phone %>%
+  select(working_class4, mip_tax, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(working_class4, mip_tax) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "MIP_Tax Working Class Vote 2019.html"))
+
+#MIP Economy by class and vote
+ces19phone %>%
+  select(working_class4, mip_economy, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(working_class4, mip_economy) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "MIP_Economy Working Class Vote 2019.html"))
+
+#MIP Jobs by class and vote
+ces19phone %>%
+  select(working_class4, mip_jobs, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(working_class4, mip_jobs) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "MIP_Jobs Working Class Vote 2019.html"))
+
+#MIP Ethics by class and vote
+ces19phone %>%
+  select(working_class4, mip_ethics, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(working_class4, mip_ethics) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "MIP_Ethics Working Class Vote 2019.html"))
+
+#MIP Immigration by class and vote
+ces19phone %>%
+  select(working_class4, mip_immigration, liberal, conservative, ndp, bloc, green) %>% 
+  group_by(working_class4, mip_immigration) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "MIP_Immigration Working Class Vote 2019.html"))
+
+#MIP overall 
+table(ces19phone$mip, useNA="ifany")
+#MIP by class overall numbers
+# Percentage-wise per issue the working class is most concerned about energy, jobs and crime. Then immigration, taxes and economy.
+ces19phone %>% 
+  group_by(mip, working_class3) %>% 
+  summarize(n=n()) %>% 
+  filter(working_class3==1) %>% 
+  mutate(percent=n/sum(n))
+
+#Addressing MIP overall
+table(ces19phone$address_issue, useNA="ifany")
+#Addressing MIP by class overall numbers
+ces19phone %>% 
+  group_by(address_issue, working_class3) %>% 
+  summarize(n=n()) %>% 
+  filter(working_class3==1) %>% 
+  mutate(percent=n/sum(n))
+
+ces19phone %>% 
+  group_by(address_issue, working_class3) %>% 
+  summarize(n=n()) %>% 
+  filter(working_class3==1) %>% 
+  mutate(percent=n/sum(n))
+
+#Addressing MIP by class
+ces19phone %>%
+  select(occupation4, mip_environment, mip_energy, mip_jobs, mip_economy, mip_tax, mip_immigration, mip_programs, mip_education, mip_health, mip_ethics) %>% 
+  group_by(occupation4) %>%
+  summarise_at(vars(mip_environment, mip_energy, mip_jobs, mip_economy, mip_tax, mip_immigration, mip_programs, mip_education, mip_health, mip_ethics), mean, na.rm=T)
+
+#Addressing MIP Voting
+#Addressing MIP Environment by class and vote
+ces19phone %>%
+  filter(mip_environment==1) %>% 
+  select(mip_environment, working_class4, address_issue, liberal, conservative, ndp, bloc, green) %>% 
+  filter(mip_environment==1) %>% 
+  group_by(working_class4, address_issue) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Address MIP_Environment Working Class Vote 2019.html"))
+
+#Addressing MIP Economy by class and vote
+ces19phone %>%
+  filter(mip_economy==1) %>% 
+  select(mip_economy, working_class4, address_issue, liberal, conservative, ndp, bloc, green) %>% 
+  filter(mip_economy==1) %>% 
+  group_by(working_class4, address_issue) %>%
+  summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
+  as.data.frame() %>% 
+  stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Address MIP_Economy Working Class Vote 2019.html"))
