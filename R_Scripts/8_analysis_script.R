@@ -889,18 +889,41 @@ singh3.qc<-lm(ndp_leader~(immigration+minorities_help)*working_class4, data=ces1
 stargazer(singh1.roc, singh2.roc, singh1.qc, singh2.qc,type="text", out=here("Tables", "singh_approval_interactions.html"), covariate.labels=c("Immigration", "Help Minorities", "Environment", "Working Class", "Immigration* Working Class", "Help Minorities * Working Class", "Environment * Working Class"), dep.var.caption="Approval of Jagmeet Singh, 2019, Outside of Quebec", dep.var.labels=c("Singh Thermometer Rating"), column.labels=c(rep("ROC",3), rep("QC", 3)))
 
 #### Continentalism and Jobs ####
+val_labels(out$mip)
+out %>% 
+  mutate(mip_enviro=case_when(
+    mip==7~1,
+    TRUE~0
+  ))->out
+out %>% 
+  mutate(mip_jobs=case_when(
+    mip==6~1,
+    mip==7~1,
+    TRUE~0
+  ))->out
+
 out %>% 
   nest(-survey) %>% 
-  mutate(ndp_continentalism=map(data, function(x) glm(ndp~quebec+degree+old+male+working_class4+continentalism, data=x)), 
-        ndp_continentalism1=map(data, function(x) glm(ndp~quebec+degree+old+male+working_class4*continentalism, data=x)))->jobs_models
+  mutate(ndp_continentalism=map(data, function(x) glm(ndp~quebec+degree+old+male+working_class4+continentalism,family="binomial", data=x)), 
+        ndp_continentalism1=map(data, function(x) glm(ndp~quebec+degree+old+male+working_class4*continentalism, family="binomial", data=x)),
+       ndp_redisribution=map(data, function(x) glm(ndp~quebec+degree+old+male+working_class4+redistribution, family="binomial", data=x)), 
+        ndp_redistribution1=map(data, function(x) glm(ndp~quebec+degree+old+male+working_class4*redistribution,family="binomial",  data=x)), 
+       ndp_enviro=map(data, function(x) glm(ndp~quebec+degree+old+male+working_class4+mip_enviro,family="binomial",  data=x)), 
+        ndp_enviro1=map(data, function(x) glm(ndp~quebec+degree+old+male+working_class4*mip_enviro, family="binomial", data=x)),       
+       ndp_jobs=map(data, function(x) glm(ndp~quebec+degree+old+male+working_class4+mip_jobs,family="binomial",  data=x)), 
+        ndp_jobs1=map(data, function(x) glm(ndp~quebec+degree+old+male+working_class4*mip_jobs, family="binomial", data=x))
+        )->jobs_models
 
-stargazer(
-  list(jobs_models$ndp_continentalism, jobs_models$ndp_continentalism1),
-  column.labels=rep(c("2015", "2019"), 2),
-  type="html",
-  out=here("Tables/jobs_models.html"),
-  omit=c(1:5)
-)
+stargazer(list(jobs_models$ndp_continentalism,
+               jobs_models$ndp_continentalism1,
+               jobs_models$ndp_redisribution,
+               jobs_models$ndp_redistribution1,
+               jobs_models$ndp_enviro,
+               jobs_models$ndp_enviro1,
+               jobs_models$ndp_jobs,
+               jobs_models$ndp_jobs1), type="html", 
+          column.labels=c(rep(c("2015", "2019"), 8)),
+          out=here("Tables/jobs_models_ndp.html"))
 
 
 #### Redistribution descriptives ####
