@@ -23,6 +23,10 @@ ces19web %>%
   filter(is.na(NOC)==F&is.na(occupation)==T) %>% 
   select(NOC, occupation)
 
+#### Check the MIP Problems have been added ####
+ces19phone$mip
+
+
 #### SPLITTING THE 1979-1980 FILE ####
 table(ces7980$male80)
 names(ces7980)

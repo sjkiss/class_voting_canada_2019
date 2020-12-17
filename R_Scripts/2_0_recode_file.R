@@ -50,7 +50,7 @@ here("R_Scripts/2_ces65_recode.R")
 # source(here("R_Scripts/2_10_ces97_recode.R"))
 # source(here("R_Scripts/2_11_ces00_recode.R"))
 # source(here("R_Scripts/2_12_ces0411_recode.R"))
-# source(here("R_Scripts/2_13_ces15_recode.R"), echo=T)
+ source(here("R_Scripts/2_13_ces15_recode.R"), echo=T)
 source(here("R_Scripts/2_14_ces19_recode.R"), echo=T)
 #source(here("R_Scripts/2_15_ces19_web_recode.R"), echo=T)
 #This saves the ojbects that we 
@@ -63,7 +63,7 @@ source(here("R_Scripts/2_14_ces19_recode.R"), echo=T)
 library(cgwtools)
 
 #use resave to update the file recoded_cesdata.Rdata with just *one* specific file. All other files in recoded_cesdata.rdata are *untouched*. If you want you can update more than one file and all others are still untouched
-resave(ces19phone, file="Data/recoded_cesdata.Rdata")
+resave(ces15phone, ces19phone, file="Data/recoded_cesdata.Rdata")
 detach('package:cgwtools')
 #now clear everything out
 

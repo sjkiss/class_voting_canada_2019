@@ -65,20 +65,6 @@ ces15phone$region3<-Recode(as.factor(ces15phone$region), "1='East' ; 2='Ontario'
 levels(ces15phone$region3)
 table(ces15phone$region3)
 
-#This line collapses jobs and economy in the 2015 CES just for the present purposes
-ces15phone$mip<-Recode(ces15phone$mip, "7=6")
-ces15phone %>% 
-  mutate(mip_enviro=case_when(
-    mip==1~1,
-    TRUE ~1
-  ),
-  mip_jobs=case_when(
-    mip==6~1,
-    TRUE~1
-  )
-  )->ces15phone
-val_labels(ces15phone$mip_enviro)<-c(Other=0, Environment=1)
-val_labels(ces15phone$mip_jobs)<-c(Other=0, Jobs_Economy=1)
 #Other dummies
 ces15phone$low_income<-Recode(ces15phone$income, "2:5=0; 1=1")
 ces15phone$high_income<-Recode(ces15phone$income, "1:4=0; 5=1")
@@ -174,20 +160,6 @@ ces19phone$region3<-Recode(as.factor(ces19phone$region), "1='East' ; 2='Ontario'
 levels(ces19phone$region3)
 table(ces19phone$region3)
 
-#This creates two mip enviro and mip jobs dummies
-ces19phone %>% 
-  mutate(mip_enviro=case_when(
-    mip==1~1,
-    TRUE ~1
-  ),
-  mip_jobs=case_when(
-    mip==6~1,
-    TRUE~1
-  )
-  )->ces19phone
-
-val_labels(ces19phone$mip_enviro)<-c(Other=0, Environment=1)
-val_labels(ces19phone$mip_jobs)<-c(Other=0, Jobs_Economy=1)
 
 #Other dummies
 ces19phone$low_income<-Recode(ces19phone$income, "2:5=0; 1=1")
@@ -364,8 +336,8 @@ out15 %>%
   bind_rows(., out19)->out
 #Value Labels
 val_labels(out$working_class4)<-c(Other=0, Working_class=1)
-val_labels(out$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs_Economy=6, Economy=7, Health=8, Taxes=9, 
-                              Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Pipeline=20)
+val_labels(out$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, 
+                              Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15)
 
 #Split out into ROC 
 roc<-out %>% 
@@ -700,7 +672,6 @@ tidy(test1)
 #The sign for market liberalism is just reversed, so it works. 
 rm(test1, test2, test3)
 
-#Policy rating changes
 #Start with tghe combined 15 and 19 data frame
 out %>% 
   #select the variables we need for the attitudinal shifts
@@ -720,8 +691,69 @@ rename(., `Moral Traditionalism`=1, `Market Liberalism`=2, `Continentalism`=3, D
  ggplot(., aes(x=fct_relevel(occupation4, "Working_Class", "Routine_Nonmanual", "Self-Employed", "Professionals", "Managers"), y=mod$estimate))+labs(x="Class", y="Difference (2019-2015)", subtitle="CES 2015 and 2019", col="Region")+geom_point(aes(col=quebec), size=0.5,position=position_dodge(width=0.5))+facet_wrap(~name)+coord_flip(expand=T, clip="off")+geom_hline(aes(yintercept=0), linetype=2)+scale_color_grey(start=0.2 ,end=0.5)+geom_linerange(aes(ymin=mod$conf.low, ymax=mod$conf.high, col=quebec), position=position_dodge(width=0.5))
 ggsave(here("Plots", "attitudinal_differences_2015_2019.png"), width=6, height=4)
 
+#### Most Important Issue Changes####
+table(as_factor(out$mip), out$survey)
+out %>% 
+  group_by(survey, mip) %>% 
+  summarize(n=n()) %>% 
+  arrange(desc(n)) %>% 
+  as_factor() %>% 
+print(n=100)
+val_labels(out$mip)
 
-#Leader rating changes
+out %>% 
+  mutate(mip2=case_when(
+      #Other=0
+  mip==0~0,
+    #Environment=1
+  mip==1~1,
+#Crime = Other
+mip==2~0,
+#Ethics=2
+mip==3~2,
+#Welfare=3
+mip==4~3,
+#Energy=4
+mip==5~4,
+  #Jobs==5
+  mip==6~5,
+  #Economy=5
+  mip==7~5,
+  #Health=3
+  mip==8~3,
+  #Taxes=6
+mip==9 ~6,
+#Debt-Deficit=0
+mip==10~0,
+#Democracy=2
+mip==11~2,
+#Foreign Affairs==7
+mip==12~7,
+  #Immigratio=8
+  mip==13~8,
+  #SocioCultural ==0
+  mip>14~0,
+#Social Programs==3
+  mip==15~3,
+  TRUE~ NA_real_
+  ))->out
+
+val_labels(out$mip2)<-c(Other=0, Environment=1, Ethics=2, Welfare=3, Energy=4,Jobs_Economy=5, Taxes=6, Foreign_Affairs=7, Immigration=8)
+
+
+out %>% 
+group_by(survey, occupation4,`Most Important Problem`=as_factor(mip2)) %>% 
+  summarise(n=n()) %>%
+  rename(Class=occupation4) %>% 
+    filter(!is.na(`Most Important Problem`)) %>%
+  mutate(pct=n/sum(n)) %>% 
+  #filter(!is.na(Class)) %>% 
+  mutate(Election=car::Recode(survey, "0=2015; 1=2019", as.factor=T, levels=c("2015","2019")))%>% 
+  ggplot(., aes(x=`Most Important Problem`, y=pct, fill=fct_relevel(Class, "Working_Class", "Routine_Nonmanual", "Professionals", "Self-Employed", "Managers")))+geom_col(position = position_dodge(preserve = "single"))+labs(y="Most Important Problem")+facet_grid(~Election)+scale_fill_grey(name="Class", na.value="black", start=0.2, end=0.8,guide = guide_legend(reverse = T) )+coord_flip()
+ggsave("Plots/mip_bar_2015_2019.png", width=8, height=4)
+
+
+####Leader rating changes ####
 out %>% 
   select(`Liberal`=liberal_leader, `Conservative`=conservative_leader, `NDP`=ndp_leader, `BQ`=bloc_leader, Survey=survey, Class=occupation4, Quebec=quebec) %>%
   filter(!is.na(Quebec)) %>% 
@@ -732,19 +764,8 @@ out %>%
   ggplot(., aes(x=fct_relevel(Class, "Working_Class", "Routine_Nonmanual", "Self-Employed", "Professionals", "Managers"), y=mod$estimate*-1, col=Quebec))+geom_point(position=position_dodge(width=0.2))+ylim(-0.2,0.2)+labs(x="Class", y="Difference (2019-2015)")+coord_flip()+scale_color_grey()+facet_wrap(~Party)+geom_hline(yintercept=0, linetype=2)+geom_linerange(aes(ymin=mod$conf.low*-1, ymax=mod$conf.high*-1), position=position_dodge(width=0.2))
 ggsave(here("Plots", "leader_approval_ratings.png"), width=6, height=4)
 names(out)
-#### Most Important Issue ####
 
-out %>% 
-group_by(survey, `Most Important Problem`=as_factor(mip)) %>% 
-  summarise(n=n()) %>%  
-  mutate(pct=n/sum(n)) %>% 
-  mutate(Election=car::Recode(survey, "0=2015; 1=2019", as.factor=T, levels=c("2019", "2015")))%>% 
-  filter(!is.na(`Most Important Problem`)) %>% 
-  ggplot(., aes(y=fct_reorder(`Most Important Problem`,n), x=n, fill=Election, .desc=F))+geom_col(position = position_dodge(preserve = "single"))+scale_fill_grey()+labs(y="Most Important Problem")
 
-ggsave("Plots/mip_2015_2019.png")
-table(ces15phone$mip)
-table(ces15phone$mip)
 #### Correlates of Working Class Vote ####
 
 out %>%   
@@ -885,8 +906,8 @@ stargazer(
 #### Redistribution descriptives ####
 #Redistribution point plot
 ces %>% 
-  select(election, working_class, redistribution, vote, quebec) %>% 
-  group_by(election, working_class, quebec, vote) %>% 
+  select(election, working_class4, redistribution, vote, quebec) %>% 
+  group_by(election, working_class4, quebec, vote) %>% 
     filter(!is.na(quebec)) %>% 
     filter(vote>0 &vote<4) %>% 
   summarize(avg=mean(redistribution, na.rm=T)) %>% 

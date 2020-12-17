@@ -570,7 +570,6 @@ ces15phone$mip<-Recode(ces15phone$CPS15_1, "75=1; 71=2; 77=2; 18=2; 4=2; 5=3; 2=
                                                   80:82=0; 84=0; 92:97=0; 6=0; 8=0; 46=0; 31:33=0; 58:59=0; 35=0; 1=0; else=NA")
 val_labels(ces15phone$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, 
                               Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15)
-table(ces15phone$mip, useNA="ifany")
 
 #### Visible minority status####
 ces15phone$CPS15_85
