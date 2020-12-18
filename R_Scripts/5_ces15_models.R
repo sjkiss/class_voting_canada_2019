@@ -650,3 +650,16 @@ ces15phone %>%
   summarize(n=n()) %>% 
   filter(working_class3==1) %>% 
   mutate(percent=n/sum(n))
+
+#Managing economy by class
+ces15phone %>%
+  select(occupation4, liberal_economy, conservative_economy, ndp_economy, bloc_economy, green_economy) %>% 
+  group_by(occupation4) %>%
+  summarise_at(vars(liberal_economy, conservative_economy, ndp_economy, bloc_economy, green_economy), mean, na.rm=T)
+#Graph it
+ces15phone %>%
+  select(occupation4, liberal_economy, conservative_economy, ndp_economy, bloc_economy, green_economy) %>%
+  pivot_longer(-occupation4,values_to=c("Score"), names_to=c("Variable")) %>% 
+  group_by(occupation4, Variable) %>% 
+  summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sqrt(sd)/n) %>% 
+  ggplot(., aes(x=Variable, y=Average, col=occupation4))+geom_jitter()

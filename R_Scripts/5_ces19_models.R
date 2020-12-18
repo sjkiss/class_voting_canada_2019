@@ -971,3 +971,42 @@ ces19phone %>%
   summarise_at(vars(liberal, conservative, ndp, bloc, green), mean, na.rm=T) %>% 
   as.data.frame() %>% 
   stargazer(., type="html", summary=F, digits=2, out=here("Tables", "Address MIP_Economy Working Class Vote 2019.html"))
+
+#Managing economy by class
+ces19phone %>%
+  select(occupation4, liberal_economy, conservative_economy, ndp_economy, bloc_economy, green_economy) %>% 
+  group_by(occupation4) %>%
+  summarise_at(vars(liberal_economy, conservative_economy, ndp_economy, bloc_economy, green_economy), mean, na.rm=T)
+#Graph it
+ces19phone %>%
+  select(occupation4, liberal_economy, conservative_economy, ndp_economy, bloc_economy, green_economy) %>%
+  pivot_longer(-occupation4,values_to=c("Score"), names_to=c("Variable")) %>% 
+  group_by(occupation4, Variable) %>% 
+  summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sqrt(sd)/n) %>% 
+  ggplot(., aes(x=Variable, y=Average, col=occupation4))+geom_jitter()
+
+#Managing environment by class
+ces19phone %>%
+  select(occupation4, liberal_environment, conservative_environment, ndp_environment, bloc_environment, green_environment) %>% 
+  group_by(occupation4) %>%
+  summarise_at(vars(liberal_environment, conservative_environment, ndp_environment, bloc_environment, green_environment), mean, na.rm=T)
+#Graph it
+ces19phone %>%
+  select(occupation4, liberal_environment, conservative_environment, ndp_environment, bloc_environment, green_environment) %>%
+  pivot_longer(-occupation4,values_to=c("Score"), names_to=c("Variable")) %>% 
+  group_by(occupation4, Variable) %>% 
+  summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sqrt(sd)/n) %>% 
+  ggplot(., aes(x=Variable, y=Average, col=occupation4))+geom_jitter()
+
+#Address Issue by class
+ces19phone %>%
+  select(occupation4, liberal_issue, conservative_issue, ndp_issue, bloc_issue, green_issue) %>% 
+  group_by(occupation4) %>%
+  summarise_at(vars(liberal_issue, conservative_issue, ndp_issue, bloc_issue, green_issue), mean, na.rm=T)
+#Graph it
+ces19phone %>%
+  select(occupation4, liberal_issue, conservative_issue, ndp_issue, bloc_issue, green_issue) %>%
+  pivot_longer(-occupation4,values_to=c("Score"), names_to=c("Variable")) %>% 
+  group_by(occupation4, Variable) %>% 
+  summarize(Average=mean(Score, na.rm=T), n=n(), sd=sd(Score, na.rm=T), se=sqrt(sd)/n) %>% 
+  ggplot(., aes(x=Variable, y=Average, col=occupation4))+geom_jitter()
