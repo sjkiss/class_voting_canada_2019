@@ -320,12 +320,13 @@ stargazer(m1.all, m1.roc, m1.qc, m2.all, m2.roc, m2.qc, type="html", out=here("T
 
 #First make a ces15 roc data frame
 ces15phone %>% 
-  select(ndp, liberal, conservative, bloc, region3, working_class4, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language,          market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, liberal_economy, ndp_economy, conservative_economy, bloc_economy, 
+  select(ndp, liberal, conservative, bloc, region3, working_class4, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language,          market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, 
+         ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, liberal_economy, ndp_economy, conservative_economy, bloc_economy, green_economy,
          national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip, vismin, vote)->out15
 #Now an ces19data frame
 ces19phone %>% 
 #  filter(quebec!=1) %>% 
-  select(ndp, liberal, conservative, bloc, region3, working_class4, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, liberal_environment, ndp_environment, conservative_environment,
+  select(ndp, liberal, conservative, bloc, region3, working_class4, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, liberal_environment, ndp_environment, conservative_environment, bloc_enviroment, green_environment, green_economy, green_issue,
          market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, liberal_economy, ndp_economy, conservative_economy, bloc_economy, liberal_issue, conservative_issue, ndp_issue,
          national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip, vismin, vote)->out19
 
