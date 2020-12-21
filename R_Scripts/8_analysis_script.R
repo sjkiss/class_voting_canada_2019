@@ -750,7 +750,7 @@ group_by(survey, occupation4,`Most Important Problem`=as_factor(mip2)) %>%
   mutate(pct=n/sum(n)) %>% 
   #filter(!is.na(Class)) %>% 
   mutate(Election=car::Recode(survey, "0=2015; 1=2019", as.factor=T, levels=c("2015","2019")))%>% 
-  ggplot(., aes(x=`Most Important Problem`, y=pct, fill=fct_relevel(Class, "Working_Class", "Routine_Nonmanual", "Professionals", "Self-Employed", "Managers")))+geom_col(position = position_dodge(preserve = "single"))+labs(y="Most Important Problem")+facet_grid(~Election)+scale_fill_grey(name="Class", na.value="black", start=0.2, end=0.8,guide = guide_legend(reverse = T) )+coord_flip()
+  ggplot(., aes(x=`Most Important Problem`, y=pct, fill=fct_relevel(Class, "Working_Class", "Routine_Nonmanual", "Professionals", "Self-Employed", "Managers")))+geom_col(position = position_dodge(preserve = "single"))+labs(x="Most Important Problem", y="Percent")+facet_grid(~Election)+scale_fill_grey(name="Class", na.value="black", start=0.2, end=0.8,guide = guide_legend(reverse = T) )+coord_flip()
 ggsave("Plots/mip_bar_2015_2019.png", width=8, height=4)
 
 
