@@ -321,13 +321,13 @@ stargazer(m1.all, m1.roc, m1.qc, m2.all, m2.roc, m2.qc, type="html", out=here("T
 #First make a ces15 roc data frame
 ces15phone %>% 
   select(ndp, liberal, conservative, bloc, region3, working_class4, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language,          market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, 
-         ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, liberal_economy, ndp_economy, conservative_economy, bloc_economy, green_economy,
+         ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, manage_economy, liberal_economy, ndp_economy, conservative_economy, bloc_economy, green_economy,
          national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip, vismin, vote)->out15
 #Now an ces19data frame
 ces19phone %>% 
 #  filter(quebec!=1) %>% 
-  select(ndp, liberal, conservative, bloc, region3, working_class4, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, liberal_environment, ndp_environment, conservative_environment, bloc_enviroment, green_environment, green_economy, green_issue,
-         market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, liberal_economy, ndp_economy, conservative_economy, bloc_economy, liberal_issue, conservative_issue, ndp_issue,
+  select(ndp, liberal, conservative, bloc, region3, working_class4, union_both, young, old, male, sector, catholic, no_religion, degree, foreign, low_income, high_income, language, liberal_environment, ndp_environment, conservative_environment, bloc_environment, green_environment, green_economy, green_issue,
+         market_liberalism, moral_traditionalism, political_disaffection, continentalism, quebec_sovereignty, ndp_id, liberal_id, conservative_id, bloc_id, personal_retrospective, manage_economy, manage_environment, address_issue,liberal_economy, ndp_economy, conservative_economy, bloc_economy, liberal_issue, conservative_issue, ndp_issue,
          national_retrospective, immigration_rate, environment, redistribution, defence, liberal_leader, conservative_leader, ndp_leader, bloc_leader, quebec, occupation4, minorities, immigration, immigration2, immigration_rate, minorities_help, mip, vismin, vote)->out19
 
 #### Build out combining ces2015 and 2019 ####
@@ -753,8 +753,24 @@ group_by(survey, occupation4,`Most Important Problem`=as_factor(mip2)) %>%
   ggplot(., aes(x=`Most Important Problem`, y=pct, fill=fct_relevel(Class, "Working_Class", "Routine_Nonmanual", "Professionals", "Self-Employed", "Managers")))+geom_col(position = position_dodge(preserve = "single"))+labs(y="Most Important Problem")+facet_grid(~Election)+scale_fill_grey(name="Class", na.value="black", start=0.2, end=0.8,guide = guide_legend(reverse = T) )+coord_flip()
 ggsave("Plots/mip_bar_2015_2019.png", width=8, height=4)
 
-#### Valence ####
 
+#### Performance ####
+val_labels(out$manage_economy)
+val_labels(out$address_issue)
+val_labels(out$manage_environment)
+out %>% 
+  select(survey, occupation4, manage_economy, address_issue, manage_environment) %>%
+  rename(Election=survey, Class=occupation4, `Manage Economy`=manage_economy, `Address Issue`=address_issue, `Manage Environment`=manage_environment) %>% 
+  pivot_longer(cols=c(`Manage Economy`, `Address Issue`, `Manage Environment`), names_to=c("Issue"), values_to=c("Party")) %>% 
+  as_factor() %>% 
+  group_by(Election, Class, Issue, Party) %>% 
+filter(!is.na(Party)) %>% 
+  summarize(n=n()) %>% 
+  mutate(pct=n/sum(n), 
+         Election=Recode(Election, "0=2015;1=2019", as.factor=T, levels=c("2019", "2015"))) %>%
+  filter(Party!="Bloc"&Party!="Green") %>% 
+  ggplot(., aes(x=pct, y=fct_relevel(Class, "Working_Class", "Routine_Nonmanual", "Self-Employed", "Professionals", "Managers"), fill=Election))+geom_col(position="dodge")+facet_grid(Party~fct_relevel(Issue, "Manage Economy", "Address Issue", "Manage Environment"))+scale_fill_grey(start=0.2, end=0.8, guide = guide_legend(reverse = T))+xlim(0,1)+labs(y="Class")
+ggsave(filename=here("Plots/performance_2015_2019.png"))
 ####Leader rating changes ####
 out %>% 
   select(`Liberal`=liberal_leader, `Conservative`=conservative_leader, `NDP`=ndp_leader, `BQ`=bloc_leader, Survey=survey, Class=occupation4, Quebec=quebec) %>%
@@ -890,7 +906,7 @@ singh3.qc<-lm(ndp_leader~(immigration+minorities_help)*working_class4, data=ces1
 
 stargazer(singh1.roc, singh2.roc, singh1.qc, singh2.qc,type="text", out=here("Tables", "singh_approval_interactions.html"), covariate.labels=c("Immigration", "Help Minorities", "Environment", "Working Class", "Immigration* Working Class", "Help Minorities * Working Class", "Environment * Working Class"), dep.var.caption="Approval of Jagmeet Singh, 2019, Outside of Quebec", dep.var.labels=c("Singh Thermometer Rating"), column.labels=c(rep("ROC",3), rep("QC", 3)))
 
-#### Continentalism and Jobs ####
+
 # val_labels(out$mip)
 # out %>% 
 #   mutate(mip_enviro=case_when(
@@ -1020,7 +1036,6 @@ group_by(survey, vote, pro_redistribution) %>%
   summarize(average=mean(moral_traditionalism)) %>% 
   filter(vote>0&vote<4) %>% 
   filter(!is.na(pro_redistribution)) %>% 
-  View()
   ggplot(., aes(x=vote, y=average, col=as_factor(pro_redistribution)))+facet_grid(survey~as_factor(vote))+geom_jitter()+ylim(c(0,1))
 
 

@@ -418,6 +418,7 @@ table(ces15phone$Conservative_rating)
 
 #recode Manage economy (CPS15_40b)
 look_for(ces15phone, "economy")
+ces15phone$CPS15_40b
 ces15phone$manage_economy<-Recode(ces15phone$CPS15_40b, "1=1; 2=2; 3=3; 4=4; 0=5; else=NA")
 val_labels(ces15phone$manage_economy)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks

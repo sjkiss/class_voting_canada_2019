@@ -390,8 +390,10 @@ table(ces19phone$Conservative_rating)
 
 #recode Manage economy (q33)
 look_for(ces19phone, "economy")
-ces19phone$manage_economy<-Recode(ces19phone$q33, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
-val_labels(ces19phone$manage_economy)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+ces19phone$q33
+
+ces19phone$manage_economy<-Recode(ces19phone$q33, "1=1; 2=2; 3=3; 4=4; 5=5; 7=NA; 6=2; else=NA")
+val_labels(ces19phone$manage_economy)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
 val_labels(ces19phone$manage_economy)
 table(ces19phone$manage_economy)
@@ -399,16 +401,16 @@ table(ces19phone$manage_economy)
 #recode Manage environment (q34)
 look_for(ces19phone, "environment")
 
-ces19phone$manage_environment<-Recode(ces19phone$q34, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
-val_labels(ces19phone$manage_environment)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+ces19phone$manage_environment<-Recode(ces19phone$q34, "1=1; 2=2; 3=3; 4=4; 5=5; 7=NA; 6=2; else=NA")
+val_labels(ces19phone$manage_environment)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
 val_labels(ces19phone$manage_environment)
 table(ces19phone$manage_environment)
 
 #recode Addressing Main Issue (q8)
 look_for(ces19phone, "issue")
-ces19phone$address_issue<-Recode(ces19phone$q8, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
-val_labels(ces19phone$address_issue)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+ces19phone$address_issue<-Recode(ces19phone$q8, "1=1; 2=2; 3=3; 4=4; 5=5; 7=NA; 6=2; else=NA")
+val_labels(ces19phone$address_issue)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
 val_labels(ces19phone$address_issue)
 table(ces19phone$address_issue)
