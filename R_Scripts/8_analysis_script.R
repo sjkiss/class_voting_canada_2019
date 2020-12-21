@@ -739,7 +739,7 @@ mip==12~7,
   TRUE~ NA_real_
   ))->out
 
-val_labels(out$mip2)<-c(Other=0, Environment=1, Ethics=2, Welfare=3, Energy=4,Jobs_Economy=5, Taxes=6, Foreign_Affairs=7, Immigration=8)
+val_labels(out$mip2)<-c(Other=0, Environment=1, Ethics=2, Social_Welfare=3, Energy=4,Jobs_Economy=5, Taxes=6, Foreign_Affairs=7, Immigration=8)
 
 
 out %>% 
